@@ -261,6 +261,13 @@ const local: App.I18n.Schema = {
         sendCodeSuccess: '验证码发送成功',
         imageCodePlaceholder: '请输入图片验证码'
       },
+      captchaLogin: {
+        title: '图形验证码登录',
+        imageCodePlaceholder: '请输入图形验证码',
+        refreshCaptcha: '刷新验证码',
+        getCaptchaSuccess: '验证码已获取',
+        getCaptchaFail: '验证码获取失败'
+      },
       register: {
         title: '注册账号',
         agreement: '我已经仔细阅读并接受',

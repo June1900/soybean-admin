@@ -16,5 +16,17 @@ declare namespace Api {
       roles: string[];
       buttons: string[];
     }
+
+    /** Image captcha returned by `/base/captcha` */
+    interface Captcha {
+      /** captcha id, used to verify when login */
+      captchaId: string;
+      /** base64 image data url */
+      picPath: string;
+      /** length of the captcha code */
+      captchaLength: number;
+      /** whether captcha verification is enabled */
+      openCaptcha: boolean;
+    }
   }
 }

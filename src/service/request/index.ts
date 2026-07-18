@@ -32,9 +32,11 @@ export const request = createFlatRequest(
       return config;
     },
     isBackendSuccess(response) {
-      // when the backend response code is "0000"(default), it means the request is success
-      // to change this logic by yourself, you can modify the `VITE_SERVICE_SUCCESS_CODE` in `.env` file
-      return String(response.data.code) === import.meta.env.VITE_SERVICE_SUCCESS_CODE;
+      // 后端约定：code 为 0 或 200（以及环境变量 VITE_SERVICE_SUCCESS_CODE 配置的值）均表示请求成功
+      const successCodes = import.meta.env.VITE_SERVICE_SUCCESS_CODE
+        ? [import.meta.env.VITE_SERVICE_SUCCESS_CODE, '0', '200']
+        : ['0', '200'];
+      return successCodes.includes(String(response.data.code));
     },
     async onBackendFail(response, instance) {
       const authStore = useAuthStore();
@@ -92,7 +94,7 @@ export const request = createFlatRequest(
           const Authorization = getAuthorization();
           Object.assign(response.config.headers, { Authorization });
 
-          return instance.request(response.config) as Promise<AxiosResponse>;
+          return (await instance.request(response.config)) as unknown as Promise<AxiosResponse>;
         }
       }
 

@@ -2,7 +2,7 @@ import { computed, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { defineStore } from 'pinia';
 import { useLoading } from '@sa/hooks';
-import { fetchGetUserInfo, fetchLogin } from '@/service/api';
+import { fetchGetUserInfo, fetchLogin, fetchLoginByCaptcha } from '@/service/api';
 import { useRouterPush } from '@/hooks/common/router';
 import { localStg } from '@/utils/storage';
 import { SetupStoreId } from '@/enum';
@@ -128,6 +128,63 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
     endLoading();
   }
 
+  /**
+   * Login with image captcha
+   *
+   * @param username User name
+   * @param password Password
+   * @param captcha Captcha code typed by user
+   * @param captchaId Captcha id returned by `/base/captcha`
+   * @param [openCaptcha=true] Whether captcha verification is enabled
+   * @param [redirect=true] Whether to redirect after login. Default is `true`
+   */
+  async function loginByCaptcha(
+    username: string,
+    password: string,
+    captcha: string,
+    captchaId: string,
+    openCaptcha = true,
+    redirect = true
+  ): Promise<boolean> {
+    startLoading();
+
+    const { data: loginToken, error } = await fetchLoginByCaptcha({
+      username,
+      password,
+      captcha,
+      captchaId,
+      openCaptcha
+    });
+
+    let pass = false;
+
+    if (!error) {
+      pass = await loginByToken(loginToken);
+
+      if (pass) {
+        // Check if the tab needs to be cleared
+        const isClear = checkTabClear();
+        let needRedirect = redirect;
+
+        if (isClear) {
+          // If the tab needs to be cleared,it means we don't need to redirect.
+          needRedirect = false;
+        }
+        await redirectFromLogin(needRedirect);
+
+        window.$notification?.success({
+          title: $t('page.login.common.loginSuccess'),
+          content: $t('page.login.common.welcomeBack', { userName: userInfo.userName }),
+          duration: 4500
+        });
+      }
+    }
+
+    endLoading();
+
+    return pass;
+  }
+
   async function loginByToken(loginToken: Api.Auth.LoginToken) {
     // 1. stored in the localStorage, the later requests need it in headers
     localStg.set('token', loginToken.token);
@@ -179,6 +236,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
     loginLoading,
     resetStore,
     login,
+    loginByCaptcha,
     initUserInfo
   };
 });

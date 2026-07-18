@@ -60,13 +60,14 @@ export function useRouterPush(inSetup = true) {
    * @param redirectUrl The redirect url, if not specified, it will be the current route fullPath
    */
   async function toLogin(loginModule?: UnionKey.LoginModule, redirectUrl?: string) {
-    const module = loginModule || 'pwd-login';
+    const options: App.Global.RouterPushOptions = {};
 
-    const options: App.Global.RouterPushOptions = {
-      params: {
-        module
-      }
-    };
+    // Only pass `module` when a specific login module is requested. The login route
+    // path only matches the legacy modules, so omitting it lets the page default to
+    // captcha login (the current project temporarily disables switching login types).
+    if (loginModule) {
+      options.params = { module: loginModule };
+    }
 
     const redirect = redirectUrl || route.value.fullPath;
 

@@ -101,6 +101,9 @@ async function handleAccountLogin(account: Account) {
         <NButton class="flex-1" block @click="toggleLoginModule('code-login')">
           {{ $t(loginModuleRecord['code-login']) }}
         </NButton>
+        <NButton class="flex-1" block @click="toggleLoginModule('captcha-login')">
+          {{ $t(loginModuleRecord['captcha-login']) }}
+        </NButton>
         <NButton class="flex-1" block @click="toggleLoginModule('register')">
           {{ $t(loginModuleRecord.register) }}
         </NButton>

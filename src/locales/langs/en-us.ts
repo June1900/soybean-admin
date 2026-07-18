@@ -265,6 +265,13 @@ const local: App.I18n.Schema = {
         sendCodeSuccess: 'Verification code sent successfully',
         imageCodePlaceholder: 'Please enter image verification code'
       },
+      captchaLogin: {
+        title: 'Captcha Login',
+        imageCodePlaceholder: 'Please enter image verification code',
+        refreshCaptcha: 'Refresh captcha',
+        getCaptchaSuccess: 'Captcha fetched',
+        getCaptchaFail: 'Failed to fetch captcha'
+      },
       register: {
         title: 'Register',
         agreement: 'I have read and agree to',

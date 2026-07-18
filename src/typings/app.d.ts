@@ -514,6 +514,13 @@ declare namespace App {
             sendCodeSuccess: string;
             imageCodePlaceholder: string;
           };
+          captchaLogin: {
+            title: string;
+            imageCodePlaceholder: string;
+            refreshCaptcha: string;
+            getCaptchaSuccess: string;
+            getCaptchaFail: string;
+          };
           register: {
             title: string;
             agreement: string;
