@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import type { Ref, VNodeChild } from 'vue';
 import useBoolean from './use-boolean';
 import useLoading from './use-loading';
@@ -24,6 +24,11 @@ export type TableColumnCheck = {
   checked: boolean;
   visible: boolean;
   fixed: 'left' | 'right' | 'unFixed';
+  /**
+   * locked columns (e.g. the table operation column) cannot be hidden or moved
+   * via the column settings; they are always shown, pinned to the right.
+   */
+  lock?: boolean;
 };
 
 export interface UseTableOptions<ResponseData, ApiData, Column, Pagination extends boolean> {
@@ -83,11 +88,19 @@ export default function useTable<ResponseData, ApiData, Column, Pagination exten
 
     const defaultChecks = getColumnChecks(columns());
 
-    columnChecks.value = defaultChecks.map(col => ({
-      ...col,
-      checked: checkMap.get(col.key) ?? col.checked,
-      fixed: (fixedMap.get(col.key) !== 'unFixed' ? fixedMap.get(col.key) : undefined) ?? col.fixed
-    }));
+    columnChecks.value = defaultChecks.map(col => {
+      // locked columns (e.g. the operation column) are always visible, pinned
+      // to the right and cannot be toggled off by the user.
+      if (col.lock) {
+        return { ...col, checked: true, fixed: 'right' as const };
+      }
+
+      return {
+        ...col,
+        checked: checkMap.get(col.key) ?? col.checked,
+        fixed: (fixedMap.get(col.key) !== 'unFixed' ? fixedMap.get(col.key) : undefined) ?? col.fixed
+      };
+    });
   }
 
   async function getData() {
@@ -108,8 +121,15 @@ export default function useTable<ResponseData, ApiData, Column, Pagination exten
     }
   }
 
+  // NOTE: defer the initial fetch to onMounted. The page-level `api`/`transform`
+  // callbacks typically read values (e.g. `mobilePagination`) that are part of
+  // the same `const { ... } = useNaivePaginatedTable(...)` destructuring, so
+  // calling `getData()` synchronously here (during setup, before the destructuring
+  // completes) triggers a TDZ `ReferenceError`. By mount time all bindings exist.
   if (immediate) {
-    getData();
+    onMounted(() => {
+      void getData();
+    });
   }
 
   return {

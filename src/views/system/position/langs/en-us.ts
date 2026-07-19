@@ -1,0 +1,32 @@
+const enUS: import('../types/i18n').SystemPositionLang = {
+  title: 'Position Management',
+  addPosition: 'Add Position',
+  editPosition: 'Edit Position',
+  deletePosition: 'Delete Position',
+  refresh: 'Refresh',
+  colSetting: 'Column Settings',
+  selectAll: 'Select All',
+  search: 'Search',
+  searchTitle: 'Search Position',
+  reset: 'Reset',
+  operation: 'Operation',
+  index: 'No.',
+  name: 'Name',
+  code: 'Code',
+  sort: 'Sort',
+  status: 'Status',
+  remark: 'Remark',
+  enabled: 'Enabled',
+  disabled: 'Disabled',
+  confirmDelete: 'Are you sure to delete this position?',
+  confirmBatchDelete: 'Are you sure to batch delete the selected positions?',
+  namePlaceholder: 'Please enter the position name',
+  codePlaceholder: 'Please enter the position code',
+  sortPlaceholder: 'Please enter the sort value',
+  remarkPlaceholder: 'Please enter a remark',
+  addSuccess: 'Created successfully',
+  editSuccess: 'Updated successfully',
+  deleteSuccess: 'Deleted successfully'
+};
+
+export default enUS;

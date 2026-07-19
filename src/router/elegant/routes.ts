@@ -74,5 +74,182 @@ export const generatedRoutes: GeneratedRoute[] = [
       constant: true,
       hideInMenu: true
     }
-  }
+  },
+  {
+    name: 'system',
+    path: '/system',
+    component: 'layout.base',
+    meta: {
+      title: 'system',
+      i18nKey: 'route.system'
+    },
+    children: [
+      {
+        name: 'system_api',
+        path: '/system/api',
+        component: 'view.system_api',
+        meta: {
+          title: 'system_api',
+          i18nKey: 'route.system_api'
+        }
+      },
+      {
+        name: 'system_authority',
+        path: '/system/authority',
+        component: 'view.system_authority',
+        meta: {
+          title: 'system_authority',
+          i18nKey: 'route.system_authority'
+        }
+      },
+      {
+        name: 'system_department',
+        path: '/system/department',
+        component: 'view.system_department',
+        meta: {
+          title: 'system_department',
+          i18nKey: 'route.system_department'
+        }
+      },
+      {
+        name: 'system_dictionary',
+        path: '/system/dictionary',
+        component: 'view.system_dictionary',
+        meta: {
+          title: 'system_dictionary',
+          i18nKey: 'route.system_dictionary'
+        }
+      },
+      {
+        name: 'system_menu',
+        path: '/system/menu',
+        component: 'view.system_menu',
+        meta: {
+          title: 'system_menu',
+          i18nKey: 'route.system_menu'
+        }
+      },
+      {
+        name: 'system_params',
+        path: '/system/params',
+        component: 'view.system_params',
+        meta: {
+          title: 'system_params',
+          i18nKey: 'route.system_params'
+        }
+      },
+      {
+        name: 'system_position',
+        path: '/system/position',
+        component: 'view.system_position',
+        meta: {
+          title: 'system_position',
+          i18nKey: 'route.system_position'
+        }
+      },
+      {
+        name: 'system_security',
+        path: '/system/security',
+        component: 'view.system_security',
+        meta: {
+          title: 'system_security',
+          i18nKey: 'route.system_security'
+        }
+      },
+      {
+        name: 'system_user',
+        path: '/system/user',
+        component: 'view.system_user',
+        meta: {
+          title: 'system_user',
+          i18nKey: 'route.system_user'
+        }
+      }
+    ]
+  },
+  {
+    name: 'systemtools',
+    path: '/systemtools',
+    component: 'layout.base',
+    meta: {
+      title: 'systemtools',
+      i18nKey: 'route.systemtools'
+    },
+    children: [
+      {
+        name: 'systemtools_apitoken',
+        path: '/systemtools/apitoken',
+        component: 'view.systemtools_apitoken',
+        meta: {
+          title: 'systemtools_apitoken',
+          i18nKey: 'route.systemtools_apitoken'
+        }
+      },
+      {
+        name: 'systemtools_loginlog',
+        path: '/systemtools/loginlog',
+        component: 'view.systemtools_loginlog',
+        meta: {
+          title: 'systemtools_loginlog',
+          i18nKey: 'route.systemtools_loginlog'
+        }
+      },
+      {
+        name: 'systemtools_syserror',
+        path: '/systemtools/syserror',
+        component: 'view.systemtools_syserror',
+        meta: {
+          title: 'systemtools_syserror',
+          i18nKey: 'route.systemtools_syserror'
+        }
+      },
+      {
+        name: 'systemtools_system',
+        path: '/systemtools/system',
+        component: 'view.systemtools_system',
+        meta: {
+          title: 'systemtools_system',
+          i18nKey: 'route.systemtools_system'
+        }
+      },
+      {
+        name: 'systemtools_timedtask',
+        path: '/systemtools/timedtask',
+        component: 'view.systemtools_timedtask',
+        meta: {
+          title: 'systemtools_timedtask',
+          i18nKey: 'route.systemtools_timedtask'
+        }
+      },
+      {
+        name: 'systemtools_version',
+        path: '/systemtools/version',
+        component: 'view.systemtools_version',
+        meta: {
+          title: 'systemtools_version',
+          i18nKey: 'route.systemtools_version'
+        }
+      }
+    ]
+  },
+  {
+    name: 'example',
+    path: '/example',
+    component: 'layout.base',
+    meta: {
+      title: 'example',
+      i18nKey: 'route.example'
+    },
+    children: [
+      {
+        name: 'example_customer',
+        path: '/example/customer',
+        component: 'view.example_customer',
+        meta: {
+          title: 'example_customer',
+          i18nKey: 'route.example_customer'
+        }
+      }
+    ]
+  },
 ];

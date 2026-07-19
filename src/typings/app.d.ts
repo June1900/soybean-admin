@@ -562,6 +562,28 @@ declare namespace App {
           };
           creativity: string;
         };
+        system: {
+          user: import('../../views/system/user/types').SystemUserLang;
+          authority: import('../../views/system/authority/types').AuthorityLang;
+          menu: import('../../views/system/menu/types').SystemMenuLang;
+          api: import('../../views/system/api/types').SystemApiLang;
+          department: import('../../views/system/department/types').SystemDepartmentLang;
+          position: import('../../views/system/position/types').SystemPositionLang;
+          params: import('../../views/system/params/types').SystemParamsLang;
+          dictionary: import('../../views/system/dictionary/types').SystemDictionaryLang;
+          security: import('../../views/system/security/types').SystemSecurityLang;
+        };
+        example: {
+          customer: import('../../views/example/customer/types').ExampleCustomerLang;
+        };
+        systemTools: {
+          apiToken: import('../../views/systemtools/apiToken/types').SystemToolsApiTokenLang;
+          timedTask: import('../../views/systemtools/timedtask/types').SystemToolsTimedTaskLang;
+          sysError: import('../../views/systemtools/syserror/types').SystemToolsSysErrorLang;
+          loginLog: import('../../views/systemtools/loginlog/types').SystemToolsLoginLogLang;
+          version: import('../../views/systemtools/version/types').SystemToolsVersionLang;
+          system: import('../../views/systemtools/system/types').SystemToolsSystemLang;
+        };
       };
       form: {
         required: string;
@@ -592,6 +614,7 @@ declare namespace App {
           right: string;
           unFixed: string;
         };
+        operationLocked: string;
       };
     };
 

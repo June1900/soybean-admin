@@ -1,0 +1,41 @@
+/** i18n schema for the menu (system/menu) feature. */
+export interface SystemMenuLang {
+  title: string;
+  addMenu: string;
+  editMenu: string;
+  deleteMenu: string;
+  copyMenu: string;
+  refresh: string;
+  colSetting: string;
+  selectAll: string;
+  search: string;
+  searchTitle: string;
+  reset: string;
+  operation: string;
+  index: string;
+  name: string;
+  titleField: string;
+  path: string;
+  component: string;
+  parentId: string;
+  sort: string;
+  icon: string;
+  keepAlive: string;
+  closeTab: string;
+  defaultMenu: string;
+  visibility: string;
+  show: string;
+  hidden: string;
+  confirmDelete: string;
+  confirmBatchDelete: string;
+  namePlaceholder: string;
+  titlePlaceholder: string;
+  pathPlaceholder: string;
+  componentPlaceholder: string;
+  parentIdPlaceholder: string;
+  sortPlaceholder: string;
+  iconPlaceholder: string;
+  addSuccess: string;
+  editSuccess: string;
+  deleteSuccess: string;
+}

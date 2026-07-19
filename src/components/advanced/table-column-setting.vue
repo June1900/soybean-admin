@@ -52,7 +52,7 @@ const selectAllIndeterminate = computed(() => {
 
 function toggleSelectAll(checked: boolean) {
   columns.value.forEach(column => {
-    if (!column.visible) return;
+    if (!column.visible || column.lock) return;
 
     column.checked = checked;
   });
@@ -87,11 +87,14 @@ function toggleSelectAll(checked: boolean) {
           v-for="item in columns"
           :key="item.key"
           class="h-36px flex-y-center justify-between gap-6px"
-          :class="{ hidden: !item.visible }"
+          :class="{ hidden: !item.visible, none_draggable: item.lock }"
         >
-          <div class="h-full flex-y-center flex-1 rd-4px hover:(bg-primary bg-opacity-20)">
+          <div
+            class="h-full flex-y-center flex-1 rd-4px hover:(bg-primary bg-opacity-20)"
+            :title="item.lock ? $t('datatable.operationLocked') : undefined"
+          >
             <icon-mdi-drag class="mr-8px h-full cursor-move text-icon" />
-            <NCheckbox v-model:checked="item.checked" class="none_draggable flex-1">
+            <NCheckbox v-model:checked="item.checked" :disabled="item.lock" class="none_draggable flex-1">
               <template v-if="typeof item.title === 'function'">
                 <component :is="item.title" />
               </template>
@@ -99,12 +102,13 @@ function toggleSelectAll(checked: boolean) {
             </NCheckbox>
           </div>
           <ButtonIcon
-            :disabled="!item.checked"
+            :disabled="item.lock || !item.checked"
             :focusable="false"
-            :tooltip-content="$t(tooltipRecord[item.fixed!])"
+            :tooltip-content="item.lock ? $t('datatable.operationLocked') : $t(tooltipRecord[item.fixed!])"
             @click="handleFixed(item)"
           >
-            <icon-octicon-pin-16 v-if="item.fixed === 'unFixed'" />
+            <icon-octicon-pin-16 v-if="item.lock" class="rotate-90" />
+            <icon-octicon-pin-16 v-else-if="item.fixed === 'unFixed'" />
             <icon-octicon-pin-16 v-else-if="item.fixed === 'left'" class="rotate-270" />
             <icon-octicon-pin-slash-16 v-else />
           </ButtonIcon>

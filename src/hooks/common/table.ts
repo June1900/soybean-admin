@@ -254,6 +254,12 @@ export function defaultTransform<ApiData>(
   };
 }
 
+const OPERATION_COLUMN_KEYS = ['operate', 'operation'];
+
+function isOperationColumn(column: { key?: unknown }): boolean {
+  return Boolean(column.key) && OPERATION_COLUMN_KEYS.includes(String(column.key));
+}
+
 function getColumnChecks<Column extends NaiveUI.TableColumn<any>>(
   cols: Column[],
   getColumnVisible?: (column: Column) => boolean
@@ -262,12 +268,17 @@ function getColumnChecks<Column extends NaiveUI.TableColumn<any>>(
 
   cols.forEach(column => {
     if (isTableColumnHasKey(column)) {
+      const isOperation = isOperationColumn(column);
+
       checks.push({
         key: column.key as string,
         title: column.title!,
+        // the operation column is mandatory: always shown, pinned to the right,
+        // and cannot be hidden or moved via the column settings.
         checked: true,
-        fixed: column.fixed ?? 'unFixed',
-        visible: getColumnVisible?.(column) ?? true
+        fixed: isOperation ? 'right' : (column.fixed ?? 'unFixed'),
+        visible: isOperation ? true : (getColumnVisible?.(column) ?? true),
+        lock: isOperation
       });
     } else if (column.type === 'selection') {
       checks.push({
@@ -305,11 +316,12 @@ function getColumns<Column extends NaiveUI.TableColumn<any>>(cols: Column[], che
   });
 
   const filteredColumns = checks
-    .filter(item => item.checked)
+    .filter(item => item.checked || item.lock)
     .map(check => {
       return {
         ...columnMap.get(check.key),
-        fixed: check.fixed
+        // locked columns (operation column) are always pinned to the right
+        fixed: check.lock ? 'right' : check.fixed
       } as Column;
     });
 

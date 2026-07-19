@@ -1,0 +1,32 @@
+const zhCN: import('../types/i18n').SystemPositionLang = {
+  title: '岗位管理',
+  addPosition: '新增岗位',
+  editPosition: '编辑岗位',
+  deletePosition: '删除岗位',
+  refresh: '刷新',
+  colSetting: '列设置',
+  selectAll: '全选',
+  search: '搜索',
+  searchTitle: '搜索岗位',
+  reset: '重置',
+  operation: '操作',
+  index: '序号',
+  name: '岗位名称',
+  code: '岗位编码',
+  sort: '排序',
+  status: '状态',
+  remark: '备注',
+  enabled: '启用',
+  disabled: '停用',
+  confirmDelete: '确定要删除该岗位吗？',
+  confirmBatchDelete: '确定要批量删除选中的岗位吗？',
+  namePlaceholder: '请输入岗位名称',
+  codePlaceholder: '请输入岗位编码',
+  sortPlaceholder: '请输入排序值',
+  remarkPlaceholder: '请输入备注',
+  addSuccess: '新增成功',
+  editSuccess: '编辑成功',
+  deleteSuccess: '删除成功'
+};
+
+export default zhCN;

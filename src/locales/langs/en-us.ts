@@ -1,3 +1,20 @@
+import userEnUS from '@/views/system/user/langs/en-us';
+import authorityEnUS from '@/views/system/authority/langs/en-us';
+import menuEnUS from '@/views/system/menu/langs/en-us';
+import apiEnUS from '@/views/system/api/langs/en-us';
+import departmentEnUS from '@/views/system/department/langs/en-us';
+import positionEnUS from '@/views/system/position/langs/en-us';
+import paramsEnUS from '@/views/system/params/langs/en-us';
+import dictionaryEnUS from '@/views/system/dictionary/langs/en-us';
+import customerEnUS from '@/views/example/customer/langs/en-us';
+import sysErrorEnUS from '@/views/systemtools/syserror/langs/en-us';
+import loginLogEnUS from '@/views/systemtools/loginlog/langs/en-us';
+import versionEnUS from '@/views/systemtools/version/langs/en-us';
+import securityEnUS from '@/views/system/security/langs/en-us';
+import systemConfigEnUS from '@/views/systemtools/system/langs/en-us';
+import apiTokenEnUS from '@/views/systemtools/apiToken/langs/en-us';
+import timedTaskEnUS from '@/views/systemtools/timedtask/langs/en-us';
+
 const local: App.I18n.Schema = {
   system: {
     title: 'SoybeanAdmin',
@@ -229,7 +246,26 @@ const local: App.I18n.Schema = {
     404: 'Page Not Found',
     500: 'Server Error',
     'iframe-page': 'Iframe',
-    home: 'Home'
+    home: 'Home',
+    system: 'System Management',
+    system_user: 'User Management',
+    system_authority: 'Role Management',
+    system_menu: 'Menu Management',
+    system_api: 'API Management',
+    system_department: 'Department Management',
+    system_position: 'Position Management',
+    system_params: 'System Parameters',
+    system_dictionary: 'Dictionary',
+    system_security: 'Security',
+    example: 'Example',
+    example_customer: 'Customer',
+    systemtools: 'System Tools',
+    systemtools_apitoken: 'API Token',
+    systemtools_timedtask: 'Timed Task',
+    systemtools_syserror: 'System Error Logs',
+    systemtools_loginlog: 'Login Logs',
+    systemtools_version: 'Version Info',
+    systemtools_system: 'System Config'
   },
   page: {
     login: {
@@ -313,6 +349,28 @@ const local: App.I18n.Schema = {
         desc5: 'Soybean just wrote some of the workbench pages casually, and it was enough to see!'
       },
       creativity: 'Creativity'
+    },
+    system: {
+      user: { ...userEnUS },
+      authority: { ...authorityEnUS },
+      menu: { ...menuEnUS },
+      api: { ...apiEnUS },
+      department: { ...departmentEnUS },
+      position: { ...positionEnUS },
+      params: { ...paramsEnUS },
+      dictionary: { ...dictionaryEnUS },
+      security: { ...securityEnUS }
+    },
+    example: {
+      customer: { ...customerEnUS }
+    },
+    systemTools: {
+      apiToken: { ...apiTokenEnUS },
+      timedTask: { ...timedTaskEnUS },
+      sysError: { ...sysErrorEnUS },
+      loginLog: { ...loginLogEnUS },
+      version: { ...versionEnUS },
+      system: { ...systemConfigEnUS }
     }
   },
   form: {
@@ -369,7 +427,8 @@ const local: App.I18n.Schema = {
       left: 'Left Fixed',
       right: 'Right Fixed',
       unFixed: 'Unfixed'
-    }
+    },
+    operationLocked: 'The operation column is pinned to the right and cannot be hidden or moved'
   }
 };
 

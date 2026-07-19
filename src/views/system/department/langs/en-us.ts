@@ -1,0 +1,32 @@
+const enUS: import('../types/i18n').SystemDepartmentLang = {
+  title: 'Department Management',
+  addDept: 'Add Department',
+  editDept: 'Edit Department',
+  deleteDept: 'Delete Department',
+  refresh: 'Refresh',
+  colSetting: 'Column Settings',
+  selectAll: 'Select All',
+  search: 'Search',
+  searchTitle: 'Search Department',
+  reset: 'Reset',
+  operation: 'Operation',
+  index: 'No.',
+  name: 'Name',
+  parentId: 'Parent Department',
+  leader: 'Leader',
+  sort: 'Sort',
+  status: 'Status',
+  enabled: 'Enabled',
+  disabled: 'Disabled',
+  confirmDelete: 'Are you sure to delete this department?',
+  confirmBatchDelete: 'Are you sure to batch delete the selected departments?',
+  namePlaceholder: 'Please enter the department name',
+  parentIdPlaceholder: 'Please select the parent department',
+  leaderPlaceholder: 'Please enter the leader',
+  sortPlaceholder: 'Please enter the sort value',
+  addSuccess: 'Created successfully',
+  editSuccess: 'Updated successfully',
+  deleteSuccess: 'Deleted successfully'
+};
+
+export default enUS;

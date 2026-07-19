@@ -1,0 +1,32 @@
+const zhCN: import('../types/i18n').SystemDepartmentLang = {
+  title: '部门管理',
+  addDept: '新增部门',
+  editDept: '编辑部门',
+  deleteDept: '删除部门',
+  refresh: '刷新',
+  colSetting: '列设置',
+  selectAll: '全选',
+  search: '搜索',
+  searchTitle: '搜索部门',
+  reset: '重置',
+  operation: '操作',
+  index: '序号',
+  name: '部门名称',
+  parentId: '上级部门',
+  leader: '负责人',
+  sort: '排序',
+  status: '状态',
+  enabled: '启用',
+  disabled: '禁用',
+  confirmDelete: '确定要删除该部门吗？',
+  confirmBatchDelete: '确定要批量删除选中的部门吗？',
+  namePlaceholder: '请输入部门名称',
+  parentIdPlaceholder: '请选择上级部门',
+  leaderPlaceholder: '请输入负责人',
+  sortPlaceholder: '请输入排序值',
+  addSuccess: '新增成功',
+  editSuccess: '编辑成功',
+  deleteSuccess: '删除成功'
+};
+
+export default zhCN;

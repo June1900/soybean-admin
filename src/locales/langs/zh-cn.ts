@@ -1,3 +1,20 @@
+import userZhCN from '@/views/system/user/langs/zh-cn';
+import authorityZhCN from '@/views/system/authority/langs/zh-cn';
+import menuZhCN from '@/views/system/menu/langs/zh-cn';
+import apiZhCN from '@/views/system/api/langs/zh-cn';
+import departmentZhCN from '@/views/system/department/langs/zh-cn';
+import positionZhCN from '@/views/system/position/langs/zh-cn';
+import paramsZhCN from '@/views/system/params/langs/zh-cn';
+import apiTokenZhCN from '@/views/systemtools/apiToken/langs/zh-cn';
+import timedTaskZhCN from '@/views/systemtools/timedtask/langs/zh-cn';
+import dictionaryZhCN from '@/views/system/dictionary/langs/zh-cn';
+import customerZhCN from '@/views/example/customer/langs/zh-cn';
+import sysErrorZhCN from '@/views/systemtools/syserror/langs/zh-cn';
+import loginLogZhCN from '@/views/systemtools/loginlog/langs/zh-cn';
+import versionZhCN from '@/views/systemtools/version/langs/zh-cn';
+import securityZhCN from '@/views/system/security/langs/zh-cn';
+import systemConfigZhCN from '@/views/systemtools/system/langs/zh-cn';
+
 const local: App.I18n.Schema = {
   system: {
     title: 'Soybean 管理系统',
@@ -225,7 +242,26 @@ const local: App.I18n.Schema = {
     404: '页面不存在',
     500: '服务器错误',
     'iframe-page': '外链页面',
-    home: '首页'
+    home: '首页',
+    system: '系统管理',
+    system_user: '用户管理',
+    system_authority: '角色管理',
+    system_menu: '菜单管理',
+    system_api: '接口管理',
+    system_department: '部门管理',
+    system_position: '岗位管理',
+    system_params: '系统参数',
+    system_dictionary: '字典管理',
+    system_security: '安全设置',
+    example: '示例',
+    example_customer: '客户管理',
+    systemtools: '系统工具',
+    systemtools_apitoken: '接口凭证',
+    systemtools_timedtask: '定时任务',
+    systemtools_syserror: '系统错误日志',
+    systemtools_loginlog: '登录日志',
+    systemtools_version: '版本信息',
+    systemtools_system: '系统配置'
   },
   page: {
     login: {
@@ -309,6 +345,28 @@ const local: App.I18n.Schema = {
         desc5: 'Soybean 刚才把工作台页面随便写了一些，凑合能看了！'
       },
       creativity: '创意'
+    },
+    system: {
+      user: { ...userZhCN },
+      authority: { ...authorityZhCN },
+      menu: { ...menuZhCN },
+      api: { ...apiZhCN },
+      department: { ...departmentZhCN },
+      position: { ...positionZhCN },
+      params: { ...paramsZhCN },
+      dictionary: { ...dictionaryZhCN },
+      security: { ...securityZhCN }
+    },
+    example: {
+      customer: { ...customerZhCN }
+    },
+    systemTools: {
+      apiToken: { ...apiTokenZhCN },
+      timedTask: { ...timedTaskZhCN },
+      sysError: { ...sysErrorZhCN },
+      loginLog: { ...loginLogZhCN },
+      version: { ...versionZhCN },
+      system: { ...systemConfigZhCN }
     }
   },
   form: {
@@ -365,7 +423,8 @@ const local: App.I18n.Schema = {
       left: '左固定',
       right: '右固定',
       unFixed: '取消固定'
-    }
+    },
+    operationLocked: '操作列已固定右侧，不可隐藏或移动'
   }
 };
 

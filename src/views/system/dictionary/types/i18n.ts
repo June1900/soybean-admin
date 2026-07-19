@@ -1,0 +1,47 @@
+/** i18n schema for the dictionary (system/dictionary) feature. */
+export interface SystemDictionaryLang {
+  title: string;
+  addDictionary: string;
+  editDictionary: string;
+  deleteDictionary: string;
+  refresh: string;
+  colSetting: string;
+  selectAll: string;
+  search: string;
+  reset: string;
+  operation: string;
+  index: string;
+  name: string;
+  type: string;
+  status: string;
+  enabled: string;
+  disabled: string;
+  desc: string;
+  confirmDeleteDictionary: string;
+  namePlaceholder: string;
+  typePlaceholder: string;
+  descPlaceholder: string;
+  addDictSuccess: string;
+  editDictSuccess: string;
+  deleteDictSuccess: string;
+  detailTitle: string;
+  detail: string;
+  selectDictHint: string;
+  addDetail: string;
+  editDetail: string;
+  deleteDetail: string;
+  label: string;
+  value: string;
+  extend: string;
+  sort: string;
+  parentId: string;
+  confirmDeleteDetail: string;
+  labelPlaceholder: string;
+  valuePlaceholder: string;
+  extendPlaceholder: string;
+  sortPlaceholder: string;
+  parentIdPlaceholder: string;
+  addDetailSuccess: string;
+  editDetailSuccess: string;
+  deleteDetailSuccess: string;
+}
