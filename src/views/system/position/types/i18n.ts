@@ -1,6 +1,13 @@
-/** i18n schema for the position (system/position) feature. */
+// 岗位功能 i18n 文案结构
 export interface SystemPositionLang {
   title: string;
+  positionList: string;
+  searchPosition: string;
+  members: string;
+  saveMembers: string;
+  userName: string;
+  nickName: string;
+  query: string;
   addPosition: string;
   editPosition: string;
   deletePosition: string;
@@ -25,7 +32,13 @@ export interface SystemPositionLang {
   codePlaceholder: string;
   sortPlaceholder: string;
   remarkPlaceholder: string;
+  userNamePlaceholder: string;
+  nickNamePlaceholder: string;
   addSuccess: string;
   editSuccess: string;
   deleteSuccess: string;
+  saveSuccess: string;
+  selectPositionFirst: string;
+  totalItems: string;
+  perPage: string;
 }

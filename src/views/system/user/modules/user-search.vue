@@ -23,7 +23,7 @@ const model = defineModel<UserSearchParams>('model', { required: true });
 type RuleKey = Extract<keyof UserSearchParams, 'userEmail' | 'userPhone'>;
 
 const rules = computed<Record<RuleKey, App.Global.FormRule>>(() => {
-  const { patternRules } = useFormRules(); // inside computed to make locale reactive
+  const { patternRules } = useFormRules();
 
   return {
     userEmail: patternRules.email,
@@ -80,7 +80,7 @@ async function search() {
                 clearable
               />
             </NFormItemGi>
-            <NFormItemGi span="24 m:12" class="pr-24px">
+            <NFormItemGi span="24 m:18" class="pr-24px">
               <NSpace class="w-full" justify="end">
                 <NButton @click="reset">
                   <template #icon>

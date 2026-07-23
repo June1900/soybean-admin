@@ -1,5 +1,12 @@
 const enUS: import('../types/i18n').SystemPositionLang = {
   title: 'Position Management',
+  positionList: 'Position List',
+  searchPosition: 'Search Position',
+  members: 'Members',
+  saveMembers: 'Save Members',
+  userName: 'Username',
+  nickName: 'Nickname',
+  query: 'Query',
   addPosition: 'Add Position',
   editPosition: 'Edit Position',
   deletePosition: 'Delete Position',
@@ -24,9 +31,15 @@ const enUS: import('../types/i18n').SystemPositionLang = {
   codePlaceholder: 'Please enter the position code',
   sortPlaceholder: 'Please enter the sort value',
   remarkPlaceholder: 'Please enter a remark',
+  userNamePlaceholder: 'Please enter the username',
+  nickNamePlaceholder: 'Please enter the nickname',
   addSuccess: 'Created successfully',
   editSuccess: 'Updated successfully',
-  deleteSuccess: 'Deleted successfully'
+  deleteSuccess: 'Deleted successfully',
+  saveSuccess: 'Saved successfully',
+  selectPositionFirst: 'Please select a position first',
+  totalItems: 'Total {total} items',
+  perPage: 'per page'
 };
 
 export default enUS;

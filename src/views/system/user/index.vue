@@ -21,7 +21,6 @@ defineOptions({
 
 const appStore = useAppStore();
 
-/* ---------- search model ---------- */
 const searchModel = reactive<UserSearchParams>({
   userName: '',
   nickName: '',
@@ -32,7 +31,6 @@ const searchModel = reactive<UserSearchParams>({
 
 type UserListResponseType = Awaited<ReturnType<typeof fetchGetUserList>>;
 
-/* ---------- table ---------- */
 const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagination } = useNaivePaginatedTable<
   UserListResponseType,
   User
@@ -123,7 +121,6 @@ function getQueryParams(): UserListQuery {
   };
 }
 
-/* ---------- operate (add / edit / delete) ---------- */
 const {
   drawerVisible,
   closeDrawer,

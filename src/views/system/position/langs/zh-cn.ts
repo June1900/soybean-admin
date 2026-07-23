@@ -1,5 +1,12 @@
 const zhCN: import('../types/i18n').SystemPositionLang = {
   title: '岗位管理',
+  positionList: '岗位列表',
+  searchPosition: '搜索岗位',
+  members: '成员',
+  saveMembers: '保存成员',
+  userName: '用户名',
+  nickName: '昵称',
+  query: '查询',
   addPosition: '新增岗位',
   editPosition: '编辑岗位',
   deletePosition: '删除岗位',
@@ -24,9 +31,15 @@ const zhCN: import('../types/i18n').SystemPositionLang = {
   codePlaceholder: '请输入岗位编码',
   sortPlaceholder: '请输入排序值',
   remarkPlaceholder: '请输入备注',
+  userNamePlaceholder: '请输入用户名',
+  nickNamePlaceholder: '请输入昵称',
   addSuccess: '新增成功',
   editSuccess: '编辑成功',
-  deleteSuccess: '删除成功'
+  deleteSuccess: '删除成功',
+  saveSuccess: '保存成功',
+  selectPositionFirst: '请先选择岗位',
+  totalItems: '共 {total} 条',
+  perPage: '条/页'
 };
 
 export default zhCN;

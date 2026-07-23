@@ -32,7 +32,7 @@ function createDefaultModel(): PositionForm {
     name: '',
     code: '',
     sort: 0,
-    status: 1,
+    status: true,
     remark: ''
   };
 }
@@ -48,14 +48,14 @@ watch(
     if (!val) return;
     const editing = props.operateType === 'edit' && props.editingData;
     model.value = editing
-      ? {
-          ID: props.editingData!.ID,
-          name: props.editingData!.name,
-          code: props.editingData!.code,
-          sort: props.editingData!.sort,
-          status: props.editingData!.status,
-          remark: props.editingData!.remark
-        }
+          ? {
+              ID: props.editingData!.ID,
+              name: props.editingData!.name,
+              code: props.editingData!.code,
+              sort: props.editingData!.sort,
+              status: props.editingData!.status,
+              remark: props.editingData!.remark
+            }
       : createDefaultModel();
   }
 );
@@ -105,7 +105,7 @@ async function handleSubmit() {
           <NInputNumber v-model:value="model.sort" :placeholder="$t('page.system.position.sortPlaceholder')" :min="0" />
         </NFormItem>
         <NFormItem :label="$t('page.system.position.status')" path="status">
-          <NSwitch v-model:value="model.status" :checked-value="1" :unchecked-value="2" />
+          <NSwitch v-model:value="model.status" :checked-value="true" :unchecked-value="false" />
         </NFormItem>
         <NFormItem :label="$t('page.system.position.remark')" path="remark">
           <NInput
