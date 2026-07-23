@@ -60,7 +60,7 @@ watch(
     if (!visible) return;
 
     const { data } = await fetchGetAuthorityList();
-    parentOptions.value = [{ label: $t('page.system.authority.parentRole'), value: 0 }, ...(flatten(data ?? []))];
+    parentOptions.value = [{ label: $t('page.system.authority.parentRole'), value: 0 }, ...flatten(data ?? [])];
 
     if (props.operateType === 'edit' && props.editingData) {
       const d = props.editingData;
@@ -92,15 +92,11 @@ async function handleSubmit() {
 
   try {
     const { error } =
-      props.operateType === 'add'
-        ? await fetchCreateAuthority(payload)
-        : await fetchUpdateAuthority(payload);
+      props.operateType === 'add' ? await fetchCreateAuthority(payload) : await fetchUpdateAuthority(payload);
 
     if (!error) {
       window.$message?.success(
-        props.operateType === 'add'
-          ? $t('page.system.authority.addSuccess')
-          : $t('page.system.authority.editSuccess')
+        props.operateType === 'add' ? $t('page.system.authority.addSuccess') : $t('page.system.authority.editSuccess')
       );
       emit('submitted');
       emit('close');

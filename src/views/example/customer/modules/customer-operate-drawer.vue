@@ -61,13 +61,7 @@ function closeDrawer() {
 </script>
 
 <template>
-  <NDrawer
-    :show="visible"
-    display-directive="show"
-    :width="400"
-    @mask-click="closeDrawer"
-    @close="closeDrawer"
-  >
+  <NDrawer :show="visible" display-directive="show" :width="400" @mask-click="closeDrawer" @close="closeDrawer">
     <NDrawerContent
       :title="isEdit ? $t('page.example.customer.edit') : $t('page.example.customer.add')"
       :native-scrollbar="false"
@@ -77,7 +71,10 @@ function closeDrawer() {
           <NInput v-model:value="model.customerName" :placeholder="$t('page.example.customer.drawer.customerName')" />
         </NFormItem>
         <NFormItem :label="$t('page.example.customer.drawer.customerPhoneData')">
-          <NInput v-model:value="model.customerPhoneData" :placeholder="$t('page.example.customer.drawer.customerPhoneData')" />
+          <NInput
+            v-model:value="model.customerPhoneData"
+            :placeholder="$t('page.example.customer.drawer.customerPhoneData')"
+          />
         </NFormItem>
       </NForm>
       <template #footer>

@@ -15,7 +15,9 @@ function resolve<T>(data: T): FlatResponseData<any, T> {
   return { data, error: null } as unknown as FlatResponseData<any, T>;
 }
 
-export async function fetchCustomerList(params: CustomerListQuery): Promise<FlatResponseData<any, CustomerListResponse>> {
+export async function fetchCustomerList(
+  params: CustomerListQuery
+): Promise<FlatResponseData<any, CustomerListResponse>> {
   const filtered = mockCustomers.filter(c => {
     if (params.customerName && !c.customerName.includes(params.customerName)) return false;
     if (params.customerPhoneData && !c.customerPhoneData.includes(params.customerPhoneData)) return false;

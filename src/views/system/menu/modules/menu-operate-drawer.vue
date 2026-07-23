@@ -69,9 +69,7 @@ function flatten(list: Menu[] = [], acc: Menu[] = []): Menu[] {
 async function loadParentOptions(excludeId?: number) {
   const { data } = await fetchGetMenuList({ page: 1, pageSize: 9999 });
   const all = flatten(data?.list ?? []);
-  parentOptions.value = all
-    .filter(m => m.ID !== excludeId)
-    .map(m => ({ label: m.meta?.title || m.name, value: m.ID }));
+  parentOptions.value = all.filter(m => m.ID !== excludeId).map(m => ({ label: m.meta?.title || m.name, value: m.ID }));
 }
 
 watch(
@@ -109,9 +107,7 @@ async function handleSubmit() {
 
   saving.value = false;
   if (!error) {
-    window.$message?.success(
-      isEdit ? $t('page.system.menu.editSuccess') : $t('page.system.menu.addSuccess')
-    );
+    window.$message?.success(isEdit ? $t('page.system.menu.editSuccess') : $t('page.system.menu.addSuccess'));
     emit('submitted');
     emit('close');
   }
@@ -119,12 +115,7 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <NDrawer
-    :show="props.visible"
-    display-directive="show"
-    :width="480"
-    @update:show="val => !val && emit('close')"
-  >
+  <NDrawer :show="props.visible" display-directive="show" :width="480" @update:show="val => !val && emit('close')">
     <NDrawerContent :title="title" :native-scrollbar="false">
       <NForm ref="formRef" :model="model" label-placement="left" :label-width="100">
         <NFormItem :label="$t('page.system.menu.titleField')" path="meta.title">

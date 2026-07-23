@@ -154,24 +154,44 @@ function createAllColumns(): NaiveUI.TableColumn<Menu>[] {
       fixed: 'right',
       width: 190,
       render: row =>
-        h(NTooltip, {}, {
-          trigger: () =>
-            h(NSpace, { justify: 'center', size: 'small' }, {
-              default: () => [
-                h(NButton, { size: 'small', tertiary: true, type: 'primary', onClick: () => handleEdit(row.ID) }, {
-                  default: () => $t('page.system.menu.editMenu')
-                }),
-                h(NPopconfirm, { onPositiveClick: () => handleDelete(row.ID) }, {
-                  trigger: () =>
-                    h(NButton, { size: 'small', tertiary: true, type: 'error' }, {
-                      default: () => $t('page.system.menu.deleteMenu')
-                    }),
-                  default: () => $t('page.system.menu.confirmDelete')
-                })
-              ]
-            }),
-          default: () => $t('page.system.menu.operation')
-        })
+        h(
+          NTooltip,
+          {},
+          {
+            trigger: () =>
+              h(
+                NSpace,
+                { justify: 'center', size: 'small' },
+                {
+                  default: () => [
+                    h(
+                      NButton,
+                      { size: 'small', tertiary: true, type: 'primary', onClick: () => handleEdit(row.ID) },
+                      {
+                        default: () => $t('page.system.menu.editMenu')
+                      }
+                    ),
+                    h(
+                      NPopconfirm,
+                      { onPositiveClick: () => handleDelete(row.ID) },
+                      {
+                        trigger: () =>
+                          h(
+                            NButton,
+                            { size: 'small', tertiary: true, type: 'error' },
+                            {
+                              default: () => $t('page.system.menu.deleteMenu')
+                            }
+                          ),
+                        default: () => $t('page.system.menu.confirmDelete')
+                      }
+                    )
+                  ]
+                }
+              ),
+            default: () => $t('page.system.menu.operation')
+          }
+        )
     }
   ];
 }

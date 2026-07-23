@@ -65,8 +65,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
           NTag,
           { type: row.enable === 1 ? 'success' : 'warning', size: 'small', bordered: false },
           {
-            default: () =>
-              row.enable === 1 ? $t('page.system.user.enable') : $t('page.system.user.disable')
+            default: () => (row.enable === 1 ? $t('page.system.user.enable') : $t('page.system.user.disable'))
           }
         )
     },
@@ -76,7 +75,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
       align: 'center',
       fixed: 'right',
       width: 190,
-      render: row => (
+      render: row =>
         h('div', { class: 'flex-center gap-8px' }, [
           h(
             NButton,
@@ -97,7 +96,6 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
             }
           )
         ])
-      )
     }
   ]
 });

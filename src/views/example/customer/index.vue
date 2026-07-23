@@ -29,15 +29,10 @@ const searchParams = reactive<CustomerSearchParams>({
 });
 
 /* ---------- table ---------- */
-const {
-  columns,
-  columnChecks,
-  data,
-  getData,
-  getDataByPage,
-  loading,
-  mobilePagination
-} = useNaivePaginatedTable<CustomerListApiResponse, Customer>({
+const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagination } = useNaivePaginatedTable<
+  CustomerListApiResponse,
+  Customer
+>({
   api: () => fetchCustomerList(getQueryParams()),
   transform: res => {
     const body = res.data || { list: [], total: 0, page: 1, pageSize: 10 };
@@ -53,7 +48,11 @@ const {
 
 const scrollX = computed(() =>
   columns.value.reduce(
-    (acc, col) => acc + ((col as { width?: number; minWidth?: number }).width ?? (col as { width?: number; minWidth?: number }).minWidth ?? 120),
+    (acc, col) =>
+      acc +
+      ((col as { width?: number; minWidth?: number }).width ??
+        (col as { width?: number; minWidth?: number }).minWidth ??
+        120),
     0
   )
 );
@@ -125,21 +124,38 @@ function createAllColumns(): NaiveUI.TableColumn<Customer>[] {
           { trigger: 'click', placement: 'bottom-end' },
           {
             trigger: () =>
-              h(NButton, { size: 'small', tertiary: true, type: 'primary' }, { default: () => $t('page.example.customer.columns.operations') }),
+              h(
+                NButton,
+                { size: 'small', tertiary: true, type: 'primary' },
+                { default: () => $t('page.example.customer.columns.operations') }
+              ),
             default: () =>
-              h(NSpace, { justify: 'center', size: 'small' }, {
-                default: () => [
-                  h(NButton, { size: 'small', tertiary: true, type: 'info', onClick: () => handleEdit(row.ID) }, { default: () => $t('page.example.customer.columns.edit') }),
-                  h(
-                    NPopconfirm,
-                    { onPositiveClick: () => handleDelete(row.ID) },
-                    {
-                      trigger: () => h(NButton, { size: 'small', tertiary: true, type: 'error' }, { default: () => $t('page.example.customer.columns.delete') }),
-                      default: () => $t('page.example.customer.deleteConfirm')
-                    }
-                  )
-                ]
-              })
+              h(
+                NSpace,
+                { justify: 'center', size: 'small' },
+                {
+                  default: () => [
+                    h(
+                      NButton,
+                      { size: 'small', tertiary: true, type: 'info', onClick: () => handleEdit(row.ID) },
+                      { default: () => $t('page.example.customer.columns.edit') }
+                    ),
+                    h(
+                      NPopconfirm,
+                      { onPositiveClick: () => handleDelete(row.ID) },
+                      {
+                        trigger: () =>
+                          h(
+                            NButton,
+                            { size: 'small', tertiary: true, type: 'error' },
+                            { default: () => $t('page.example.customer.columns.delete') }
+                          ),
+                        default: () => $t('page.example.customer.deleteConfirm')
+                      }
+                    )
+                  ]
+                }
+              )
           }
         )
     }
@@ -151,7 +167,12 @@ function createAllColumns(): NaiveUI.TableColumn<Customer>[] {
   <div class="min-h-500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
     <CustomerSearch v-model:model="searchParams" @search="getDataByPage" @reset="getDataByPage" />
 
-    <NCard :title="$t('page.example.customer.title')" :bordered="false" size="small" class="card-wrapper sm:flex-1-hidden">
+    <NCard
+      :title="$t('page.example.customer.title')"
+      :bordered="false"
+      size="small"
+      class="card-wrapper sm:flex-1-hidden"
+    >
       <template #header-extra>
         <TableHeaderOperation
           v-model:columns="columnChecks"

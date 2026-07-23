@@ -110,7 +110,11 @@ function createAllColumns(): NaiveUI.TableColumn<SysError>[] {
       width: 90,
       align: 'center',
       render: row =>
-        h(NTag, { type: levelTagType[row.level], size: 'small', bordered: false }, { default: () => $t(`page.systemTools.sysError.level.${row.level}`) })
+        h(
+          NTag,
+          { type: levelTagType[row.level], size: 'small', bordered: false },
+          { default: () => $t(`page.systemTools.sysError.level.${row.level}`) }
+        )
     },
     {
       key: 'status',
@@ -118,10 +122,19 @@ function createAllColumns(): NaiveUI.TableColumn<SysError>[] {
       width: 100,
       align: 'center',
       render: row =>
-        h(NTag, { type: statusTagType[row.status], size: 'small', bordered: false }, { default: () => $t(`page.systemTools.sysError.status.${row.status}`) })
+        h(
+          NTag,
+          { type: statusTagType[row.status], size: 'small', bordered: false },
+          { default: () => $t(`page.systemTools.sysError.status.${row.status}`) }
+        )
     },
     { key: 'info', title: $t('page.systemTools.sysError.columns.info'), minWidth: 220, ellipsis: { tooltip: true } },
-    { key: 'solution', title: $t('page.systemTools.sysError.columns.solution'), minWidth: 160, ellipsis: { tooltip: true } },
+    {
+      key: 'solution',
+      title: $t('page.systemTools.sysError.columns.solution'),
+      minWidth: 160,
+      ellipsis: { tooltip: true }
+    },
     {
       key: 'operation',
       title: $t('page.systemTools.sysError.columns.operations'),
@@ -133,21 +146,39 @@ function createAllColumns(): NaiveUI.TableColumn<SysError>[] {
           NPopover,
           { trigger: 'click', placement: 'bottom-end' },
           {
-            trigger: () => h(NButton, { size: 'small', tertiary: true, type: 'primary' }, { default: () => $t('page.systemTools.sysError.columns.operations') }),
+            trigger: () =>
+              h(
+                NButton,
+                { size: 'small', tertiary: true, type: 'primary' },
+                { default: () => $t('page.systemTools.sysError.columns.operations') }
+              ),
             default: () =>
-              h(NSpace, { justify: 'center', size: 'small' }, {
-                default: () => [
-                  h(NButton, { size: 'small', tertiary: true, onClick: () => openView(row) }, { default: () => $t('page.systemTools.sysError.columns.view') }),
-                  h(
-                    NPopconfirm,
-                    { onPositiveClick: () => handleDelete(row) },
-                    {
-                      trigger: () => h(NButton, { size: 'small', tertiary: true, type: 'error' }, { default: () => $t('page.systemTools.sysError.columns.delete') }),
-                      default: () => $t('common.confirmDelete')
-                    }
-                  )
-                ]
-              })
+              h(
+                NSpace,
+                { justify: 'center', size: 'small' },
+                {
+                  default: () => [
+                    h(
+                      NButton,
+                      { size: 'small', tertiary: true, onClick: () => openView(row) },
+                      { default: () => $t('page.systemTools.sysError.columns.view') }
+                    ),
+                    h(
+                      NPopconfirm,
+                      { onPositiveClick: () => handleDelete(row) },
+                      {
+                        trigger: () =>
+                          h(
+                            NButton,
+                            { size: 'small', tertiary: true, type: 'error' },
+                            { default: () => $t('page.systemTools.sysError.columns.delete') }
+                          ),
+                        default: () => $t('common.confirmDelete')
+                      }
+                    )
+                  ]
+                }
+              )
           }
         )
     }
@@ -163,7 +194,12 @@ onMounted(() => {
   <div class="min-h-500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
     <SysErrorSearch v-model:model="searchParams" @search="getDataByPage" @reset="getDataByPage" />
 
-    <NCard :title="$t('page.systemTools.sysError.title')" :bordered="false" size="small" class="card-wrapper sm:flex-1-hidden">
+    <NCard
+      :title="$t('page.systemTools.sysError.title')"
+      :bordered="false"
+      size="small"
+      class="card-wrapper sm:flex-1-hidden"
+    >
       <template #header-extra>
         <div class="flex-center gap-8px">
           <NButton size="small" :loading="loading" @click="getData">

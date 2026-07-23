@@ -87,9 +87,7 @@ async function handleSubmit() {
 
   const payload: TimedTaskForm = { ...model, params: p.value, httpHeader: h.value };
   loading.value = true;
-  const { error } = model.ID
-    ? await fetchUpdateTimedTask(payload)
-    : await fetchCreateTimedTask(payload);
+  const { error } = model.ID ? await fetchUpdateTimedTask(payload) : await fetchCreateTimedTask(payload);
   loading.value = false;
   if (error) return;
 
@@ -106,14 +104,15 @@ function closeDrawer() {
 </script>
 
 <template>
-  <NDrawer
-    :show="visible"
-    display-directive="show"
-    :width="520"
-    @mask-click="closeDrawer"
-    @close="closeDrawer"
-  >
-    <NDrawerContent :title="$t(operateType === 'edit' ? 'page.systemTools.timedTask.form.editTitle' : 'page.systemTools.timedTask.form.title')" :native-scrollbar="false">
+  <NDrawer :show="visible" display-directive="show" :width="520" @mask-click="closeDrawer" @close="closeDrawer">
+    <NDrawerContent
+      :title="
+        $t(
+          operateType === 'edit' ? 'page.systemTools.timedTask.form.editTitle' : 'page.systemTools.timedTask.form.title'
+        )
+      "
+      :native-scrollbar="false"
+    >
       <NForm label-placement="top">
         <NFormItem :label="$t('page.systemTools.timedTask.form.name')" required>
           <NInput v-model:value="model.name" :placeholder="$t('page.systemTools.timedTask.form.name')" />
@@ -161,7 +160,7 @@ function closeDrawer() {
             />
           </NFormItem>
           <NFormItem :label="$t('page.systemTools.timedTask.form.params')">
-            <NInput v-model:value="paramsText" type="textarea" :rows="4" placeholder="{&quot;days&quot;: 30}" />
+            <NInput v-model:value="paramsText" type="textarea" :rows="4" placeholder='{"days": 30}' />
           </NFormItem>
         </template>
 
@@ -177,14 +176,16 @@ function closeDrawer() {
             />
           </NFormItem>
           <NFormItem :label="$t('page.systemTools.timedTask.form.header')">
-            <NInput v-model:value="headerText" type="textarea" :rows="2" placeholder="{&quot;Authorization&quot;:&quot;Bearer xxx&quot;}" />
+            <NInput v-model:value="headerText" type="textarea" :rows="2" placeholder='{"Authorization":"Bearer xxx"}' />
           </NFormItem>
           <NFormItem :label="$t('page.systemTools.timedTask.form.body')">
             <NInput v-model:value="model.httpBody" type="textarea" :rows="3" />
           </NFormItem>
           <NFormItem :label="$t('page.systemTools.timedTask.form.allowPrivate')">
             <NSwitch v-model:value="model.httpAllowPrivate" />
-            <span class="ml-2 text-12px text-gray-400">{{ $t('page.systemTools.timedTask.form.allowPrivateHint') }}</span>
+            <span class="ml-2 text-12px text-gray-400">
+              {{ $t('page.systemTools.timedTask.form.allowPrivateHint') }}
+            </span>
           </NFormItem>
         </template>
 

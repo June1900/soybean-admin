@@ -4,7 +4,13 @@ import { NButton, NPopconfirm, NTooltip } from 'naive-ui';
 import { useAppStore } from '@/store/modules/app';
 import { useNaivePaginatedTable, useTableOperate } from '@/hooks/common/table';
 import { $t } from '@/locales';
-import { fetchDeleteParams, fetchGetParamsList, type Params, type ParamsListQuery, type ParamsSearchParams } from './api';
+import {
+  fetchDeleteParams,
+  fetchGetParamsList,
+  type Params,
+  type ParamsListQuery,
+  type ParamsSearchParams
+} from './api';
 import ParamsOperateDrawer from './modules/params-operate-drawer.vue';
 import ParamsSearch from './modules/params-search.vue';
 
@@ -32,15 +38,10 @@ function getQueryParams(): ParamsListQuery {
   };
 }
 
-const {
-  data,
-  columns,
-  columnChecks,
-  getData,
-  getDataByPage,
-  loading,
-  mobilePagination
-} = useNaivePaginatedTable<ParamsListResponse, Params>({
+const { data, columns, columnChecks, getData, getDataByPage, loading, mobilePagination } = useNaivePaginatedTable<
+  ParamsListResponse,
+  Params
+>({
   api: () => fetchGetParamsList(getQueryParams()),
   transform: res => ({
     data: res.data?.list ?? [],
@@ -113,24 +114,44 @@ function createAllColumns(): NaiveUI.TableColumn<Params>[] {
       fixed: 'right',
       width: 190,
       render: row =>
-        h(NTooltip, {}, {
-          trigger: () =>
-            h(NSpace, { justify: 'center', size: 'small' }, {
-              default: () => [
-                h(NButton, { size: 'small', tertiary: true, type: 'primary', onClick: () => handleEdit(row.ID) }, {
-                  default: () => $t('page.system.params.editParam')
-                }),
-                h(NPopconfirm, { onPositiveClick: () => handleDelete(row.ID) }, {
-                  trigger: () =>
-                    h(NButton, { size: 'small', tertiary: true, type: 'error' }, {
-                      default: () => $t('page.system.params.deleteParam')
-                    }),
-                  default: () => $t('page.system.params.confirmDelete')
-                })
-              ]
-            }),
-          default: () => $t('page.system.params.operation')
-        })
+        h(
+          NTooltip,
+          {},
+          {
+            trigger: () =>
+              h(
+                NSpace,
+                { justify: 'center', size: 'small' },
+                {
+                  default: () => [
+                    h(
+                      NButton,
+                      { size: 'small', tertiary: true, type: 'primary', onClick: () => handleEdit(row.ID) },
+                      {
+                        default: () => $t('page.system.params.editParam')
+                      }
+                    ),
+                    h(
+                      NPopconfirm,
+                      { onPositiveClick: () => handleDelete(row.ID) },
+                      {
+                        trigger: () =>
+                          h(
+                            NButton,
+                            { size: 'small', tertiary: true, type: 'error' },
+                            {
+                              default: () => $t('page.system.params.deleteParam')
+                            }
+                          ),
+                        default: () => $t('page.system.params.confirmDelete')
+                      }
+                    )
+                  ]
+                }
+              ),
+            default: () => $t('page.system.params.operation')
+          }
+        )
     }
   ];
 }

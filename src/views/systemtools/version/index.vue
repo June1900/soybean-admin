@@ -96,7 +96,12 @@ function createAllColumns(): NaiveUI.TableColumn<SysVersion>[] {
     { key: 'CreatedAt', title: $t('page.systemTools.version.columns.createdAt'), minWidth: 170 },
     { key: 'versionName', title: $t('page.systemTools.version.columns.versionName'), minWidth: 160 },
     { key: 'versionCode', title: $t('page.systemTools.version.columns.versionCode'), minWidth: 120 },
-    { key: 'description', title: $t('page.systemTools.version.columns.description'), minWidth: 220, ellipsis: { tooltip: true } },
+    {
+      key: 'description',
+      title: $t('page.systemTools.version.columns.description'),
+      minWidth: 220,
+      ellipsis: { tooltip: true }
+    },
     {
       key: 'operation',
       title: $t('page.systemTools.version.columns.operations'),
@@ -108,22 +113,44 @@ function createAllColumns(): NaiveUI.TableColumn<SysVersion>[] {
           NPopover,
           { trigger: 'click', placement: 'bottom-end' },
           {
-            trigger: () => h(NButton, { size: 'small', tertiary: true, type: 'primary' }, { default: () => $t('page.systemTools.version.columns.operations') }),
+            trigger: () =>
+              h(
+                NButton,
+                { size: 'small', tertiary: true, type: 'primary' },
+                { default: () => $t('page.systemTools.version.columns.operations') }
+              ),
             default: () =>
-              h(NSpace, { justify: 'center', size: 'small' }, {
-                default: () => [
-                  h(NButton, { size: 'small', tertiary: true, onClick: () => openView(row) }, { default: () => $t('page.systemTools.version.columns.view') }),
-                  h(NButton, { size: 'small', tertiary: true, type: 'info', onClick: () => handleDownload(row) }, { default: () => $t('page.systemTools.version.columns.download') }),
-                  h(
-                    NPopconfirm,
-                    { onPositiveClick: () => handleDelete(row) },
-                    {
-                      trigger: () => h(NButton, { size: 'small', tertiary: true, type: 'error' }, { default: () => $t('page.systemTools.version.columns.delete') }),
-                      default: () => $t('common.confirmDelete')
-                    }
-                  )
-                ]
-              })
+              h(
+                NSpace,
+                { justify: 'center', size: 'small' },
+                {
+                  default: () => [
+                    h(
+                      NButton,
+                      { size: 'small', tertiary: true, onClick: () => openView(row) },
+                      { default: () => $t('page.systemTools.version.columns.view') }
+                    ),
+                    h(
+                      NButton,
+                      { size: 'small', tertiary: true, type: 'info', onClick: () => handleDownload(row) },
+                      { default: () => $t('page.systemTools.version.columns.download') }
+                    ),
+                    h(
+                      NPopconfirm,
+                      { onPositiveClick: () => handleDelete(row) },
+                      {
+                        trigger: () =>
+                          h(
+                            NButton,
+                            { size: 'small', tertiary: true, type: 'error' },
+                            { default: () => $t('page.systemTools.version.columns.delete') }
+                          ),
+                        default: () => $t('common.confirmDelete')
+                      }
+                    )
+                  ]
+                }
+              )
           }
         )
     }
@@ -139,7 +166,12 @@ onMounted(() => {
   <div class="min-h-500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
     <VersionSearch v-model:model="searchParams" @search="getDataByPage" @reset="getDataByPage" />
 
-    <NCard :title="$t('page.systemTools.version.title')" :bordered="false" size="small" class="card-wrapper sm:flex-1-hidden">
+    <NCard
+      :title="$t('page.systemTools.version.title')"
+      :bordered="false"
+      size="small"
+      class="card-wrapper sm:flex-1-hidden"
+    >
       <template #header-extra>
         <div class="flex-center gap-8px">
           <NButton size="small" :loading="loading" @click="getData">

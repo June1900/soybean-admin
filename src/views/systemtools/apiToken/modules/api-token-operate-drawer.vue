@@ -74,13 +74,7 @@ function closeDrawer() {
 </script>
 
 <template>
-  <NDrawer
-    :show="visible"
-    display-directive="show"
-    :width="400"
-    @mask-click="closeDrawer"
-    @close="closeDrawer"
-  >
+  <NDrawer :show="visible" display-directive="show" :width="400" @mask-click="closeDrawer" @close="closeDrawer">
     <NDrawerContent :title="$t('page.systemTools.apiToken.drawer.title')" :native-scrollbar="false">
       <NForm label-placement="top">
         <NFormItem :label="$t('page.systemTools.apiToken.drawer.user')" required>
@@ -88,9 +82,7 @@ function closeDrawer() {
             v-model:value="model.userId"
             :placeholder="$t('page.systemTools.apiToken.drawer.selectUser')"
             filterable
-            :options="
-              userOptions.map(u => ({ label: `${u.nickName} (${u.userName})`, value: u.ID }))
-            "
+            :options="userOptions.map(u => ({ label: `${u.nickName} (${u.userName})`, value: u.ID }))"
             @update:value="handleUserChange"
           />
         </NFormItem>
@@ -100,7 +92,10 @@ function closeDrawer() {
             :placeholder="$t('page.systemTools.apiToken.drawer.selectAuthority')"
             :disabled="!model.userId"
             :options="
-              (authorityOptions ?? []).map(a => ({ label: `${a.authorityName} (${a.authorityId})`, value: a.authorityId }))
+              (authorityOptions ?? []).map(a => ({
+                label: `${a.authorityName} (${a.authorityId})`,
+                value: a.authorityId
+              }))
             "
           />
         </NFormItem>

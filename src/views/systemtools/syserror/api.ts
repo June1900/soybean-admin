@@ -1,7 +1,14 @@
 import type { FlatResponseData } from '@sa/axios';
 import type { SysError, SysErrorListQuery, SysErrorListResponse } from './types';
 
-export type { SysError, SysErrorLevel, SysErrorStatus, SysErrorListQuery, SysErrorListResponse, SysErrorSearchParams } from './types';
+export type {
+  SysError,
+  SysErrorLevel,
+  SysErrorStatus,
+  SysErrorListQuery,
+  SysErrorListResponse,
+  SysErrorSearchParams
+} from './types';
 
 /** UI-only：本地 mock 数据，不对接真实接口 */
 const mockErrors: SysError[] = Array.from({ length: 18 }).map((_, i) => ({
@@ -18,7 +25,9 @@ function resolve<T>(data: T): FlatResponseData<any, T> {
   return { data, error: null } as unknown as FlatResponseData<any, T>;
 }
 
-export async function fetchSysErrorList(params: SysErrorListQuery): Promise<FlatResponseData<any, SysErrorListResponse>> {
+export async function fetchSysErrorList(
+  params: SysErrorListQuery
+): Promise<FlatResponseData<any, SysErrorListResponse>> {
   const filtered = mockErrors.filter(e => {
     if (params.form && !e.form.includes(params.form)) return false;
     if (params.info && !e.info.includes(params.info)) return false;

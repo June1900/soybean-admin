@@ -29,15 +29,10 @@ const searchParams = reactive<ApiTokenSearchParams>({
 });
 
 /* ---------- table ---------- */
-const {
-  columns,
-  columnChecks,
-  data,
-  getData,
-  getDataByPage,
-  loading,
-  mobilePagination
-} = useNaivePaginatedTable<ApiTokenListApiResponse, ApiToken>({
+const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagination } = useNaivePaginatedTable<
+  ApiTokenListApiResponse,
+  ApiToken
+>({
   api: () => fetchGetApiTokenList(getQueryParams()),
   transform: res => {
     const body = res.data || { list: [], total: 0, page: 1, pageSize: 10 };
@@ -53,7 +48,11 @@ const {
 
 const scrollX = computed(() =>
   columns.value.reduce(
-    (acc, col) => acc + ((col as { width?: number; minWidth?: number }).width ?? (col as { width?: number; minWidth?: number }).minWidth ?? 120),
+    (acc, col) =>
+      acc +
+      ((col as { width?: number; minWidth?: number }).width ??
+        (col as { width?: number; minWidth?: number }).minWidth ??
+        120),
     0
   )
 );
@@ -163,7 +162,9 @@ function createAllColumns(): NaiveUI.TableColumn<ApiToken>[] {
           { type: row.status ? 'success' : 'error', size: 'small', bordered: false },
           {
             default: () =>
-              row.status ? $t('page.systemTools.apiToken.columns.valid') : $t('page.systemTools.apiToken.columns.invalid')
+              row.status
+                ? $t('page.systemTools.apiToken.columns.valid')
+                : $t('page.systemTools.apiToken.columns.invalid')
           }
         )
     },
@@ -231,7 +232,12 @@ function createAllColumns(): NaiveUI.TableColumn<ApiToken>[] {
   <div class="min-h-500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
     <ApiTokenSearch v-model:model="searchParams" @search="getDataByPage" @reset="getDataByPage" />
 
-    <NCard :title="$t('page.systemTools.apiToken.title')" :bordered="false" size="small" class="card-wrapper sm:flex-1-hidden">
+    <NCard
+      :title="$t('page.systemTools.apiToken.title')"
+      :bordered="false"
+      size="small"
+      class="card-wrapper sm:flex-1-hidden"
+    >
       <template #header-extra>
         <TableHeaderOperation
           v-model:columns="columnChecks"

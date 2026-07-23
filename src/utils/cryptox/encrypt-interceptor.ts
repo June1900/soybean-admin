@@ -99,9 +99,7 @@ export async function decryptResponse(response: AxiosResponse): Promise<void> {
   if (!ENCRYPT_ENABLED) return;
 
   const headerVal = String(
-    response.headers[RESPONSE_ENCRYPTED_HEADER] ||
-      response.headers['X-Response-Encrypted'] ||
-      ''
+    response.headers[RESPONSE_ENCRYPTED_HEADER] || response.headers['X-Response-Encrypted'] || ''
   ).toLowerCase();
   const isEncrypted = headerVal === 'true';
   const aesKey = response.config?._aesKey;

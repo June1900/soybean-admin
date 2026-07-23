@@ -41,7 +41,7 @@ export function fetchDeleteUser(id: number) {
 
 /** Batch delete users (gin-vue-admin uses single delete in loop, or batch if supported) */
 export function fetchBatchDeleteUser(ids: number[]) {
-  return Promise.all(ids.map(id => fetchDeleteUser(id))).then(() => ({ data: null, error: false } as const));
+  return Promise.all(ids.map(id => fetchDeleteUser(id))).then(() => ({ data: null, error: false }) as const);
 }
 
 /** Reset user password */

@@ -49,10 +49,20 @@ async function search() {
       <NCollapseItem :title="$t('common.search')" name="api-token-search">
         <NForm ref="formRef" :model="model" label-placement="left" :label-width="80">
           <NGrid responsive="screen" item-responsive>
-            <NFormItemGi span="24 s:12 m:6" :label="$t('page.systemTools.apiToken.search.userId')" path="userId" class="pr-24px">
+            <NFormItemGi
+              span="24 s:12 m:6"
+              :label="$t('page.systemTools.apiToken.search.userId')"
+              path="userId"
+              class="pr-24px"
+            >
               <NInputNumber v-model:value="model.userId" :min="1" clearable class="w-full" />
             </NFormItemGi>
-            <NFormItemGi span="24 s:12 m:6" :label="$t('page.systemTools.apiToken.search.status')" path="status" class="pr-24px">
+            <NFormItemGi
+              span="24 s:12 m:6"
+              :label="$t('page.systemTools.apiToken.search.status')"
+              path="status"
+              class="pr-24px"
+            >
               <NSelect
                 v-model:value="model.status"
                 :placeholder="$t('page.systemTools.apiToken.search.status')"

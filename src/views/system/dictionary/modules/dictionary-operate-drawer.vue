@@ -4,12 +4,7 @@ import { useLoading } from '@sa/hooks';
 import type { FormInst, FormRules } from 'naive-ui';
 import { NDrawer, NDrawerContent, NForm, NFormItem, NInput, NRadioGroup, NRadio, NSpace } from 'naive-ui';
 import { $t } from '@/locales';
-import {
-  fetchCreateDictionary,
-  fetchUpdateDictionary,
-  type Dictionary,
-  type DictionaryForm
-} from '../api';
+import { fetchCreateDictionary, fetchUpdateDictionary, type Dictionary, type DictionaryForm } from '../api';
 
 defineOptions({
   name: 'DictionaryOperateDrawer'
@@ -24,7 +19,9 @@ const props = defineProps<{
 const emit = defineEmits<{ close: []; submitted: [] }>();
 
 const title = computed(() =>
-  props.operateType === 'edit' ? $t('page.system.dictionary.editDictionary') : $t('page.system.dictionary.addDictionary')
+  props.operateType === 'edit'
+    ? $t('page.system.dictionary.editDictionary')
+    : $t('page.system.dictionary.addDictionary')
 );
 
 const { loading, startLoading, endLoading } = useLoading();
@@ -90,12 +87,7 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <NDrawer
-    :show="props.visible"
-    display-directive="show"
-    :width="480"
-    @update:show="val => !val && emit('close')"
-  >
+  <NDrawer :show="props.visible" display-directive="show" :width="480" @update:show="val => !val && emit('close')">
     <NDrawerContent :title="title" :native-scrollbar="false">
       <NForm ref="formRef" :model="model" :rules="rules" label-placement="left" :label-width="100">
         <NFormItem :label="$t('page.system.dictionary.name')" path="name">

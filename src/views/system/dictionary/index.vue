@@ -127,27 +127,51 @@ function createAllColumns(): NaiveUI.TableColumn<Dictionary>[] {
       fixed: 'right',
       width: 280,
       render: row =>
-        h(NTooltip, {}, {
-          trigger: () =>
-            h(NSpace, { justify: 'center', size: 'small' }, {
-              default: () => [
-                h(NButton, { size: 'small', tertiary: true, type: 'primary', onClick: () => selectDict(row.ID) }, {
-                  default: () => $t('page.system.dictionary.detail')
-                }),
-                h(NButton, { size: 'small', tertiary: true, type: 'primary', onClick: () => handleEdit(row.ID) }, {
-                  default: () => $t('page.system.dictionary.editDictionary')
-                }),
-                h(NPopconfirm, { onPositiveClick: () => handleDelete(row.ID) }, {
-                  trigger: () =>
-                    h(NButton, { size: 'small', tertiary: true, type: 'error' }, {
-                      default: () => $t('page.system.dictionary.deleteDictionary')
-                    }),
-                  default: () => $t('page.system.dictionary.confirmDeleteDictionary')
-                })
-              ]
-            }),
-          default: () => $t('page.system.dictionary.operation')
-        })
+        h(
+          NTooltip,
+          {},
+          {
+            trigger: () =>
+              h(
+                NSpace,
+                { justify: 'center', size: 'small' },
+                {
+                  default: () => [
+                    h(
+                      NButton,
+                      { size: 'small', tertiary: true, type: 'primary', onClick: () => selectDict(row.ID) },
+                      {
+                        default: () => $t('page.system.dictionary.detail')
+                      }
+                    ),
+                    h(
+                      NButton,
+                      { size: 'small', tertiary: true, type: 'primary', onClick: () => handleEdit(row.ID) },
+                      {
+                        default: () => $t('page.system.dictionary.editDictionary')
+                      }
+                    ),
+                    h(
+                      NPopconfirm,
+                      { onPositiveClick: () => handleDelete(row.ID) },
+                      {
+                        trigger: () =>
+                          h(
+                            NButton,
+                            { size: 'small', tertiary: true, type: 'error' },
+                            {
+                              default: () => $t('page.system.dictionary.deleteDictionary')
+                            }
+                          ),
+                        default: () => $t('page.system.dictionary.confirmDeleteDictionary')
+                      }
+                    )
+                  ]
+                }
+              ),
+            default: () => $t('page.system.dictionary.operation')
+          }
+        )
     }
   ];
 }
@@ -236,24 +260,44 @@ function createDetailColumns(): NaiveUI.TableColumn<DictionaryDetail>[] {
       fixed: 'right',
       width: 190,
       render: row =>
-        h(NTooltip, {}, {
-          trigger: () =>
-            h(NSpace, { justify: 'center', size: 'small' }, {
-              default: () => [
-                h(NButton, { size: 'small', tertiary: true, type: 'primary', onClick: () => handleEditDetail(row.ID) }, {
-                  default: () => $t('page.system.dictionary.editDetail')
-                }),
-                h(NPopconfirm, { onPositiveClick: () => handleDeleteDetail(row.ID) }, {
-                  trigger: () =>
-                    h(NButton, { size: 'small', tertiary: true, type: 'error' }, {
-                      default: () => $t('page.system.dictionary.deleteDetail')
-                    }),
-                  default: () => $t('page.system.dictionary.confirmDeleteDetail')
-                })
-              ]
-            }),
-          default: () => $t('page.system.dictionary.operation')
-        })
+        h(
+          NTooltip,
+          {},
+          {
+            trigger: () =>
+              h(
+                NSpace,
+                { justify: 'center', size: 'small' },
+                {
+                  default: () => [
+                    h(
+                      NButton,
+                      { size: 'small', tertiary: true, type: 'primary', onClick: () => handleEditDetail(row.ID) },
+                      {
+                        default: () => $t('page.system.dictionary.editDetail')
+                      }
+                    ),
+                    h(
+                      NPopconfirm,
+                      { onPositiveClick: () => handleDeleteDetail(row.ID) },
+                      {
+                        trigger: () =>
+                          h(
+                            NButton,
+                            { size: 'small', tertiary: true, type: 'error' },
+                            {
+                              default: () => $t('page.system.dictionary.deleteDetail')
+                            }
+                          ),
+                        default: () => $t('page.system.dictionary.confirmDeleteDetail')
+                      }
+                    )
+                  ]
+                }
+              ),
+            default: () => $t('page.system.dictionary.operation')
+          }
+        )
     }
   ];
 }
@@ -263,7 +307,12 @@ function createDetailColumns(): NaiveUI.TableColumn<DictionaryDetail>[] {
   <div class="min-h-500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
     <DictionarySearch v-model:model="searchParams" @search="getDataByPage" @reset="getDataByPage" />
 
-    <NCard :title="$t('page.system.dictionary.title')" :bordered="false" size="small" class="card-wrapper sm:flex-1-hidden">
+    <NCard
+      :title="$t('page.system.dictionary.title')"
+      :bordered="false"
+      size="small"
+      class="card-wrapper sm:flex-1-hidden"
+    >
       <template #header-extra>
         <TableHeaderOperation
           v-model:columns="columnChecks"

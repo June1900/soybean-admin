@@ -1,7 +1,13 @@
 import type { FlatResponseData } from '@sa/axios';
 import type { SysVersion, SysVersionForm, SysVersionListQuery, SysVersionListResponse } from './types';
 
-export type { SysVersion, SysVersionForm, SysVersionListQuery, SysVersionListResponse, VersionSearchParams } from './types';
+export type {
+  SysVersion,
+  SysVersionForm,
+  SysVersionListQuery,
+  SysVersionListResponse,
+  VersionSearchParams
+} from './types';
 
 /** UI-only：本地 mock 数据，不对接真实接口 */
 const mockVersions: SysVersion[] = Array.from({ length: 12 }).map((_, i) => ({
@@ -19,7 +25,9 @@ function resolve<T>(data: T): FlatResponseData<any, T> {
   return { data, error: null } as unknown as FlatResponseData<any, T>;
 }
 
-export async function fetchVersionList(params: SysVersionListQuery): Promise<FlatResponseData<any, SysVersionListResponse>> {
+export async function fetchVersionList(
+  params: SysVersionListQuery
+): Promise<FlatResponseData<any, SysVersionListResponse>> {
   const filtered = mockVersions.filter(v => {
     if (params.versionName && !v.versionName.includes(params.versionName)) return false;
     if (params.versionCode && !v.versionCode.includes(params.versionCode)) return false;

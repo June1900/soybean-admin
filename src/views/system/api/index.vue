@@ -124,11 +124,7 @@ function createAllColumns(): NaiveUI.TableColumn<Api>[] {
       width: 120,
       align: 'center',
       render: row =>
-        h(
-          NTag,
-          { type: methodTagType(row.method), size: 'small', bordered: false },
-          { default: () => row.method }
-        )
+        h(NTag, { type: methodTagType(row.method), size: 'small', bordered: false }, { default: () => row.method })
     },
     {
       key: 'operation',
@@ -137,24 +133,44 @@ function createAllColumns(): NaiveUI.TableColumn<Api>[] {
       fixed: 'right',
       width: 190,
       render: row =>
-        h(NTooltip, {}, {
-          trigger: () =>
-            h(NSpace, { justify: 'center', size: 'small' }, {
-              default: () => [
-                h(NButton, { size: 'small', tertiary: true, type: 'primary', onClick: () => handleEdit(row.ID) }, {
-                  default: () => $t('page.system.api.editApi')
-                }),
-                h(NPopconfirm, { onPositiveClick: () => handleDelete(row.ID) }, {
-                  trigger: () =>
-                    h(NButton, { size: 'small', tertiary: true, type: 'error' }, {
-                      default: () => $t('page.system.api.deleteApi')
-                    }),
-                  default: () => $t('page.system.api.confirmDelete')
-                })
-              ]
-            }),
-          default: () => $t('page.system.api.operation')
-        })
+        h(
+          NTooltip,
+          {},
+          {
+            trigger: () =>
+              h(
+                NSpace,
+                { justify: 'center', size: 'small' },
+                {
+                  default: () => [
+                    h(
+                      NButton,
+                      { size: 'small', tertiary: true, type: 'primary', onClick: () => handleEdit(row.ID) },
+                      {
+                        default: () => $t('page.system.api.editApi')
+                      }
+                    ),
+                    h(
+                      NPopconfirm,
+                      { onPositiveClick: () => handleDelete(row.ID) },
+                      {
+                        trigger: () =>
+                          h(
+                            NButton,
+                            { size: 'small', tertiary: true, type: 'error' },
+                            {
+                              default: () => $t('page.system.api.deleteApi')
+                            }
+                          ),
+                        default: () => $t('page.system.api.confirmDelete')
+                      }
+                    )
+                  ]
+                }
+              ),
+            default: () => $t('page.system.api.operation')
+          }
+        )
     }
   ];
 }

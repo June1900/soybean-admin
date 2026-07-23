@@ -4,7 +4,13 @@ import type { LoginLog, LoginLogListQuery, LoginLogListResponse } from './types'
 export type { LoginLog, LoginLogListQuery, LoginLogListResponse, LoginLogSearchParams } from './types';
 
 /** UI-only：本地 mock 数据，不对接真实接口 */
-const browsers = ['Chrome 120 / Windows', 'Safari 17 / macOS', 'Firefox 121 / Linux', 'Edge 120 / Windows', 'Mobile Safari / iOS'];
+const browsers = [
+  'Chrome 120 / Windows',
+  'Safari 17 / macOS',
+  'Firefox 121 / Linux',
+  'Edge 120 / Windows',
+  'Mobile Safari / iOS'
+];
 const mockLogs: LoginLog[] = Array.from({ length: 26 }).map((_, i) => {
   const ok = i % 4 !== 0;
   return {
@@ -22,7 +28,9 @@ function resolve<T>(data: T): FlatResponseData<any, T> {
   return { data, error: null } as unknown as FlatResponseData<any, T>;
 }
 
-export async function fetchLoginLogList(params: LoginLogListQuery): Promise<FlatResponseData<any, LoginLogListResponse>> {
+export async function fetchLoginLogList(
+  params: LoginLogListQuery
+): Promise<FlatResponseData<any, LoginLogListResponse>> {
   const filtered = mockLogs.filter(l => {
     if (params.username && !l.username.includes(params.username)) return false;
     if (params.status === 'success' && !l.status) return false;

@@ -2,7 +2,18 @@
 import { computed, ref, watch } from 'vue';
 import { useLoading } from '@sa/hooks';
 import type { FormInst, FormRules, SelectOption } from 'naive-ui';
-import { NDrawer, NDrawerContent, NForm, NFormItem, NInput, NInputNumber, NRadioGroup, NRadio, NSelect, NSpace } from 'naive-ui';
+import {
+  NDrawer,
+  NDrawerContent,
+  NForm,
+  NFormItem,
+  NInput,
+  NInputNumber,
+  NRadioGroup,
+  NRadio,
+  NSelect,
+  NSpace
+} from 'naive-ui';
 import { $t } from '@/locales';
 import {
   fetchCreateDictionaryDetail,
@@ -106,12 +117,7 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <NDrawer
-    :show="props.visible"
-    display-directive="show"
-    :width="480"
-    @update:show="val => !val && emit('close')"
-  >
+  <NDrawer :show="props.visible" display-directive="show" :width="480" @update:show="val => !val && emit('close')">
     <NDrawerContent :title="title" :native-scrollbar="false">
       <NForm ref="formRef" :model="model" :rules="rules" label-placement="left" :label-width="100">
         <NFormItem :label="$t('page.system.dictionary.label')" path="label">
@@ -139,7 +145,11 @@ async function handleSubmit() {
           </NRadioGroup>
         </NFormItem>
         <NFormItem :label="$t('page.system.dictionary.sort')" path="sort">
-          <NInputNumber v-model:value="model.sort" :placeholder="$t('page.system.dictionary.sortPlaceholder')" :min="0" />
+          <NInputNumber
+            v-model:value="model.sort"
+            :placeholder="$t('page.system.dictionary.sortPlaceholder')"
+            :min="0"
+          />
         </NFormItem>
       </NForm>
 

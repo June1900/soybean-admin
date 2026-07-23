@@ -4,7 +4,13 @@ import { NButton, NPopconfirm, NTag, NTooltip } from 'naive-ui';
 import { useAppStore } from '@/store/modules/app';
 import { useNaivePaginatedTable, useTableOperate } from '@/hooks/common/table';
 import { $t } from '@/locales';
-import { fetchDeleteDepartment, fetchGetDepartmentList, type Department, type DepartmentListQuery, type DepartmentSearchParams } from './api';
+import {
+  fetchDeleteDepartment,
+  fetchGetDepartmentList,
+  type Department,
+  type DepartmentListQuery,
+  type DepartmentSearchParams
+} from './api';
 import DepartmentOperateDrawer from './modules/department-operate-drawer.vue';
 import DepartmentSearch from './modules/department-search.vue';
 
@@ -40,15 +46,10 @@ function getQueryParams(): DepartmentListQuery {
   };
 }
 
-const {
-  data,
-  columns,
-  columnChecks,
-  getData,
-  getDataByPage,
-  loading,
-  mobilePagination
-} = useNaivePaginatedTable<DepartmentListResponse, Department>({
+const { data, columns, columnChecks, getData, getDataByPage, loading, mobilePagination } = useNaivePaginatedTable<
+  DepartmentListResponse,
+  Department
+>({
   api: () => fetchGetDepartmentList(getQueryParams()),
   transform: res => ({
     data: res.data?.list ?? [],
@@ -100,7 +101,10 @@ async function handleBatchDelete() {
 async function loadParentOptions(excludeId?: number) {
   const { data: res } = await fetchGetDepartmentList({ page: 1, pageSize: 9999 });
   const all = flatten(res?.list ?? []).filter(d => d.ID !== excludeId);
-  parentOptions.value = [{ label: $t('page.system.department.parentId'), value: 0 }, ...all.map(d => ({ label: d.name, value: d.ID }))];
+  parentOptions.value = [
+    { label: $t('page.system.department.parentId'), value: 0 },
+    ...all.map(d => ({ label: d.name, value: d.ID }))
+  ];
 }
 
 onMounted(() => {
@@ -127,7 +131,13 @@ function createAllColumns(): NaiveUI.TableColumn<Department>[] {
       render: row => parentName(row.parentId)
     },
     { key: 'leader', title: $t('page.system.department.leader'), minWidth: 120, render: row => row.leader || '-' },
-    { key: 'sort', title: $t('page.system.department.sort'), width: 80, align: 'center', render: row => row.sort ?? '-' },
+    {
+      key: 'sort',
+      title: $t('page.system.department.sort'),
+      width: 80,
+      align: 'center',
+      render: row => row.sort ?? '-'
+    },
     {
       key: 'status',
       title: $t('page.system.department.status'),
@@ -137,7 +147,10 @@ function createAllColumns(): NaiveUI.TableColumn<Department>[] {
         h(
           NTag,
           { size: 'small', type: row.status === 1 ? 'success' : 'default', bordered: false },
-          { default: () => (row.status === 1 ? $t('page.system.department.enabled') : $t('page.system.department.disabled')) }
+          {
+            default: () =>
+              row.status === 1 ? $t('page.system.department.enabled') : $t('page.system.department.disabled')
+          }
         )
     },
     {
@@ -147,24 +160,44 @@ function createAllColumns(): NaiveUI.TableColumn<Department>[] {
       fixed: 'right',
       width: 190,
       render: row =>
-        h(NTooltip, {}, {
-          trigger: () =>
-            h(NSpace, { justify: 'center', size: 'small' }, {
-              default: () => [
-                h(NButton, { size: 'small', tertiary: true, type: 'primary', onClick: () => handleEdit(row.ID) }, {
-                  default: () => $t('page.system.department.editDept')
-                }),
-                h(NPopconfirm, { onPositiveClick: () => handleDelete(row.ID) }, {
-                  trigger: () =>
-                    h(NButton, { size: 'small', tertiary: true, type: 'error' }, {
-                      default: () => $t('page.system.department.deleteDept')
-                    }),
-                  default: () => $t('page.system.department.confirmDelete')
-                })
-              ]
-            }),
-          default: () => $t('page.system.department.operation')
-        })
+        h(
+          NTooltip,
+          {},
+          {
+            trigger: () =>
+              h(
+                NSpace,
+                { justify: 'center', size: 'small' },
+                {
+                  default: () => [
+                    h(
+                      NButton,
+                      { size: 'small', tertiary: true, type: 'primary', onClick: () => handleEdit(row.ID) },
+                      {
+                        default: () => $t('page.system.department.editDept')
+                      }
+                    ),
+                    h(
+                      NPopconfirm,
+                      { onPositiveClick: () => handleDelete(row.ID) },
+                      {
+                        trigger: () =>
+                          h(
+                            NButton,
+                            { size: 'small', tertiary: true, type: 'error' },
+                            {
+                              default: () => $t('page.system.department.deleteDept')
+                            }
+                          ),
+                        default: () => $t('page.system.department.confirmDelete')
+                      }
+                    )
+                  ]
+                }
+              ),
+            default: () => $t('page.system.department.operation')
+          }
+        )
     }
   ];
 }
@@ -174,7 +207,12 @@ function createAllColumns(): NaiveUI.TableColumn<Department>[] {
   <div class="min-h-500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
     <DepartmentSearch v-model:model="searchModel" @search="getDataByPage" @reset="getDataByPage" />
 
-    <NCard :title="$t('page.system.department.title')" :bordered="false" size="small" class="card-wrapper sm:flex-1-hidden">
+    <NCard
+      :title="$t('page.system.department.title')"
+      :bordered="false"
+      size="small"
+      class="card-wrapper sm:flex-1-hidden"
+    >
       <template #header-extra>
         <TableHeaderOperation
           v-model:columns="columnChecks"

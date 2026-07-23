@@ -72,9 +72,7 @@ async function handleSubmit() {
       : await fetchCreateParams(payload as ParamsForm);
 
     if (!error) {
-      window.$message?.success(
-        isEdit ? $t('page.system.params.editSuccess') : $t('page.system.params.addSuccess')
-      );
+      window.$message?.success(isEdit ? $t('page.system.params.editSuccess') : $t('page.system.params.addSuccess'));
       emit('submitted');
       emit('close');
     }
@@ -85,12 +83,7 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <NDrawer
-    :show="props.visible"
-    display-directive="show"
-    :width="480"
-    @update:show="val => !val && emit('close')"
-  >
+  <NDrawer :show="props.visible" display-directive="show" :width="480" @update:show="val => !val && emit('close')">
     <NDrawerContent :title="title" :native-scrollbar="false">
       <NForm ref="formRef" :model="model" :rules="rules" label-placement="left" :label-width="90">
         <NFormItem :label="$t('page.system.params.name')" path="name">

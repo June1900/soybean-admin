@@ -51,7 +51,11 @@ async function search() {
               <NInput v-model:value="model.name" :placeholder="$t('page.system.menu.namePlaceholder')" clearable />
             </NFormItemGi>
             <NFormItemGi span="24 s:12 m:6" :label="$t('page.system.menu.component')" path="component" class="pr-24px">
-              <NInput v-model:value="model.component" :placeholder="$t('page.system.menu.componentPlaceholder')" clearable />
+              <NInput
+                v-model:value="model.component"
+                :placeholder="$t('page.system.menu.componentPlaceholder')"
+                clearable
+              />
             </NFormItemGi>
             <NFormItemGi span="24 m:12" class="pr-24px">
               <NSpace class="w-full" justify="end">

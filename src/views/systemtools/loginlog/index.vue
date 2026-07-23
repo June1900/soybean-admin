@@ -89,7 +89,10 @@ function createAllColumns(): NaiveUI.TableColumn<LoginLog>[] {
         h(
           NTag,
           { type: row.status ? 'success' : 'error', size: 'small', bordered: false },
-          { default: () => (row.status ? $t('page.systemTools.loginLog.search.success') : $t('page.systemTools.loginLog.search.fail')) }
+          {
+            default: () =>
+              row.status ? $t('page.systemTools.loginLog.search.success') : $t('page.systemTools.loginLog.search.fail')
+          }
         )
     },
     {
@@ -112,7 +115,12 @@ function createAllColumns(): NaiveUI.TableColumn<LoginLog>[] {
           NPopconfirm,
           { onPositiveClick: () => handleDelete(row) },
           {
-            trigger: () => h(NButton, { size: 'small', tertiary: true, type: 'error' }, { default: () => $t('page.systemTools.loginLog.columns.delete') }),
+            trigger: () =>
+              h(
+                NButton,
+                { size: 'small', tertiary: true, type: 'error' },
+                { default: () => $t('page.systemTools.loginLog.columns.delete') }
+              ),
             default: () => $t('common.confirmDelete')
           }
         )
@@ -129,7 +137,12 @@ onMounted(() => {
   <div class="min-h-500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
     <LoginLogSearch v-model:model="searchParams" @search="getDataByPage" @reset="getDataByPage" />
 
-    <NCard :title="$t('page.systemTools.loginLog.title')" :bordered="false" size="small" class="card-wrapper sm:flex-1-hidden">
+    <NCard
+      :title="$t('page.systemTools.loginLog.title')"
+      :bordered="false"
+      size="small"
+      class="card-wrapper sm:flex-1-hidden"
+    >
       <template #header-extra>
         <div class="flex-center gap-8px">
           <NButton size="small" :loading="loading" @click="getData">

@@ -1,7 +1,13 @@
 import { request } from '@/service/request';
 import type { DepartmentForm, DepartmentListQuery, DepartmentListResponse } from './types';
 
-export type { Department, DepartmentForm, DepartmentListQuery, DepartmentListResponse, DepartmentSearchParams } from './types';
+export type {
+  Department,
+  DepartmentForm,
+  DepartmentListQuery,
+  DepartmentListResponse,
+  DepartmentSearchParams
+} from './types';
 
 /** Get paginated department list. */
 export function fetchGetDepartmentList(params?: DepartmentListQuery) {

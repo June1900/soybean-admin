@@ -42,9 +42,7 @@ const rules: FormRules = {
   name: [{ required: true, message: $t('page.system.department.namePlaceholder'), trigger: 'blur' }]
 };
 
-const parentSelectOptions = computed(() =>
-  props.parentOptions.filter(o => o.value !== (props.editingData?.ID ?? -1))
-);
+const parentSelectOptions = computed(() => props.parentOptions.filter(o => o.value !== (props.editingData?.ID ?? -1)));
 
 watch(
   () => props.visible,
@@ -91,12 +89,7 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <NDrawer
-    :show="props.visible"
-    display-directive="show"
-    :width="480"
-    @update:show="val => !val && emit('close')"
-  >
+  <NDrawer :show="props.visible" display-directive="show" :width="480" @update:show="val => !val && emit('close')">
     <NDrawerContent :title="title" :native-scrollbar="false">
       <NForm ref="formRef" :model="model" :rules="rules" label-placement="left" :label-width="90">
         <NFormItem :label="$t('page.system.department.name')" path="name">
@@ -114,14 +107,14 @@ async function handleSubmit() {
           <NInput v-model:value="model.leader" :placeholder="$t('page.system.department.leaderPlaceholder')" />
         </NFormItem>
         <NFormItem :label="$t('page.system.department.sort')" path="sort">
-          <NInputNumber v-model:value="model.sort" :placeholder="$t('page.system.department.sortPlaceholder')" :min="0" />
+          <NInputNumber
+            v-model:value="model.sort"
+            :placeholder="$t('page.system.department.sortPlaceholder')"
+            :min="0"
+          />
         </NFormItem>
         <NFormItem :label="$t('page.system.department.status')" path="status">
-          <NSwitch
-            v-model:value="model.status"
-            :checked-value="1"
-            :unchecked-value="2"
-          />
+          <NSwitch v-model:value="model.status" :checked-value="1" :unchecked-value="2" />
         </NFormItem>
       </NForm>
 

@@ -1,9 +1,26 @@
 <script setup lang="ts">
-import { computed, h, onMounted, reactive, ref } from 'vue';
-import { NButton, NEmpty, NInput, NPopconfirm, NScrollbar, NSpin, NTag, NTooltip, NPagination, useThemeVars } from 'naive-ui';
+import { computed, h, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
+import {
+  NButton,
+  NEmpty,
+  NInput,
+  NPopconfirm,
+  NScrollbar,
+  NSpin,
+  NTag,
+  NTooltip,
+  NPagination,
+  useThemeVars
+} from 'naive-ui';
 import { useAppStore } from '@/store/modules/app';
 import { $t } from '@/locales';
-import { fetchDeletePosition, fetchGetPositionList, fetchGetPositionUsers, fetchSetPositionUsers, type Position } from './api';
+import {
+  fetchDeletePosition,
+  fetchGetPositionList,
+  fetchGetPositionUsers,
+  fetchSetPositionUsers,
+  type Position
+} from './api';
 import { fetchGetUserList, type User } from '@/views/system/user/api';
 import PositionOperateDrawer from './modules/position-operate-drawer.vue';
 
@@ -15,6 +32,55 @@ const appStore = useAppStore();
 
 // naive-ui 主题主色，注入为局部 CSS 变量供样式使用
 const themeVars = useThemeVars();
+
+// 左侧面板宽度百分比（可拖拽分隔条调整）
+const MIN_PERCENT = 20;
+const MAX_PERCENT = 50;
+const DEFAULT_PERCENT = 25;
+const leftPanelPercent = ref(DEFAULT_PERCENT);
+const isDragging = ref(false);
+const containerRef = ref<HTMLElement | null>(null);
+
+const leftPanelStyle = computed(() => {
+  if (appStore.isMobile) return {};
+  return { width: `${leftPanelPercent.value}%` };
+});
+
+function handleDragMove(ev: MouseEvent) {
+  if (!containerRef.value) return;
+  const rect = containerRef.value.getBoundingClientRect();
+  // 容器有 16px padding，按内容区计算百分比
+  const contentLeft = rect.left + 16;
+  const contentWidth = rect.width - 32;
+  if (contentWidth <= 0) return;
+  const percent = ((ev.clientX - contentLeft) / contentWidth) * 100;
+  leftPanelPercent.value = Math.max(MIN_PERCENT, Math.min(MAX_PERCENT, percent));
+}
+
+function handleDragEnd() {
+  isDragging.value = false;
+  document.body.style.cursor = '';
+  document.body.style.userSelect = '';
+  document.removeEventListener('mousemove', handleDragMove);
+  document.removeEventListener('mouseup', handleDragEnd);
+}
+
+function startDrag(e: MouseEvent) {
+  if (appStore.isMobile) return;
+  e.preventDefault();
+  isDragging.value = true;
+  document.body.style.cursor = 'col-resize';
+  document.body.style.userSelect = 'none';
+  document.addEventListener('mousemove', handleDragMove);
+  document.addEventListener('mouseup', handleDragEnd);
+}
+
+onBeforeUnmount(() => {
+  document.removeEventListener('mousemove', handleDragMove);
+  document.removeEventListener('mouseup', handleDragEnd);
+  document.body.style.cursor = '';
+  document.body.style.userSelect = '';
+});
 
 // 左侧面板：岗位列表（已对接接口）
 
@@ -236,8 +302,7 @@ const memberColumns: NaiveUI.TableColumn<User>[] = [
     title: $t('page.system.position.nickName'),
     align: 'center',
     minWidth: 120,
-    render: row =>
-      h(NTag, { size: 'small', bordered: false, type: 'info' }, { default: () => row.nickName })
+    render: row => h(NTag, { size: 'small', bordered: false, type: 'info' }, { default: () => row.nickName })
   }
 ];
 
@@ -254,13 +319,15 @@ onMounted(async () => {
 
 <template>
   <div
-    class="position-page flex h-full gap-16px overflow-hidden p-16px lt-sm:block lt-sm:overflow-auto"
-    :style="{ '--theme-primary': themeVars.primaryColor }"
+    ref="containerRef"
+    class="position-page flex h-full overflow-hidden p-16px lt-sm:block lt-sm:overflow-auto"
+    :style="{ '--theme-primary': themeVars.primaryColor, '--theme-border': themeVars.borderColor }"
   >
     <NCard
       :bordered="false"
       size="small"
-      class="position-page__left w-280px flex-shrink-0 self-stretch lt-sm:w-full lt-sm:mb-16px"
+      class="position-page__left flex-shrink-0 self-stretch lt-sm:w-full lt-sm:mb-16px"
+      :style="leftPanelStyle"
       :content-style="{ display: 'flex', flexDirection: 'column', minHeight: 0 }"
     >
       <template #header>
@@ -313,6 +380,8 @@ onMounted(async () => {
         </NSpin>
       </NScrollbar>
     </NCard>
+
+    <div class="drag-handle lt-sm:hidden" :class="{ 'is-dragging': isDragging }" @mousedown="startDrag"></div>
 
     <NCard
       :bordered="false"
@@ -426,6 +495,36 @@ onMounted(async () => {
   }
 }
 
+// 左右面板之间的拖拽分隔条
+.drag-handle {
+  width: 16px;
+  flex-shrink: 0;
+  align-self: stretch;
+  position: relative;
+  cursor: col-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+
+  &::after {
+    content: '';
+    width: 2px;
+    height: 40px;
+    border-radius: 2px;
+    background-color: var(--theme-border, rgb(224, 224, 230));
+    transition:
+      background-color 0.2s ease,
+      height 0.2s ease;
+  }
+
+  &:hover::after,
+  &.is-dragging::after {
+    background-color: var(--theme-primary, #18a058);
+    height: 64px;
+  }
+}
+
 .position-list {
   list-style: none;
   margin: 0;
@@ -494,7 +593,9 @@ onMounted(async () => {
   cursor: pointer;
   font-size: 13px;
   color: var(--n-text-color-base);
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
   margin-bottom: 6px;
 
   &__name {

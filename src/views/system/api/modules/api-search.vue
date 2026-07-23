@@ -56,7 +56,11 @@ async function search() {
               <NInput v-model:value="model.path" :placeholder="$t('page.system.api.pathPlaceholder')" clearable />
             </NFormItemGi>
             <NFormItemGi span="24 s:12 m:6" :label="$t('page.system.api.apiGroup')" path="apiGroup" class="pr-24px">
-              <NInput v-model:value="model.apiGroup" :placeholder="$t('page.system.api.apiGroupPlaceholder')" clearable />
+              <NInput
+                v-model:value="model.apiGroup"
+                :placeholder="$t('page.system.api.apiGroupPlaceholder')"
+                clearable
+              />
             </NFormItemGi>
             <NFormItemGi span="24 s:12 m:6" :label="$t('page.system.api.method')" path="method" class="pr-24px">
               <NSelect

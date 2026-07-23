@@ -1,6 +1,38 @@
 import json5 from 'json5';
 
 /**
+ * Parse `VITE_OTHER_SERVICE_BASE_URL` from a tuple-array string into a record
+ *
+ * @param raw The raw env string (json5). In `.env` files it is wrapped in
+ *   backticks, e.g. `` VITE_OTHER_SERVICE_BASE_URL=`[["demo","http://..."]]` ``.
+ *   Each tuple is `[key, baseURL]`; the parsed record maps key -> baseURL.
+ */
+function parseOtherServiceBaseURLs(raw: string): Record<string, string> {
+  const result: Record<string, string> = {};
+  try {
+    const tuples = json5.parse(raw);
+    if (!Array.isArray(tuples)) {
+      // eslint-disable-next-line no-console
+      console.error('VITE_OTHER_SERVICE_BASE_URL should be a tuple array like [["demo","http://..."]]');
+      return result;
+    }
+    for (const item of tuples) {
+      if (!Array.isArray(item) || item.length < 2 || typeof item[0] !== 'string') {
+        // eslint-disable-next-line no-console
+        console.warn('Skip invalid item in VITE_OTHER_SERVICE_BASE_URL:', item);
+        continue;
+      }
+      const key = item[0];
+      result[key] = typeof item[1] === 'string' ? item[1] : String(item[1] ?? '');
+    }
+  } catch {
+    // eslint-disable-next-line no-console
+    console.error('VITE_OTHER_SERVICE_BASE_URL is not a valid json5 string');
+  }
+  return result;
+}
+
+/**
  * Create service config by current env
  *
  * @param env The current env
@@ -8,13 +40,7 @@ import json5 from 'json5';
 export function createServiceConfig(env: Env.ImportMeta) {
   const { VITE_SERVICE_BASE_URL, VITE_OTHER_SERVICE_BASE_URL } = env;
 
-  let other = {} as Record<App.Service.OtherBaseURLKey, string>;
-  try {
-    other = json5.parse(VITE_OTHER_SERVICE_BASE_URL);
-  } catch {
-    // eslint-disable-next-line no-console
-    console.error('VITE_OTHER_SERVICE_BASE_URL is not a valid json5 string');
-  }
+  const other = parseOtherServiceBaseURLs(VITE_OTHER_SERVICE_BASE_URL);
 
   const httpConfig: App.Service.SimpleServiceConfig = {
     baseURL: VITE_SERVICE_BASE_URL,

@@ -61,9 +61,9 @@ declare namespace Env {
     /** when the route mode is static, the defined super role */
     readonly VITE_STATIC_SUPER_ROLE: string;
     /**
-     * other backend service base url
+     * other backend service base urls
      *
-     * the value is a json
+     * the value is a json5 tuple array, e.g. `[["demo","http://localhost:9528"]]`
      */
     readonly VITE_OTHER_SERVICE_BASE_URL: string;
     /**

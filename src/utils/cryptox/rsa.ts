@@ -10,13 +10,7 @@
  */
 export async function importPublicKey(pemOrBase64: string): Promise<CryptoKey> {
   const der = pemOrDer(pemOrBase64);
-  return globalThis.crypto.subtle.importKey(
-    'spki',
-    der,
-    { name: 'RSA-OAEP', hash: 'SHA-256' },
-    false,
-    ['encrypt']
-  );
+  return globalThis.crypto.subtle.importKey('spki', der, { name: 'RSA-OAEP', hash: 'SHA-256' }, false, ['encrypt']);
 }
 
 /**
@@ -25,13 +19,7 @@ export async function importPublicKey(pemOrBase64: string): Promise<CryptoKey> {
  */
 export async function importPrivateKey(pemOrBase64: string): Promise<CryptoKey> {
   const der = pemOrDer(pemOrBase64);
-  return globalThis.crypto.subtle.importKey(
-    'pkcs8',
-    der,
-    { name: 'RSA-OAEP', hash: 'SHA-256' },
-    false,
-    ['decrypt']
-  );
+  return globalThis.crypto.subtle.importKey('pkcs8', der, { name: 'RSA-OAEP', hash: 'SHA-256' }, false, ['decrypt']);
 }
 
 /**
@@ -85,7 +73,9 @@ function pemOrDer(input: string): ArrayBuffer {
   try {
     binary = atob(body);
   } catch (e) {
-    throw new Error(`base64 decode failed: ${(e as Error)?.message ?? e}; input head="${input.slice(0, 60)}..."`, { cause: e });
+    throw new Error(`base64 decode failed: ${(e as Error)?.message ?? e}; input head="${input.slice(0, 60)}..."`, {
+      cause: e
+    });
   }
 
   const bytes = new Uint8Array(binary.length);

@@ -32,15 +32,10 @@ const searchParams = reactive<TimedTaskSearchParams>({
 /* ---------- table ---------- */
 type TimedTaskListApiResponse = Awaited<ReturnType<typeof fetchGetTimedTaskList>>;
 
-const {
-  columns,
-  columnChecks,
-  data,
-  getData,
-  getDataByPage,
-  loading,
-  mobilePagination
-} = useNaivePaginatedTable<TimedTaskListApiResponse, TimedTask>({
+const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagination } = useNaivePaginatedTable<
+  TimedTaskListApiResponse,
+  TimedTask
+>({
   api: () => fetchGetTimedTaskList(getQueryParams() as any),
   transform: res => {
     const body = res.data || { list: [], total: 0, page: 1, pageSize: 10 };
@@ -56,7 +51,11 @@ const {
 
 const scrollX = computed(() =>
   columns.value.reduce(
-    (acc, col) => acc + ((col as { width?: number; minWidth?: number }).width ?? (col as { width?: number; minWidth?: number }).minWidth ?? 120),
+    (acc, col) =>
+      acc +
+      ((col as { width?: number; minWidth?: number }).width ??
+        (col as { width?: number; minWidth?: number }).minWidth ??
+        120),
     0
   )
 );
@@ -88,7 +87,9 @@ const {
 async function handleToggle(row: TimedTask, enabled: boolean) {
   const { error } = await fetchToggleTimedTask(row.ID, enabled);
   if (!error) {
-    window.$message?.success(enabled ? $t('page.systemTools.timedTask.enable') : $t('page.systemTools.timedTask.disable'));
+    window.$message?.success(
+      enabled ? $t('page.systemTools.timedTask.enable') : $t('page.systemTools.timedTask.disable')
+    );
   }
   await getData();
 }
@@ -167,7 +168,11 @@ const logColumns: NaiveUI.TableColumn<TimedTaskLog>[] = [
     type: 'expand',
     renderExpand: (row: TimedTaskLog) => {
       if (row.errorMsg)
-        return h('p', { class: 'text-red-500 break-all p-4' }, `${$t('page.systemTools.timedTask.log.error')}：${row.errorMsg}`);
+        return h(
+          'p',
+          { class: 'text-red-500 break-all p-4' },
+          `${$t('page.systemTools.timedTask.log.error')}：${row.errorMsg}`
+        );
       if (row.output)
         return h('p', { class: 'break-all mt-1 p-4' }, `${$t('page.systemTools.timedTask.log.output')}：${row.output}`);
       return h('p', { class: 'text-gray-400 p-4' }, $t('page.systemTools.timedTask.log.noDetail'));
@@ -181,7 +186,12 @@ const logColumns: NaiveUI.TableColumn<TimedTaskLog>[] = [
       h(
         NTag,
         { type: row.triggerType === 'auto' ? 'info' : 'warning', size: 'small', bordered: false },
-        { default: () => (row.triggerType === 'auto' ? $t('page.systemTools.timedTask.log.auto') : $t('page.systemTools.timedTask.log.manual')) }
+        {
+          default: () =>
+            row.triggerType === 'auto'
+              ? $t('page.systemTools.timedTask.log.auto')
+              : $t('page.systemTools.timedTask.log.manual')
+        }
       )
   },
   {
@@ -192,7 +202,12 @@ const logColumns: NaiveUI.TableColumn<TimedTaskLog>[] = [
       h(
         NTag,
         { type: row.status === 'success' ? 'success' : 'error', size: 'small', bordered: false },
-        { default: () => (row.status === 'success' ? $t('page.systemTools.timedTask.log.success') : $t('page.systemTools.timedTask.log.failed')) }
+        {
+          default: () =>
+            row.status === 'success'
+              ? $t('page.systemTools.timedTask.log.success')
+              : $t('page.systemTools.timedTask.log.failed')
+        }
       )
   },
   { key: 'startedAt', title: $t('page.systemTools.timedTask.log.startedAt'), width: 180 },
@@ -309,7 +324,12 @@ function createAllColumns(): NaiveUI.TableColumn<TimedTask>[] {
   <div class="min-h-500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
     <TimedTaskSearch v-model:model="searchParams" @search="getDataByPage" @reset="getDataByPage" />
 
-    <NCard :title="$t('page.systemTools.timedTask.title')" :bordered="false" size="small" class="card-wrapper sm:flex-1-hidden">
+    <NCard
+      :title="$t('page.systemTools.timedTask.title')"
+      :bordered="false"
+      size="small"
+      class="card-wrapper sm:flex-1-hidden"
+    >
       <template #header-extra>
         <TableHeaderOperation
           v-model:columns="columnChecks"
@@ -346,7 +366,10 @@ function createAllColumns(): NaiveUI.TableColumn<TimedTask>[] {
     </NCard>
 
     <NDrawer v-model:show="logVisible" :width="640" placement="right">
-      <NDrawerContent :title="`${$t('page.systemTools.timedTask.log.title')}：${logTaskName}`" :native-scrollbar="false">
+      <NDrawerContent
+        :title="`${$t('page.systemTools.timedTask.log.title')}：${logTaskName}`"
+        :native-scrollbar="false"
+      >
         <NDataTable
           :columns="logColumns"
           :data="logData"

@@ -48,14 +48,14 @@ watch(
     if (!val) return;
     const editing = props.operateType === 'edit' && props.editingData;
     model.value = editing
-          ? {
-              ID: props.editingData!.ID,
-              name: props.editingData!.name,
-              code: props.editingData!.code,
-              sort: props.editingData!.sort,
-              status: props.editingData!.status,
-              remark: props.editingData!.remark
-            }
+      ? {
+          ID: props.editingData!.ID,
+          name: props.editingData!.name,
+          code: props.editingData!.code,
+          sort: props.editingData!.sort,
+          status: props.editingData!.status,
+          remark: props.editingData!.remark
+        }
       : createDefaultModel();
   }
 );
@@ -74,9 +74,7 @@ async function handleSubmit() {
       : await fetchCreatePosition(payload as PositionForm);
 
     if (!error) {
-      window.$message?.success(
-        isEdit ? $t('page.system.position.editSuccess') : $t('page.system.position.addSuccess')
-      );
+      window.$message?.success(isEdit ? $t('page.system.position.editSuccess') : $t('page.system.position.addSuccess'));
       emit('submitted');
       emit('close');
     }
@@ -87,12 +85,7 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <NDrawer
-    :show="props.visible"
-    display-directive="show"
-    :width="480"
-    @update:show="val => !val && emit('close')"
-  >
+  <NDrawer :show="props.visible" display-directive="show" :width="480" @update:show="val => !val && emit('close')">
     <NDrawerContent :title="title" :native-scrollbar="false">
       <NForm ref="formRef" :model="model" :rules="rules" label-placement="left" :label-width="90">
         <NFormItem :label="$t('page.system.position.name')" path="name">
