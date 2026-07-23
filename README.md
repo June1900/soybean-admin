@@ -1,266 +1,208 @@
 <div align="center">
-	<img src="./public/favicon.svg" width="160" />
-	<h1>SoybeanAdmin</h1>
-  <span>中文 | <a href="./README.en_US.md">English</a></span>
+  <img src="./public/favicon.svg" width="120" />
+  <h1>SoybeanAdmin</h1>
+  <p>基于 Vue 3 的清新优雅、高颜值中后台管理模板（本仓库为定制版）</p>
 </div>
 
 ---
 
-[![license](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
-[![github stars](https://img.shields.io/github/stars/honghuangdc/soybean-admin)](https://github.com/soybeanjs/soybean-admin)
-[![github forks](https://img.shields.io/github/forks/honghuangdc/soybean-admin)](https://github.com/soybeanjs/soybean-admin)
-[![gitee stars](https://gitee.com/honghuangdc/soybean-admin/badge/star.svg)](https://gitee.com/honghuangdc/soybean-admin)
-[![gitcode star](https://gitcode.com/soybeanjs/soybean-admin/star/badge.svg)](https://gitcode.com/soybeanjs/soybean-admin)
-
-<div style="display: flex; gap: 12px; align-items: center;">
-  <a href="https://trendshift.io/repositories/7963" target="_blank"><img src="https://trendshift.io/api/badge/repositories/7963" alt="soybeanjs%2Fsoybean-admin | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
-  <a href="https://hellogithub.com/repository/1298f27d5fe54959a16cf9686516ddb3" target="_blank"><img src="https://abroad.hellogithub.com/v1/widgets/recommend.svg?rid=1298f27d5fe54959a16cf9686516ddb3&claim_uid=IiDXWmP4TEntjbV" alt="Featured｜HelloGitHub" style="width: 250px; height: 54px;" width="250" height="54" /></a>
-</div>
-
-> [!NOTE]
-> 如果您觉得 `SoybeanAdmin`对您有所帮助，或者您喜欢我们的项目，请在 GitHub 上给我们一个 ⭐️。您的支持是我们持续改进和增加新功能的动力！感谢您的支持！
-
-> [!NOTE]
-> `SoybeanAdmin` 快速上手系列视频已在 [Bilibili](https://www.bilibili.com/video/BV1YKdRYXELC) 上线 [点击这里](https://www.bilibili.com/video/BV1YKdRYXELC) 前往查看
-
-<div align="center">
-  <table width="100%">
-    <tr>
-      <td align="left">
-        <table>
-          <tr>
-            <td>
-              <a href="https://ui.soybeanjs.cn">
-                <img alt="SoybeanUI" src="./public/favicon.svg" width="52" />
-              </a>
-            </td>
-            <td>
-              <a href="https://ui.soybeanjs.cn">
-                <img
-                  alt="SoybeanUI"
-                  src="https://img.shields.io/badge/SoybeanUI-Headless%20%2B%20UI-6366f1?style=for-the-badge&labelColor=312e81"
-                />
-              </a>
-            </td>
-          </tr>
-        </table>
-        <strong>面向 Vue 3 的强大而优雅的组件系统，提供无头交互能力与开箱即用的样式封装。</strong><br />
-        <sub>采用 Headless + UI 两层架构，复用底层交互能力，统一上层界面表达。</sub>
-        <br /><br />
-        <img alt="Vue 3" src="https://img.shields.io/badge/Vue%203-Component%20Library-6366f1?style=flat-square&labelColor=4338ca" />
-        <img alt="Headless" src="https://img.shields.io/badge/Headless-Logic%20%26%20State-818cf8?style=flat-square&labelColor=3730a3" />
-        <img alt="Admin" src="https://img.shields.io/badge/Admin-Professional%20UI-a5b4fc?style=flat-square&labelColor=4f46e5" />
-      </td>
-      <td align="right">
-        <a href="https://ui.soybeanjs.cn">
-          <img
-            alt="Visit SoybeanUI"
-            src="https://img.shields.io/badge/%E7%AB%8B%E5%8D%B3%E8%AE%BF%E9%97%AE-ui.soybeanjs.cn-6366f1?style=for-the-badge&labelColor=312e81&logo=vercel&logoColor=white"
-          />
-        </a>
-      </td>
-    </tr>
-  </table>
-</div>
+> 本项目基于 [SoybeanAdmin](https://github.com/soybeanjs/soybean-admin)（v2.2.0）定制，在保留其工程化能力的基础上，新增了**非侵入式接口加密**（验证码 / 登录 AES + RSA）等定制能力。
 
 ## 简介
 
-[`SoybeanAdmin`](https://github.com/soybeanjs/soybean-admin) 是一个清新优雅、高颜值且功能强大的后台管理模板，基于最新的前端技术栈，包括 Vue3, Vite8, TypeScript, Pinia 和 UnoCSS。它内置了丰富的主题配置和组件，代码规范严谨，实现了自动化的文件路由系统。此外，它还采用了基于 ApiFox 的在线Mock数据方案。`SoybeanAdmin` 为您提供了一站式的后台管理解决方案，无需额外配置，开箱即用。同样是一个快速学习前沿技术的最佳实践。
+SoybeanAdmin 是一个清新优雅、高颜值且功能强大的后台管理模板，基于最新的前端技术栈构建，包括 **Vue 3、Vite 8、TypeScript、Pinia、UnoCSS、Naive UI**。内置了丰富的主题配置与组件，代码规范严谨，实现了自动化的文件路由系统，并采用基于 Mock 的在线接口方案，开箱即用。
+
+本定制仓库在官方模板之上：
+
+- 新增 `src/utils/cryptox` 加密模块（AES-256 + RSA-OAEP），参考 gin-vue-admin 的加密接口实现；
+- 在 `@sa/axios` 请求管线中扩展 `onResponse` 钩子，使「验证码 / 登录」请求与响应可非侵入式加解密；
+- 通过环境变量开关控制，默认关闭，对其它接口零影响。
+
+## 技术栈
+
+| 分类 | 技术 |
+| --- | --- |
+| 框架 | Vue 3.5（`<script setup>` + TSX） |
+| 构建 | Vite 8 |
+| 语言 | TypeScript 6（严格模式） |
+| 状态管理 | Pinia 3 |
+| UI 组件 | Naive UI 2.44 |
+| 样式 | UnoCSS 66 |
+| 路由 | Vue Router 5（Elegant Router 自动生成） |
+| 请求 | 自研 `@sa/axios`（Axios 封装） |
+| 工具 | VueUse、dayjs、echarts、@iconify/vue |
 
 ## 特性
 
-- **前沿技术应用**：采用 Vue3, Vite8, TypeScript, Pinia 和 UnoCSS 等最新流行的技术栈。
-- **清晰的项目架构**：采用 pnpm monorepo 架构，结构清晰，优雅易懂。
-- **严格的代码规范**：遵循 [SoybeanJS 规范](https://docs.soybeanjs.cn/zh/standard)，集成了eslint, prettier 和 simple-git-hooks，保证代码的规范性。
-- **TypeScript**： 支持严格的类型检查，提高代码的可维护性。
-- **丰富的主题配置**：内置多样的主题配置，与 UnoCSS 完美结合。
-- **内置国际化方案**：轻松实现多语言支持。
-- **自动化文件路由系统**：自动生成路由导入、声明和类型。更多细节请查看 [Elegant Router](https://github.com/soybeanjs/elegant-router)。
-- **灵活的权限路由**：同时支持前端静态路由和后端动态路由。
-- **丰富的页面组件**：内置多样页面和组件，包括403、404、500页面，以及布局组件、标签组件、主题配置组件等。
-- **命令行工具**：内置高效的命令行工具，git提交、删除文件、发布等。
-- **移动端适配**：完美支持移动端，实现自适应布局。
+- **前沿技术栈**：Vue 3 + Vite 8 + TypeScript + Pinia + UnoCSS + Naive UI。
+- **清晰的 monorepo 架构**：`packages/` 内聚 `@sa/*` 内部包，结构清晰、可复用。
+- **严格的代码规范**：集成 ESLint / Prettier / oxlint / simple-git-hooks，提交前置校验。
+- **类型安全**：全量 TypeScript 严格类型检查。
+- **主题与国际化**：内置多样主题配置，开箱即用的 i18n 方案。
+- **自动化路由**：基于 Elegant Router 自动生成路由导入、声明与类型。
+- **灵活的权限路由**：同时支持前端静态路由与后端动态路由（`VITE_AUTH_ROUTE_MODE`）。
+- **非侵入式接口加密**：可对指定接口（验证码 / 登录）启用 AES + RSA 加解密，详见[接口加密](#接口加密)。
 
-## 版本
+## 目录结构
 
-- **NaiveUI 版本:**
-  - [预览地址](https://naive.soybeanjs.cn/)
-  - [Github 仓库](https://github.com/soybeanjs/soybean-admin)
-  - [Gitee 仓库](https://gitee.com/honghuangdc/soybean-admin)
-  - [Gitcode 仓库](https://gitcode.com/soybeanjs/soybean-admin)
-- **AntDesignVue 版本:**
-  - [预览地址](https://antd.soybeanjs.cn/)
-  - [Github 仓库](https://github.com/soybeanjs/soybean-admin-antd)
-  - [Gitee 仓库](https://gitee.com/honghuangdc/soybean-admin-antd)
-  - [Gitcode 仓库](https://gitcode.com/soybeanjs/soybean-admin-antd)
-- **ElementPlus 版本:**
-  - [预览地址](https://elp.soybeanjs.cn/)
-  - [Github 仓库](https://github.com/soybeanjs/soybean-admin-element-plus)
-  - [Gitee 仓库](https://gitee.com/honghuangdc/soybean-admin-element-plus)
-  - [Gitcode 仓库](https://gitcode.com/soybeanjs/soybean-admin-element-plus)
-- **旧版:**
-  - [预览地址](https://legacy.soybeanjs.cn/)
-  - [Github 仓库](https://github.com/soybeanjs/soybean-admin/tree/legacy)
-  - [Gitee 仓库](https://gitee.com/honghuangdc/soybean-admin/tree/legacy)
-  - [Gitcode 仓库](https://gitcode.com/soybeanjs/soybean-admin/tree/legacy)
-
-## 文档
-
-- [地址](https://docs.soybeanjs.cn)
-- [旧版文档](https://legacy-docs.soybeanjs.cn)
-
-## 合作事项
-
-我们非常感谢大家对 [`SoybeanAdmin`](https://github.com/soybeanjs/soybean-admin) 的支持！为了进一步回馈社区，并助力企业和开发者实现个性化需求，我们现提供多种合作服务，期待与您携手共赢。
-
-##### 1、定制化管理后台开发
-
-针对企业和开发者的特定业务需求，我们提供基于 [`SoybeanAdmin`](https://github.com/soybeanjs/soybean-admin) 的定制化管理后台开发服务。我们的团队具备丰富的行业经验，能够迅速理解并实现您的需求，打造高效、灵活且安全的定制化解决方案。
-
-- **定制开发**：我们将根据您的具体需求，提供从需求分析、UI设计到功能实现的全方位服务，确保项目高效交付。
-- **功能扩展**：在 [`SoybeanAdmin`](https://github.com/soybeanjs/soybean-admin) 基础上，扩展您所需的特定功能模块，提升管理后台的功能和用户体验。
-
-##### 2、企业外包服务
-
-我们承接各类企业级外包项目，特别是在管理后台系统的开发、集成与运维方面。我们以精益求精的态度，确保项目的质量和进度，为您的业务提供强有力的技术支持。
-
-- **项目开发**：无论是全新的项目，还是现有系统的优化与集成，我们都将为您量身打造高效可靠的解决方案。
-- **系统集成与维护**：我们也提供基于 [`SoybeanAdmin`](https://github.com/soybeanjs/soybean-admin) 的系统集成与长期维护服务，确保您的系统稳定、安全地运行。
-
-##### 3、联系方式
-
-如有合作意向或项目咨询，请通过以下方式与我们联系：
-
-- **Email**: [soybeanjs@outlook.com](mailto:soybeanjs@outlook.com)
-- **GitHub Issues**: 欢迎通过 [GitHub Issues](https://github.com/soybeanjs/soybean-admin/issues/new) 联系我们，进行初步的合作洽谈。
-- **商务合作微信**: honghuangdc
-
-期待与您开展深入合作，共同推动 SoybeanAdmin 项目及其在更多领域的成功应用！
-
-## 示例图片
-
-![](https://soybeanjs-1300612522.cos.ap-guangzhou.myqcloud.com/uPic/soybean-admin-v1-01.png)
-![](https://soybeanjs-1300612522.cos.ap-guangzhou.myqcloud.com/uPic/soybean-admin-v1-02.png)
-![](https://soybeanjs-1300612522.cos.ap-guangzhou.myqcloud.com/uPic/soybean-admin-v1-03.png)
-![](https://soybeanjs-1300612522.cos.ap-guangzhou.myqcloud.com/uPic/soybean-admin-v1-04.png)
-![](https://soybeanjs-1300612522.cos.ap-guangzhou.myqcloud.com/uPic/soybean-admin-v1-05.png)
-![](https://soybeanjs-1300612522.cos.ap-guangzhou.myqcloud.com/uPic/soybean-admin-v1-06.png)
-![](https://soybeanjs-1300612522.cos.ap-guangzhou.myqcloud.com/uPic/soybean-admin-v1-07.png)
-![](https://soybeanjs-1300612522.cos.ap-guangzhou.myqcloud.com/uPic/soybean-admin-v1-08.png)
-![](https://soybeanjs-1300612522.cos.ap-guangzhou.myqcloud.com/uPic/soybean-admin-v1-09.png)
-![](https://soybeanjs-1300612522.cos.ap-guangzhou.myqcloud.com/uPic/soybean-admin-v1-10.png)
-![](https://soybeanjs-1300612522.cos.ap-guangzhou.myqcloud.com/uPic/soybean-admin-v1-mobile.png)
-
-## 使用
-
-**环境准备**
-
-确保你的环境满足以下要求：
-
-- **git**: 你需要git来克隆和管理项目版本。
-- **NodeJS**: >=20.19.0，推荐 20.19.0 或更高。
-- **pnpm**: >= 10.5.0，推荐 10.5.0 或更高。
-
-**克隆项目**
-
-```bash
-# github
-git clone https://github.com/soybeanjs/soybean-admin.git
-# gitee
-git clone https://gitee.com/honghuangdc/soybean-admin.git
-# gitcode
-git clone https://gitcode.com/soybeanjs/soybean-admin.git
+```text
+soybean-admin/
+├── build/                     # 构建相关脚本
+├── packages/                  # monorepo 内部包（@sa/*）
+│   ├── axios/                 #   请求封装（已扩展 onResponse 钩子）
+│   ├── alova/                 #   alova 请求封装
+│   ├── color/                 #   颜色工具
+│   ├── hooks/                 #   通用组合式函数
+│   ├── materials/             #   物料/模板
+│   ├── scripts/               #   脚手架与脚本（sa 命令）
+│   ├── uno-preset/            #   UnoCSS 预设
+│   └── utils/                 #   通用工具
+├── public/                    # 静态资源
+├── src/
+│   ├── assets/                # 资源
+│   ├── components/            # 通用组件
+│   ├── constants/             # 常量
+│   ├── enum/                  # 枚举
+│   ├── hooks/                 # 组合式函数
+│   ├── layouts/               # 布局
+│   ├── locales/               # 国际化
+│   ├── plugins/               # 插件
+│   ├── router/                # 路由（自动生成）
+│   ├── service/               # 接口层
+│   │   ├── api/               #   各业务 API（auth 等）
+│   │   └── request/           #   请求实例与拦截器
+│   ├── store/                 # Pinia 状态
+│   ├── styles/                # 全局样式
+│   ├── theme/                 # 主题
+│   ├── typings/               # 类型声明
+│   ├── utils/                 # 工具
+│   │   └── cryptox/           #   加密模块（AES/RSA/拦截器）
+│   └── views/                 # 页面
+├── .env / .env.prod / .env.test
+├── vite.config.ts
+└── package.json
 ```
 
-**安装依赖**
+## 环境要求
+
+- **Node.js**: >= 20.19.0（推荐 20.19.0 或更高）
+- **pnpm**: >= 10.5.0（推荐 10.5.0 或更高）
+- **git**: 用于版本管理
+
+> 本项目采用 pnpm monorepo 管理，**请勿**使用 npm 或 yarn 安装依赖。
+
+## 快速开始
 
 ```bash
+# 1. 安装依赖
 pnpm i
-```
 
-> 由于本项目采用了 pnpm monorepo 的管理方式，因此请不要使用 npm 或 yarn 来安装依赖。
-
-**启动项目**
-
-```bash
+# 2. 启动开发服务器（默认 test 模式）
 pnpm dev
+
+# 3. 生产构建
+pnpm build          # prod 模式
+pnpm build:test     # test 模式
 ```
 
-**构建项目**
+开发服务器默认以 `test` 模式运行（`vite --mode test`），环境变量加载顺序为 `.env` → `.env.test`。
+
+## 常用脚本
+
+| 命令 | 说明 |
+| --- | --- |
+| `pnpm dev` | 启动开发服务器（test 模式） |
+| `pnpm dev:prod` | 以 prod 模式启动开发服务器 |
+| `pnpm build` | 生产构建（prod 模式） |
+| `pnpm build:test` | 构建（test 模式） |
+| `pnpm preview` | 预览构建产物 |
+| `pnpm typecheck` | `vue-tsc` 类型检查（`--noEmit --skipLibCheck`） |
+| `pnpm lint` | oxlint + eslint 修复 |
+| `pnpm fmt` | 代码格式化（oxfmt） |
+| `pnpm commit` | 生成 Conventional Commits 提交信息 |
+| `pnpm gen-route` | 自动生成路由 |
+| `pnpm cleanup` | 清理无效文件 |
+
+## 环境变量
+
+项目使用多套环境文件：`.env`（基础，始终加载）、`.env.test`（test 模式）、`.env.prod`（prod 模式）。
+
+核心变量：
+
+| 变量 | 说明 | 默认值 |
+| --- | --- | --- |
+| `VITE_BASE_URL` | 应用基础路径 | `/` |
+| `VITE_APP_TITLE` | 应用标题 | `SoybeanAdmin` |
+| `VITE_AUTH_ROUTE_MODE` | 权限路由模式：`static` / `dynamic` | `static` |
+| `VITE_ROUTE_HOME` | 首页路由名 | `home` |
+| `VITE_HTTP_PROXY` | 是否开启接口代理 | `Y` |
+| `VITE_SERVICE_SUCCESS_CODE` | 后端成功状态码 | `0000` |
+| `VITE_SERVICE_LOGOUT_CODES` | 登出状态码（逗号分隔） | `8888,8889` |
+| `VITE_SERVICE_EXPIRED_TOKEN_CODES` | 令牌过期状态码 | `9999,9998,3333` |
+| `VITE_STORAGE_PREFIX` | 本地存储前缀 | `SOY_` |
+| `VITE_APP_ENCRYPT` | 是否开启接口加密 | `false` |
+| `VITE_APP_RSA_PUBLIC_KEY` | 后端 RSA 公钥（单行 base64） | 空 |
+
+## 接口加密
+
+本项目为「获取验证码」与「登录」接口提供**非侵入式**加解密能力，默认关闭，仅对显式标记的接口生效。
+
+### 加密策略（与 gin-vue-admin 对齐）
+
+- **请求**：前端随机生成 AES-256 key → 用**后端 RSA 公钥**加密该 key，放入 `encrypt-key` 请求头 → 用 AES 加密请求体，封包为 `{ __encrypted__: true, data }`。
+- **响应**：后端用同一把 AES key 加密响应体，并在响应头标记 `X-Response-Encrypted: true`；前端用请求时缓存的 AES key 自动解密。
+- **非侵入**：仅当请求选项标记 `isEncrypt: true` 且全局开关 `VITE_APP_ENCRYPT=true` 时生效，对其它接口完全透明。
+
+### 已接入的接口
+
+| 函数 | 方法 | 路径 | 标记 |
+| --- | --- | --- | --- |
+| `fetchGetCaptcha` | POST | `/base/captcha` | `isEncrypt: true` |
+| `fetchLogin` | POST | `/auth/login` | `isEncrypt: true` |
+| `fetchLoginByCaptcha` | POST | `/base/login` | `isEncrypt: true` |
+
+> 业务页面（`captcha-login`、`pwd-login` 及 `authStore`）无需改动，自动走加密通道。短信验证码登录（`code-login`）走另一套短信接口，如需覆盖，给对应 `fetch*` 增加 `isEncrypt: true` 即可。
+
+### 启用步骤
+
+1. **后端开启加密**，并提供 RSA 公钥（PKCS#8 / 标准格式均可）。
+2. 将 RSA 公钥转换为**单行 base64**（去除 `-----BEGIN/-----END-----` 头尾与换行），填入 `.env` 的 `VITE_APP_RSA_PUBLIC_KEY`。
+3. 将 `VITE_APP_ENCRYPT` 设为 `true`。
+4. 后端需保证：
+   - 能从 `encrypt-key` 请求头解出 AES key；
+   - 用该 key 加密响应体，并在响应头写入 `X-Response-Encrypted: true`；
+   - 能解析请求体信封 `{ __encrypted__: true, data }`。
 
 ```bash
-pnpm build
+# .env
+VITE_APP_ENCRYPT=true
+VITE_APP_RSA_PUBLIC_KEY=MIICIjANBgkqhkiG...（单行 base64）
 ```
 
-**代码同步**
+### 涉及文件
 
-参考 [代码同步](https://docs.soybeanjs.cn/zh/guide/sync) 文档。
+- `src/utils/cryptox/aes.ts` —— AES-256-CBC（Web Crypto，base64([IV][密文])）
+- `src/utils/cryptox/rsa.ts` —— RSA-OAEP（SHA-256），兼容 PEM / 单行 base64
+- `src/utils/cryptox/index.ts` —— `encryptRequestPayload` / `decryptResponsePayload` / `setServerPublicKey`
+- `src/utils/cryptox/encrypt-interceptor.ts` —— 与 `@sa/axios` 桥接：`encryptRequest`(onRequest) / `decryptResponse`(onResponse)
+- `packages/axios/src/type.ts`、`index.ts` —— 新增 `onResponse` 钩子（在 `isBackendSuccess` 之前执行，使解密先于成功判定）
+- `src/service/request/index.ts` —— 在 `onRequest` 中 `await encryptRequest(config)`，并注册 `onResponse` 调用 `decryptResponse`
+- `src/service/api/auth.ts` —— `fetchGetCaptcha`、`fetchLogin`、`fetchLoginByCaptcha` 增加 `isEncrypt: true`
 
-## 周边生态
+## 代码规范与提交
 
-- [skyroc-admin](https://github.com/Ohh-889/skyroc-admin): SoybeanAdmin的React版本实现.
-- [electron-mock-admin](https://github.com/lixin59/electron-mock-api): 一个 Mock Api 管理系统，帮助前端开发伙伴快速实现接口的 mock。
-- [T-Shell](https://github.com/TheBlindM/T-Shell): 是一个可配置命令提示的终端模拟器和 SSH 客户端。
-- [pea](https://github.com/haitang1894/pea) : 采用SpringBoot3.2 + JDK21、MyBatis-Plus、SpringSecurity安全框架等，适配 [soybean-admin](https://gitee.com/honghuangdc/soybean-admin) 开发的简单权限系统。
-- [MalusAdmin](https://github.com/pridejoy/MalusAdmin): 基于 Vue3/TypeScript/NaiveUI 和 NET7 & Sqlsugar 开发的后台管理框架。采用最原生最简洁的方式来实现, 前端清新优雅高颜值，后端 结构清晰，优雅易懂，功能强大。
-- [PanisAdmin](https://github.com/paynezhuang/panis-admin): 采用SpringBoot3、SaToken、MySQL等框架开发，二次修改 [soybean-admin](https://github.com/soybeanjs/soybean-admin)，适配动态菜单/按钮级别的鉴权，保留原汁原味、清新优雅、高颜值的后台管理系统脚手架。
-- [snail-job](https://github.com/aizuda/snail-job): 一款兼具 “高性能、高颜值、高活跃” 的分布式任务重试和分布式任务调度平台。
-- [SuperApi](https://github.com/TmmTop/SuperApi): 快速将你的 idea 变成线上稳定运行的产品！ 无实体建库建表，对无实体库表进行增删改查，支持 15 种条件查询，以及分页，列表，无限级树形列表 等功能的 API 部署！ 拥有接口文档，Auth 授权，接口限流，获取客户端真实 IP，先进的服务器缓存组件，动态 API 等功能，期待您的体验！
-- [FastSoyAdmin](https://github.com/sleep1223/fast-soy-admin): 基于 FastAPI+Vue3+Naive UI 的现代化轻量管理平台.
-- [ba](https://github.com/xiatianYa/Ba-Server): 基于goFrame框架开发的后端服务对接soybean-admin,适配动态路由,接口鉴权限。
-- [soybean-admin-go](https://github.com/WgoW/soybean-admin-go):基于gin+gorm框架开发的go语言后端服务对接soybean-admin的example分支,适配动态路由,接口鉴权限。
-
-更多周边生态请翻阅 [周边生态](https://docs.soybeanjs.cn/zh/awesome) 文档。
-
-## 如何贡献
-
-我们热烈欢迎并感谢所有形式的贡献。如果您有任何想法或建议，欢迎通过提交 [pull requests](https://github.com/soybeanjs/soybean-admin/pulls) 或创建 GitHub [issue](https://github.com/soybeanjs/soybean-admin/issues/new) 来分享。
-
-## Git 提交规范
-
-本项目已内置 `commit` 命令，您可以通过执行 `pnpm commit` 来生成符合 [Conventional Commits](<[conventionalcommits](https://www.conventionalcommits.org/)>) 规范的提交信息。在提交PR时，请务必使用 `commit` 命令来创建提交信息，以确保信息的规范性。
+- 提交前会自动执行 `typecheck` + `lint` + `fmt` 校验（simple-git-hooks）。
+- 使用 `pnpm commit` 生成符合 [Conventional Commits](https://www.conventionalcommits.org/) 规范的提交信息。
+- 自定义 `git-commit-verify` 钩子会校验提交信息格式。
 
 ## 浏览器支持
 
-推荐使用最新版的 Chrome 浏览器进行开发，以获得更好的体验。
+推荐使用最新版 Chrome 进行开发以获得最佳体验。
 
-| [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/archive/internet-explorer_9-11/internet-explorer_9-11_48x48.png" alt="IE" width="24px" height="24px"  />](http://godban.github.io/browsers-support-badges/) | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png" alt=" Edge" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/) | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png" alt="Firefox" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/) | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/) | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/) |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| not support                                                                                                                                                                                                                             | last 2 versions                                                                                                                                                                               | last 2 versions                                                                                                                                                                                       | last 2 versions                                                                                                                                                                                    | last 2 versions                                                                                                                                                                                    |
-
-## 开源作者
-
-[Soybean](https://github.com/honghuangdc)
-
-## 贡献者
-
-感谢以下贡献者的贡献。如果您想为本项目做出贡献，请参考 [如何贡献](#如何贡献)。
-
-<a href="https://github.com/soybeanjs/soybean-admin/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=soybeanjs/soybean-admin" />
-</a>
-
----
-
-以下是近一年中活跃度较高的贡献者，感谢各位的支持，让项目得以持续发展。
-
-<a href="https://openomy.com/soybeanjs/soybean-admin" target="_blank" style="display: block; width: 100%;" align="center">
-  <img src="https://www.openomy.com/svg?repo=soybeanjs/soybean-admin&chart=list&latestMonth=12" target="_blank" alt="Contribution Leaderboard" style="display: block; width: 100%;" />
-</a>
-
-## 交流
-
-`SoybeanAdmin` 是完全开源免费的项目，在帮助开发者更方便地进行中大型管理系统开发，同时提供飞书群供大家交流，使用问题欢迎在群内提问。
-
-<div>
-  <p>飞书群</p>
-  <img src="https://soybeanjs-1300612522.cos.ap-guangzhou.myqcloud.com/uPic/feishu-soybean-admin.png?v=202605151546" style="width:200px" />
-</div>
-
-## Star 趋势
-
-[![Star History Chart](https://api.star-history.com/svg?repos=soybeanjs/soybean-admin&type=Date)](https://star-history.com/#soybeanjs/soybean-admin&Date)
+| Chrome | Edge | Firefox | Safari |
+| --- | --- | --- | --- |
+| last 2 versions | last 2 versions | last 2 versions | last 2 versions |
 
 ## 开源协议
 
-项目基于 [MIT © 2021 Soybean](./LICENSE) 协议，仅供学习参考，商业使用请保留作者版权信息，作者不保证也不承担任何软件的使用风险。
+基于 [MIT © 2021 Soybean](./LICENSE) 协议。本项目为定制分支，仅供学习参考，商业使用请保留作者版权信息。

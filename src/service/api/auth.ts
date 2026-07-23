@@ -13,7 +13,8 @@ export function fetchLogin(userName: string, password: string) {
     data: {
       userName,
       password
-    }
+    },
+    isEncrypt: true
   });
 }
 
@@ -33,7 +34,8 @@ export function fetchGetUserInfo() {
 export function fetchGetCaptcha() {
   return request<Api.Auth.Captcha>({
     url: '/base/captcha',
-    method: 'post'
+    method: 'post',
+    isEncrypt: true
   });
 }
 
@@ -56,7 +58,8 @@ export function fetchLoginByCaptcha(params: {
   return request<Api.Auth.LoginToken>({
     url: '/base/login',
     method: 'post',
-    data: params
+    data: params,
+    isEncrypt: true
   });
 }
 

@@ -5,6 +5,7 @@ import { localStg } from '@/utils/storage';
 import { getServiceBaseURL } from '@/utils/service';
 import { $t } from '@/locales';
 import { getAuthorization, handleExpiredRequest, showErrorMsg } from './shared';
+import { decryptResponse, encryptRequest } from '@/utils/cryptox/encrypt-interceptor';
 import type { RequestInstanceState } from './type';
 
 const isHttpProxy = import.meta.env.DEV && import.meta.env.VITE_HTTP_PROXY === 'Y';
@@ -29,7 +30,14 @@ export const request = createFlatRequest(
       const Authorization = getAuthorization();
       Object.assign(config.headers, { Authorization });
 
+      // 非侵入式加解密:仅对标记 isEncrypt 的请求(验证码/登录)加密请求体
+      await encryptRequest(config);
+
       return config;
+    },
+    async onResponse(response) {
+      // 在后端成功判定之前解密响应体(响应头 X-Response-Encrypted=true 时生效)
+      await decryptResponse(response);
     },
     isBackendSuccess(response) {
       // 后端约定：code 为 0 或 200（以及环境变量 VITE_SERVICE_SUCCESS_CODE 配置的值）均表示请求成功

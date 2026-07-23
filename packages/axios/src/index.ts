@@ -56,6 +56,10 @@ function createCommonRequest<
 
       await transformResponse(response);
 
+      // pre-process response (e.g. decrypt) before the backend success check,
+      // so that isBackendSuccess and transform operate on the processed data
+      await opts.onResponse?.(response);
+
       if (responseType !== 'json' || opts.isBackendSuccess(response)) {
         return Promise.resolve(response);
       }

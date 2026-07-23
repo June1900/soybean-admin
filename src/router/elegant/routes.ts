@@ -40,6 +40,26 @@ export const generatedRoutes: GeneratedRoute[] = [
     }
   },
   {
+    name: 'example',
+    path: '/example',
+    component: 'layout.base',
+    meta: {
+      title: 'example',
+      i18nKey: 'route.example'
+    },
+    children: [
+      {
+        name: 'example_customer',
+        path: '/example/customer',
+        component: 'view.example_customer',
+        meta: {
+          title: 'example_customer',
+          i18nKey: 'route.example_customer'
+        }
+      }
+    ]
+  },
+  {
     name: 'home',
     path: '/home',
     component: 'layout.base$view.home',
@@ -231,25 +251,5 @@ export const generatedRoutes: GeneratedRoute[] = [
         }
       }
     ]
-  },
-  {
-    name: 'example',
-    path: '/example',
-    component: 'layout.base',
-    meta: {
-      title: 'example',
-      i18nKey: 'route.example'
-    },
-    children: [
-      {
-        name: 'example_customer',
-        path: '/example/customer',
-        component: 'view.example_customer',
-        meta: {
-          title: 'example_customer',
-          i18nKey: 'route.example_customer'
-        }
-      }
-    ]
-  },
+  }
 ];

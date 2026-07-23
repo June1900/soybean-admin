@@ -47,6 +47,15 @@ export interface RequestOption<
    */
   isBackendSuccess: (response: AxiosResponse<ResponseData>) => boolean;
   /**
+   * The hook before the backend response success check.
+   *
+   * For example: you can decrypt the encrypted response data here, so that
+   * `isBackendSuccess` and `transform` can work on the decrypted data.
+   *
+   * @param response Axios response
+   */
+  onResponse?: (response: AxiosResponse<ResponseData>) => void | Promise<void>;
+  /**
    * The hook after backend request fail
    *
    * For example: You can handle the expired token in this hook

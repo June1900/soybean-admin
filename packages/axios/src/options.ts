@@ -15,6 +15,7 @@ export function createDefaultOptions<
     transformBackendResponse: async response => response.data as unknown as ApiData,
     onRequest: async config => config,
     isBackendSuccess: _response => true,
+    onResponse: async () => {},
     onBackendFail: async () => {},
     onError: async () => {}
   };

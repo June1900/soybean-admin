@@ -110,6 +110,16 @@ declare namespace Env {
     readonly VITE_PROXY_LOG?: CommonType.YesOrNo;
     /** The launch editor */
     readonly VITE_DEVTOOLS_LAUNCH_EDITOR?: import('vite-plugin-vue-devtools').VitePluginVueDevToolsOptions['launchEditor'];
+    /**
+     * Whether to enable request/response encryption for specific endpoints (captcha & login).
+     *
+     * Non-intrusive: off by default, and only affects requests flagged with `isEncrypt: true`.
+     */
+    readonly VITE_APP_ENCRYPT?: string;
+    /**
+     * Backend RSA public key (single-line base64, no PEM headers/footers, no line breaks) used to encrypt the request AES key.
+     */
+    readonly VITE_APP_RSA_PUBLIC_KEY?: string;
   }
 }
 
