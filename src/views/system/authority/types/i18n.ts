@@ -22,6 +22,13 @@ export interface AuthorityLang {
   copyRole: string;
   addChildRole: string;
   deleteRole: string;
+  setPermission: string;
+  assignUser: string;
+  permissionTitle: string;
+  assignUserTitle: string;
+  permissionSuccess: string;
+  assignSuccess: string;
+  userSearchPlaceholder: string;
   confirmDelete: string;
   confirmCopy: string;
   selectAll: string;
@@ -33,4 +40,5 @@ export interface AuthorityLang {
   deleteSuccess: string;
   authorityIdPlaceholder: string;
   authorityNamePlaceholder: string;
+  parentRolePlaceholder: string;
 }

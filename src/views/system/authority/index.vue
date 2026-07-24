@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { computed, h, onMounted } from 'vue';
+import { computed, h, onMounted, ref } from 'vue';
 import { NTag } from 'naive-ui';
 import { useAppStore } from '@/store/modules/app';
-import { useNaivePaginatedTable, useTableOperate } from '@/hooks/common/table';
+import { useNaiveTable, useTableOperate } from '@/hooks/common/table';
 import { $t } from '@/locales';
 import { fetchCopyAuthority, fetchDeleteAuthority, fetchGetAuthorityList, type Authority } from './api';
 import AuthorityOperateDrawer from './modules/authority-operate-drawer.vue';
+import AuthorityPermissionModal from './modules/authority-permission-modal.vue';
+import AuthorityAssignUserModal from './modules/authority-assign-user-modal.vue';
 
 import TableActionButtons from '@/components/common/table-action-buttons';
 
@@ -18,30 +20,15 @@ const appStore = useAppStore();
 /* ---------- table ---------- */
 type AuthorityListResponse = Awaited<ReturnType<typeof fetchGetAuthorityList>>;
 
-const { columns, columnChecks, data, getData, loading, mobilePagination } = useNaivePaginatedTable<
+const { columns, columnChecks, data, getData, loading, scrollX } = useNaiveTable<
   AuthorityListResponse,
   Authority
 >({
   api: () => fetchGetAuthorityList(),
-  transform: res => {
-    const list = res.data ?? [];
-    return {
-      data: list,
-      total: list.length,
-      pageNum: 1,
-      pageSize: list.length || 10
-    };
-  },
+  transform: res => res.data ?? [],
   columns: () => createAllColumns(),
   immediate: false
 });
-
-const scrollX = computed(() =>
-  columns.value.reduce((acc, col) => {
-    const c = col as { width?: number; minWidth?: number };
-    return acc + (c.width ?? c.minWidth ?? 120);
-  }, 0)
-);
 
 const dataScopeOptions = computed(() => [
   { label: $t('page.system.authority.allData'), value: 1 },
@@ -61,25 +48,37 @@ const {
   handleAdd,
   editingData,
   handleEdit,
-  checkedRowKeys,
-  onBatchDeleted,
   onDeleted
 } = useTableOperate<Authority>(data, 'authorityId', getData);
 
+/** 新增子角色时预置的父级角色 ID（顶级为 0） */
+const defaultParentId = ref<number | null>(null);
+const permissionModalVisible = ref(false);
+const assignUserModalVisible = ref(false);
+const currentRole = ref<Authority | null>(null);
+
+function handleAddTop() {
+  defaultParentId.value = 0;
+  handleAdd();
+}
+
+function handleAddChild(row: Authority) {
+  defaultParentId.value = Number(row.authorityId) || 0;
+  handleAdd();
+}
+
+function openPermission(row: Authority) {
+  currentRole.value = row;
+  permissionModalVisible.value = true;
+}
+
+function openAssignUser(row: Authority) {
+  currentRole.value = row;
+  assignUserModalVisible.value = true;
+}
+
 function createAllColumns(): NaiveUI.TableColumn<Authority>[] {
   return [
-    {
-      type: 'selection',
-      align: 'center',
-      width: 48
-    },
-    {
-      key: 'index',
-      title: $t('page.system.authority.index'),
-      width: 70,
-      align: 'center',
-      render: (_row, index) => index + 1
-    },
     { key: 'authorityId', title: $t('page.system.authority.authorityId'), minWidth: 140 },
     { key: 'authorityName', title: $t('page.system.authority.authorityName'), minWidth: 160 },
     {
@@ -101,33 +100,55 @@ function createAllColumns(): NaiveUI.TableColumn<Authority>[] {
       title: $t('page.system.authority.operation'),
       align: 'center',
       fixed: 'right',
-      width: 280,
+      width: 680,
       render: row =>
-        h(TableActionButtons, {
-          actions: [
-            {
-              kind: 'edit',
-              icon: 'material-symbols:edit',
-              type: 'primary',
-              onClick: () => handleEdit(row.authorityId)
-            },
-            {
-              label: $t('page.system.authority.copyRole'),
-              icon: 'material-symbols:content-copy',
-              type: 'info',
-              onClick: () => handleCopy(row)
-            },
-            {
-              kind: 'delete',
-              icon: 'material-symbols:delete',
-              type: 'error',
-              popconfirm: {
-                content: $t('page.system.authority.confirmDelete'),
-                onPositiveClick: () => handleDelete(row.authorityId)
+        h(
+          TableActionButtons,
+          {
+            wrap: true,
+            actions: [
+              {
+                label: $t('page.system.authority.setPermission'),
+                icon: 'material-symbols:lock-person',
+                type: 'default',
+                onClick: () => openPermission(row)
+              },
+              {
+                label: $t('page.system.authority.assignUser'),
+                icon: 'material-symbols:group-add',
+                type: 'default',
+                onClick: () => openAssignUser(row)
+              },
+              {
+                label: $t('page.system.authority.addChildRole'),
+                icon: 'material-symbols:account-tree',
+                type: 'default',
+                onClick: () => handleAddChild(row)
+              },
+              {
+                label: $t('page.system.authority.copyRole'),
+                icon: 'material-symbols:content-copy',
+                type: 'info',
+                onClick: () => handleCopy(row)
+              },
+              {
+                kind: 'edit',
+                icon: 'material-symbols:edit',
+                type: 'primary',
+                onClick: () => handleEdit(row.authorityId)
+              },
+              {
+                kind: 'delete',
+                icon: 'material-symbols:delete',
+                type: 'error',
+                popconfirm: {
+                  content: $t('page.system.authority.confirmDelete'),
+                  onPositiveClick: () => handleDelete(row.authorityId)
+                }
               }
-            }
-          ]
-        })
+            ]
+          }
+        )
     }
   ];
 }
@@ -162,14 +183,6 @@ async function handleDelete(authorityId: string) {
   }
 }
 
-async function handleBatchDelete() {
-  for (const id of checkedRowKeys.value) {
-    // eslint-disable-next-line no-await-in-loop
-    await fetchDeleteAuthority(id);
-  }
-  await onBatchDeleted();
-}
-
 onMounted(() => {
   getData();
 });
@@ -186,25 +199,20 @@ onMounted(() => {
       <template #header-extra>
         <TableHeaderOperation
           v-model:columns="columnChecks"
-          :disabled-delete="checkedRowKeys.length === 0"
           :loading="loading"
-          @add="handleAdd"
-          @delete="handleBatchDelete"
+          @add="handleAddTop"
           @refresh="getData"
         />
       </template>
 
       <NDataTable
-        v-model:checked-row-keys="checkedRowKeys"
         :columns="columns"
         :data="data"
         size="small"
         :flex-height="!appStore.isMobile"
         :scroll-x="scrollX"
         :loading="loading"
-        remote
         :row-key="row => String(row.authorityId)"
-        :pagination="mobilePagination"
         class="sm:h-full"
       />
 
@@ -212,7 +220,22 @@ onMounted(() => {
         :visible="drawerVisible"
         :operate-type="operateType"
         :editing-data="editingData"
+        :default-parent-id="defaultParentId"
         @close="closeDrawer"
+        @submitted="getData"
+      />
+
+      <AuthorityPermissionModal
+        :visible="permissionModalVisible"
+        :role="currentRole"
+        @close="permissionModalVisible = false"
+        @submitted="getData"
+      />
+
+      <AuthorityAssignUserModal
+        :visible="assignUserModalVisible"
+        :role="currentRole"
+        @close="assignUserModalVisible = false"
         @submitted="getData"
       />
     </NCard>

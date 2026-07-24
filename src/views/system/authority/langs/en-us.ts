@@ -17,6 +17,13 @@ export default {
   copyRole: 'Copy Role',
   addChildRole: 'Add Sub Role',
   deleteRole: 'Delete Role',
+  setPermission: 'Set Permission',
+  assignUser: 'Assign Users',
+  permissionTitle: 'Set Role Permission',
+  assignUserTitle: 'Assign Users',
+  permissionSuccess: 'Permission set successfully',
+  assignSuccess: 'Users assigned successfully',
+  userSearchPlaceholder: 'Search username / nickname',
   confirmDelete: 'Are you sure to delete this role?',
   confirmCopy: 'Are you sure to copy this role?',
   selectAll: 'Select All',
@@ -27,5 +34,6 @@ export default {
   copySuccess: 'Copied successfully',
   deleteSuccess: 'Deleted successfully',
   authorityIdPlaceholder: 'Please enter role ID',
-  authorityNamePlaceholder: 'Please enter role name'
+  authorityNamePlaceholder: 'Please enter role name',
+  parentRolePlaceholder: 'Please select a parent role'
 };

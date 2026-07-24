@@ -351,6 +351,10 @@ declare namespace App {
         refresh: string;
         reset: string;
         search: string;
+        clear: string;
+        status: string;
+        enable: string;
+        disable: string;
         switch: string;
         tip: string;
         trigger: string;

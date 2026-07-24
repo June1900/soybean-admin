@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue';
 import { useLoading } from '@sa/hooks';
-import type { FormInst, FormRules } from 'naive-ui';
-import { NForm, NFormItem, NInput, NSelect } from 'naive-ui';
+import type { FormInst, FormRules, TreeSelectOption } from 'naive-ui';
+import { NForm, NFormItem, NInput, NTreeSelect } from 'naive-ui';
 import { $t } from '@/locales';
 import { fetchCreateAuthority, fetchGetAuthorityList, fetchUpdateAuthority, type Authority } from '../api';
 
@@ -10,6 +10,8 @@ const props = defineProps<{
   visible: boolean;
   operateType: NaiveUI.TableOperateType;
   editingData: Authority | null;
+  /** 新增子角色时，预置的父级角色 ID（顶级用 0） */
+  defaultParentId?: number | null;
 }>();
 
 const emit = defineEmits<{ close: []; submitted: [] }>();
@@ -24,7 +26,7 @@ const model = reactive({
   dataScope: 1
 });
 
-const parentOptions = ref<{ label: string; value: number }[]>([]);
+const parentOptions = ref<TreeSelectOption[]>([]);
 
 const rules: FormRules = {
   authorityId: [
@@ -46,12 +48,12 @@ const dataScopeOptions = computed(() => [
   { label: $t('page.system.authority.customDept'), value: 5 }
 ]);
 
-function flatten(list: Authority[], acc: { label: string; value: number }[] = []) {
-  list.forEach(item => {
-    acc.push({ label: item.authorityName, value: Number(item.authorityId) || 0 });
-    if (item.children?.length) flatten(item.children, acc);
-  });
-  return acc;
+function toTreeOptions(list: Authority[]): TreeSelectOption[] {
+  return (list ?? []).map(item => ({
+    label: item.authorityName ?? '',
+    value: Number(item.authorityId) || 0,
+    children: toTreeOptions(item.children ?? [])
+  }));
 }
 
 watch(
@@ -60,7 +62,7 @@ watch(
     if (!visible) return;
 
     const { data } = await fetchGetAuthorityList();
-    parentOptions.value = [{ label: $t('page.system.authority.parentRole'), value: 0 }, ...flatten(data ?? [])];
+    parentOptions.value = [{ label: $t('page.system.authority.parentRole'), value: 0 }, ...toTreeOptions(data ?? [])];
 
     if (props.operateType === 'edit' && props.editingData) {
       const d = props.editingData;
@@ -71,7 +73,7 @@ watch(
     } else {
       model.authorityId = '';
       model.authorityName = '';
-      model.parentId = 0;
+      model.parentId = props.defaultParentId ?? 0;
       model.dataScope = 1;
     }
   },
@@ -86,7 +88,7 @@ async function handleSubmit() {
   const payload = {
     authorityId: model.authorityId,
     authorityName: model.authorityName,
-    parentId: model.parentId,
+    parentId: model.parentId ?? 0,
     dataScope: model.dataScope
   };
 
@@ -111,6 +113,15 @@ async function handleSubmit() {
   <NDrawer :show="visible" display-directive="show" :width="480" @update:show="val => !val && emit('close')">
     <NDrawerContent :title="title" :native-scrollbar="false">
       <NForm ref="formRef" :model="model" :rules="rules" label-placement="top">
+        <NFormItem :label="$t('page.system.authority.parentRole')" path="parentId">
+          <NTreeSelect
+            v-model:value="model.parentId"
+            :options="parentOptions"
+            key-field="value"
+            clearable
+            :placeholder="$t('page.system.authority.parentRolePlaceholder')"
+          />
+        </NFormItem>
         <NFormItem :label="$t('page.system.authority.authorityId')" path="authorityId">
           <NInput
             v-model:value="model.authorityId"
@@ -123,9 +134,6 @@ async function handleSubmit() {
             v-model:value="model.authorityName"
             :placeholder="$t('page.system.authority.authorityNamePlaceholder')"
           />
-        </NFormItem>
-        <NFormItem :label="$t('page.system.authority.parentRole')" path="parentId">
-          <NSelect v-model:value="model.parentId" :options="parentOptions" clearable />
         </NFormItem>
         <NFormItem :label="$t('page.system.authority.dataScope')" path="dataScope">
           <NSelect v-model:value="model.dataScope" :options="dataScopeOptions" />

@@ -17,6 +17,13 @@ export default {
   copyRole: '拷贝角色',
   addChildRole: '新增子角色',
   deleteRole: '删除角色',
+  setPermission: '设置权限',
+  assignUser: '分配给用户',
+  permissionTitle: '设置角色权限',
+  assignUserTitle: '分配用户',
+  permissionSuccess: '权限设置成功',
+  assignSuccess: '用户分配成功',
+  userSearchPlaceholder: '搜索用户名 / 昵称',
   confirmDelete: '确定要删除该角色吗？',
   confirmCopy: '确定要拷贝该角色吗？',
   selectAll: '全选',
@@ -27,5 +34,6 @@ export default {
   copySuccess: '拷贝成功',
   deleteSuccess: '删除成功',
   authorityIdPlaceholder: '请输入角色ID',
-  authorityNamePlaceholder: '请输入角色名称'
+  authorityNamePlaceholder: '请输入角色名称',
+  parentRolePlaceholder: '请选择父级角色'
 };
