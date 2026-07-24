@@ -6,7 +6,10 @@ export interface User {
   nickName: string;
   phone?: string;
   email?: string;
+  authorityId?: number;
   authorityIds?: number[];
+  /** roles returned by getUserList, each item carries authorityId */
+  authorities?: { authorityId?: number | string; authorityName?: string }[];
   headerImg?: string;
   enable: number; // 1=启用 2=禁用
   createdAt?: string;
@@ -49,6 +52,7 @@ export interface UserForm {
   password?: string; // only required on create
   phone?: string;
   email?: string;
+  authorityId?: number;
   authorityIds?: number[];
   headerImg?: string;
   enable: number;
