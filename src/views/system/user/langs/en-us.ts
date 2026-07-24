@@ -5,6 +5,8 @@ export default {
   phone: 'Phone',
   email: 'Email',
   role: 'Role',
+  department: 'Department',
+  position: 'Position',
   status: 'Status',
   createdAt: 'Created At',
   operation: 'Operation',
@@ -37,5 +39,11 @@ export default {
   passwordRequired: 'Password is required',
   addSuccess: 'Created successfully',
   editSuccess: 'Updated successfully',
-  deleteSuccess: 'Deleted successfully'
+  deleteSuccess: 'Deleted successfully',
+  resetPwd: 'Reset Password',
+  resetPwdTitle: 'Reset Password',
+  resetPwdNewPassword: 'New Password',
+  resetPwdGenerate: 'Generate Random Password',
+  resetPwdConfirm: 'Are you sure to reset this user password?',
+  resetPwdSuccess: 'Password reset successfully'
 };

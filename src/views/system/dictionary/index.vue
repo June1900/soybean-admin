@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, h, reactive, ref } from 'vue';
-import { NButton, NEmpty, NPopconfirm, NSpace, NTag, NTooltip } from 'naive-ui';
+import { NEmpty, NTag } from 'naive-ui';
 import { useAppStore } from '@/store/modules/app';
 import { $t } from '@/locales';
 import { useNaivePaginatedTable, useTableOperate } from '@/hooks/common/table';
@@ -17,6 +17,8 @@ import {
 import DictionaryOperateDrawer from './modules/dictionary-operate-drawer.vue';
 import DictionaryDetailOperateDrawer from './modules/dictionary-detail-operate-drawer.vue';
 import DictionarySearch from './modules/dictionary-search.vue';
+
+import TableActionButtons from '@/components/common/table-action-buttons';
 
 defineOptions({
   name: 'SystemDictionary'
@@ -127,51 +129,31 @@ function createAllColumns(): NaiveUI.TableColumn<Dictionary>[] {
       fixed: 'right',
       width: 280,
       render: row =>
-        h(
-          NTooltip,
-          {},
-          {
-            trigger: () =>
-              h(
-                NSpace,
-                { justify: 'center', size: 'small' },
-                {
-                  default: () => [
-                    h(
-                      NButton,
-                      { size: 'small', tertiary: true, type: 'primary', onClick: () => selectDict(row.ID) },
-                      {
-                        default: () => $t('page.system.dictionary.detail')
-                      }
-                    ),
-                    h(
-                      NButton,
-                      { size: 'small', tertiary: true, type: 'primary', onClick: () => handleEdit(row.ID) },
-                      {
-                        default: () => $t('page.system.dictionary.editDictionary')
-                      }
-                    ),
-                    h(
-                      NPopconfirm,
-                      { onPositiveClick: () => handleDelete(row.ID) },
-                      {
-                        trigger: () =>
-                          h(
-                            NButton,
-                            { size: 'small', tertiary: true, type: 'error' },
-                            {
-                              default: () => $t('page.system.dictionary.deleteDictionary')
-                            }
-                          ),
-                        default: () => $t('page.system.dictionary.confirmDeleteDictionary')
-                      }
-                    )
-                  ]
-                }
-              ),
-            default: () => $t('page.system.dictionary.operation')
-          }
-        )
+        h(TableActionButtons, {
+          actions: [
+            {
+              label: $t('page.system.dictionary.detail'),
+              icon: 'material-symbols:visibility',
+              type: 'info',
+              onClick: () => selectDict(row.ID)
+            },
+            {
+              kind: 'edit',
+              icon: 'material-symbols:edit',
+              type: 'primary',
+              onClick: () => handleEdit(row.ID)
+            },
+            {
+              kind: 'delete',
+              icon: 'material-symbols:delete',
+              type: 'error',
+              popconfirm: {
+                content: $t('page.system.dictionary.confirmDeleteDictionary'),
+                onPositiveClick: () => handleDelete(row.ID)
+              }
+            }
+          ]
+        })
     }
   ];
 }
@@ -260,44 +242,25 @@ function createDetailColumns(): NaiveUI.TableColumn<DictionaryDetail>[] {
       fixed: 'right',
       width: 190,
       render: row =>
-        h(
-          NTooltip,
-          {},
-          {
-            trigger: () =>
-              h(
-                NSpace,
-                { justify: 'center', size: 'small' },
-                {
-                  default: () => [
-                    h(
-                      NButton,
-                      { size: 'small', tertiary: true, type: 'primary', onClick: () => handleEditDetail(row.ID) },
-                      {
-                        default: () => $t('page.system.dictionary.editDetail')
-                      }
-                    ),
-                    h(
-                      NPopconfirm,
-                      { onPositiveClick: () => handleDeleteDetail(row.ID) },
-                      {
-                        trigger: () =>
-                          h(
-                            NButton,
-                            { size: 'small', tertiary: true, type: 'error' },
-                            {
-                              default: () => $t('page.system.dictionary.deleteDetail')
-                            }
-                          ),
-                        default: () => $t('page.system.dictionary.confirmDeleteDetail')
-                      }
-                    )
-                  ]
-                }
-              ),
-            default: () => $t('page.system.dictionary.operation')
-          }
-        )
+        h(TableActionButtons, {
+          actions: [
+            {
+              kind: 'edit',
+              icon: 'material-symbols:edit',
+              type: 'primary',
+              onClick: () => handleEditDetail(row.ID)
+            },
+            {
+              kind: 'delete',
+              icon: 'material-symbols:delete',
+              type: 'error',
+              popconfirm: {
+                content: $t('page.system.dictionary.confirmDeleteDetail'),
+                onPositiveClick: () => handleDeleteDetail(row.ID)
+              }
+            }
+          ]
+        })
     }
   ];
 }

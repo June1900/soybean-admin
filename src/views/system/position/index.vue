@@ -23,6 +23,7 @@ import {
 } from './api';
 import { fetchGetUserList, type User } from '@/views/system/user/api';
 import PositionOperateDrawer from './modules/position-operate-drawer.vue';
+import SvgIcon from '@/components/custom/svg-icon.vue';
 
 defineOptions({
   name: 'SystemPosition'
@@ -363,12 +364,14 @@ onMounted(async () => {
               <span class="position-item__name">{{ pos.name }}</span>
               <span class="position-item__code">({{ pos.code }})</span>
               <span class="position-item__actions">
-                <NButton text type="primary" size="tiny" @click.stop="openEditDrawer(pos)">
+                <NButton ghost type="primary" size="tiny" @click.stop="openEditDrawer(pos)">
+                  <template #icon><SvgIcon icon="material-symbols:edit" /></template>
                   {{ $t('common.edit') }}
                 </NButton>
                 <NPopconfirm @positive-click="handleDeletePosition(pos.ID)">
                   <template #trigger>
-                    <NButton text type="error" size="tiny" @click.stop>
+                    <NButton ghost type="error" size="tiny" @click.stop>
+                      <template #icon><SvgIcon icon="material-symbols:delete" /></template>
                       {{ $t('common.delete') }}
                     </NButton>
                   </template>

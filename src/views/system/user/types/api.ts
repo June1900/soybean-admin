@@ -1,4 +1,4 @@
-/** System user (aligned with gin-vue-admin SysUser) */
+/** 系统用户（与 gin-vue-admin 的 SysUser 对齐） */
 export interface User {
   ID: number;
   uuid?: string;
@@ -8,15 +8,19 @@ export interface User {
   email?: string;
   authorityId?: number;
   authorityIds?: number[];
-  /** roles returned by getUserList, each item carries authorityId */
+  /** getUserList 返回的角色列表，每项含 authorityId */
   authorities?: { authorityId?: number | string; authorityName?: string }[];
+  /** getUserList 返回的部门列表，每项含 ID 与 name */
+  departments?: { ID?: number; name?: string }[];
+  /** getUserList 返回的岗位列表，每项含 ID 与 name */
+  positions?: { ID?: number; name?: string }[];
   headerImg?: string;
   enable: number; // 1=启用 2=禁用
   createdAt?: string;
   updatedAt?: string;
 }
 
-/** Query params for getUserList (gin-vue-admin convention) */
+/** getUserList 查询参数（gin-vue-admin 约定） */
 export interface UserListQuery {
   page?: number;
   pageSize?: number;
@@ -27,7 +31,7 @@ export interface UserListQuery {
   enable?: number | null;
 }
 
-/** Frontend search form model for user list (mapped to UserListQuery in index) */
+/** 用户列表前端搜索表单模型（在 index 中映射为 UserListQuery） */
 export interface UserSearchParams {
   userName: string;
   nickName: string;
@@ -36,7 +40,7 @@ export interface UserSearchParams {
   userStatus: Api.Common.EnableStatus | null;
 }
 
-/** User list response shape (gin-vue-admin convention) */
+/** 用户列表响应结构（gin-vue-admin 约定） */
 export interface UserListResponse {
   list: User[];
   total: number;
@@ -44,12 +48,12 @@ export interface UserListResponse {
   pageSize: number;
 }
 
-/** Form payload for create / edit user */
+/** 新增/编辑用户的表单数据 */
 export interface UserForm {
   ID?: number;
   userName: string;
   nickName: string;
-  password?: string; // only required on create
+  password?: string; // 仅新增时必填
   phone?: string;
   email?: string;
   authorityId?: number;

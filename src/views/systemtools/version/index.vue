@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, h, onMounted, reactive, ref } from 'vue';
-import { NButton, NSpace, NPopconfirm, NPopover } from 'naive-ui';
+import { NButton } from 'naive-ui';
 import { useAppStore } from '@/store/modules/app';
 import { useNaivePaginatedTable, useTableOperate } from '@/hooks/common/table';
 import { $t } from '@/locales';
@@ -16,6 +16,8 @@ import VersionOperateDrawer from './modules/version-operate-drawer.vue';
 import VersionSearch from './modules/version-search.vue';
 
 type VersionListApiResponse = Awaited<ReturnType<typeof fetchVersionList>>;
+
+import TableActionButtons from '@/components/common/table-action-buttons';
 
 defineOptions({
   name: 'SystemToolsVersion'
@@ -107,52 +109,33 @@ function createAllColumns(): NaiveUI.TableColumn<SysVersion>[] {
       title: $t('page.systemTools.version.columns.operations'),
       align: 'center',
       fixed: 'right',
-      width: 200,
+      width: 240,
       render: row =>
-        h(
-          NPopover,
-          { trigger: 'click', placement: 'bottom-end' },
-          {
-            trigger: () =>
-              h(
-                NButton,
-                { size: 'small', tertiary: true, type: 'primary' },
-                { default: () => $t('page.systemTools.version.columns.operations') }
-              ),
-            default: () =>
-              h(
-                NSpace,
-                { justify: 'center', size: 'small' },
-                {
-                  default: () => [
-                    h(
-                      NButton,
-                      { size: 'small', tertiary: true, onClick: () => openView(row) },
-                      { default: () => $t('page.systemTools.version.columns.view') }
-                    ),
-                    h(
-                      NButton,
-                      { size: 'small', tertiary: true, type: 'info', onClick: () => handleDownload(row) },
-                      { default: () => $t('page.systemTools.version.columns.download') }
-                    ),
-                    h(
-                      NPopconfirm,
-                      { onPositiveClick: () => handleDelete(row) },
-                      {
-                        trigger: () =>
-                          h(
-                            NButton,
-                            { size: 'small', tertiary: true, type: 'error' },
-                            { default: () => $t('page.systemTools.version.columns.delete') }
-                          ),
-                        default: () => $t('common.confirmDelete')
-                      }
-                    )
-                  ]
-                }
-              )
-          }
-        )
+        h(TableActionButtons, {
+          actions: [
+            {
+              label: $t('page.systemTools.version.columns.view'),
+              icon: 'material-symbols:visibility',
+              type: 'default',
+              onClick: () => openView(row)
+            },
+            {
+              label: $t('page.systemTools.version.columns.download'),
+              icon: 'material-symbols:download',
+              type: 'info',
+              onClick: () => handleDownload(row)
+            },
+            {
+              kind: 'delete',
+              icon: 'material-symbols:delete',
+              type: 'error',
+              popconfirm: {
+                content: $t('common.confirmDelete'),
+                onPositiveClick: () => handleDelete(row)
+              }
+            }
+          ]
+        })
     }
   ];
 }

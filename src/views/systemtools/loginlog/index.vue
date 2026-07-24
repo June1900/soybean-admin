@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, h, onMounted, reactive, ref } from 'vue';
-import { NButton, NPopconfirm, NTag } from 'naive-ui';
+import { NButton, NTag } from 'naive-ui';
 import { useAppStore } from '@/store/modules/app';
 import { useNaivePaginatedTable, useTableOperate } from '@/hooks/common/table';
 import { $t } from '@/locales';
@@ -14,6 +14,8 @@ import {
 import LoginLogSearch from './modules/login-log-search.vue';
 
 type LoginLogListApiResponse = Awaited<ReturnType<typeof fetchLoginLogList>>;
+
+import TableActionButtons from '@/components/common/table-action-buttons';
 
 defineOptions({
   name: 'SystemToolsLoginLog'
@@ -109,21 +111,21 @@ function createAllColumns(): NaiveUI.TableColumn<LoginLog>[] {
       title: $t('page.systemTools.loginLog.columns.operations'),
       align: 'center',
       fixed: 'right',
-      width: 100,
+      width: 120,
       render: row =>
-        h(
-          NPopconfirm,
-          { onPositiveClick: () => handleDelete(row) },
-          {
-            trigger: () =>
-              h(
-                NButton,
-                { size: 'small', tertiary: true, type: 'error' },
-                { default: () => $t('page.systemTools.loginLog.columns.delete') }
-              ),
-            default: () => $t('common.confirmDelete')
-          }
-        )
+        h(TableActionButtons, {
+          actions: [
+            {
+              kind: 'delete',
+              icon: 'material-symbols:delete',
+              type: 'error',
+              popconfirm: {
+                content: $t('common.confirmDelete'),
+                onPositiveClick: () => handleDelete(row)
+              }
+            }
+          ]
+        })
     }
   ];
 }

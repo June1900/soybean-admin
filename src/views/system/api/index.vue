@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { computed, h, onMounted, reactive } from 'vue';
-import { NButton, NPopconfirm, NSpace, NTag, NTooltip } from 'naive-ui';
+import { NTag } from 'naive-ui';
 import { useAppStore } from '@/store/modules/app';
 import { useNaivePaginatedTable, useTableOperate } from '@/hooks/common/table';
 import { $t } from '@/locales';
 import { fetchDeleteApi, fetchGetApiList, type Api, type ApiListQuery, type ApiSearchParams } from './api';
 import ApiOperateDrawer from './modules/api-operate-drawer.vue';
 import ApiSearch from './modules/api-search.vue';
+
+import TableActionButtons from '@/components/common/table-action-buttons';
 
 defineOptions({
   name: 'SystemApi'
@@ -133,44 +135,25 @@ function createAllColumns(): NaiveUI.TableColumn<Api>[] {
       fixed: 'right',
       width: 190,
       render: row =>
-        h(
-          NTooltip,
-          {},
-          {
-            trigger: () =>
-              h(
-                NSpace,
-                { justify: 'center', size: 'small' },
-                {
-                  default: () => [
-                    h(
-                      NButton,
-                      { size: 'small', tertiary: true, type: 'primary', onClick: () => handleEdit(row.ID) },
-                      {
-                        default: () => $t('page.system.api.editApi')
-                      }
-                    ),
-                    h(
-                      NPopconfirm,
-                      { onPositiveClick: () => handleDelete(row.ID) },
-                      {
-                        trigger: () =>
-                          h(
-                            NButton,
-                            { size: 'small', tertiary: true, type: 'error' },
-                            {
-                              default: () => $t('page.system.api.deleteApi')
-                            }
-                          ),
-                        default: () => $t('page.system.api.confirmDelete')
-                      }
-                    )
-                  ]
-                }
-              ),
-            default: () => $t('page.system.api.operation')
-          }
-        )
+        h(TableActionButtons, {
+          actions: [
+            {
+              kind: 'edit',
+              icon: 'material-symbols:edit',
+              type: 'primary',
+              onClick: () => handleEdit(row.ID)
+            },
+            {
+              kind: 'delete',
+              icon: 'material-symbols:delete',
+              type: 'error',
+              popconfirm: {
+                content: $t('page.system.api.confirmDelete'),
+                onPositiveClick: () => handleDelete(row.ID)
+              }
+            }
+          ]
+        })
     }
   ];
 }

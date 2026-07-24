@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, h, onMounted, reactive } from 'vue';
-import { NButton, NPopconfirm, NTooltip } from 'naive-ui';
 import { useAppStore } from '@/store/modules/app';
 import { useNaivePaginatedTable, useTableOperate } from '@/hooks/common/table';
 import { $t } from '@/locales';
@@ -13,6 +12,8 @@ import {
 } from './api';
 import ParamsOperateDrawer from './modules/params-operate-drawer.vue';
 import ParamsSearch from './modules/params-search.vue';
+
+import TableActionButtons from '@/components/common/table-action-buttons';
 
 defineOptions({
   name: 'SystemParams'
@@ -114,44 +115,25 @@ function createAllColumns(): NaiveUI.TableColumn<Params>[] {
       fixed: 'right',
       width: 190,
       render: row =>
-        h(
-          NTooltip,
-          {},
-          {
-            trigger: () =>
-              h(
-                NSpace,
-                { justify: 'center', size: 'small' },
-                {
-                  default: () => [
-                    h(
-                      NButton,
-                      { size: 'small', tertiary: true, type: 'primary', onClick: () => handleEdit(row.ID) },
-                      {
-                        default: () => $t('page.system.params.editParam')
-                      }
-                    ),
-                    h(
-                      NPopconfirm,
-                      { onPositiveClick: () => handleDelete(row.ID) },
-                      {
-                        trigger: () =>
-                          h(
-                            NButton,
-                            { size: 'small', tertiary: true, type: 'error' },
-                            {
-                              default: () => $t('page.system.params.deleteParam')
-                            }
-                          ),
-                        default: () => $t('page.system.params.confirmDelete')
-                      }
-                    )
-                  ]
-                }
-              ),
-            default: () => $t('page.system.params.operation')
-          }
-        )
+        h(TableActionButtons, {
+          actions: [
+            {
+              kind: 'edit',
+              icon: 'material-symbols:edit',
+              type: 'primary',
+              onClick: () => handleEdit(row.ID)
+            },
+            {
+              kind: 'delete',
+              icon: 'material-symbols:delete',
+              type: 'error',
+              popconfirm: {
+                content: $t('page.system.params.confirmDelete'),
+                onPositiveClick: () => handleDelete(row.ID)
+              }
+            }
+          ]
+        })
     }
   ];
 }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, h, reactive, ref } from 'vue';
-import { NButton, NDivider, NPopconfirm, NPopover, NSpace, NTag } from 'naive-ui';
+import { NButton, NDivider, NSpace, NTag } from 'naive-ui';
 import { useAppStore } from '@/store/modules/app';
 import { $t } from '@/locales';
 import { useNaivePaginatedTable, useTableOperate } from '@/hooks/common/table';
@@ -15,6 +15,8 @@ import ApiTokenOperateDrawer from './modules/api-token-operate-drawer.vue';
 import ApiTokenSearch from './modules/api-token-search.vue';
 
 type ApiTokenListApiResponse = Awaited<ReturnType<typeof fetchGetApiTokenList>>;
+
+import TableActionButtons from '@/components/common/table-action-buttons';
 
 defineOptions({
   name: 'SystemToolsApiToken'
@@ -180,49 +182,31 @@ function createAllColumns(): NaiveUI.TableColumn<ApiToken>[] {
       title: $t('page.systemTools.apiToken.columns.operations'),
       align: 'center',
       fixed: 'right',
-      width: 200,
+      width: 220,
       render: row =>
-        h(
-          NPopover,
-          { trigger: 'click', placement: 'bottom-end' },
-          {
-            trigger: () =>
-              h(
-                NButton,
-                { size: 'small', tertiary: true, type: 'primary' },
-                { default: () => $t('page.systemTools.apiToken.columns.curl') }
-              ),
-            default: () =>
-              h(
-                NSpace,
-                { justify: 'center', size: 'small' },
-                {
-                  default: () => [
-                    h(
-                      NButton,
-                      { size: 'small', tertiary: true, type: 'info', onClick: () => openCurl(row) },
-                      { default: () => $t('page.systemTools.apiToken.columns.curl') }
-                    ),
-                    row.status
-                      ? h(
-                          NPopconfirm,
-                          { onPositiveClick: () => handleDelete(row.ID) },
-                          {
-                            trigger: () =>
-                              h(
-                                NButton,
-                                { size: 'small', tertiary: true, type: 'error' },
-                                { default: () => $t('page.systemTools.apiToken.columns.invalidate') }
-                              ),
-                            default: () => $t('page.systemTools.apiToken.invalidateConfirm')
-                          }
-                        )
-                      : null
-                  ]
-                }
-              )
-          }
-        )
+        h(TableActionButtons, {
+          actions: [
+            {
+              label: $t('page.systemTools.apiToken.columns.curl'),
+              icon: 'material-symbols:terminal',
+              type: 'info',
+              onClick: () => openCurl(row)
+            },
+            ...(row.status
+              ? [
+                  {
+                    label: $t('page.systemTools.apiToken.columns.invalidate'),
+                    icon: 'material-symbols:block',
+                    type: 'error' as const,
+                    popconfirm: {
+                      content: $t('page.systemTools.apiToken.invalidateConfirm'),
+                      onPositiveClick: () => handleDelete(row.ID)
+                    }
+                  }
+                ]
+              : [])
+          ]
+        })
     }
   ];
 }

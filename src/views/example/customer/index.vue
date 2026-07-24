@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, h, reactive } from 'vue';
-import { NButton, NPopconfirm, NPopover, NSpace } from 'naive-ui';
 import { useAppStore } from '@/store/modules/app';
 import { $t } from '@/locales';
 import { useNaivePaginatedTable, useTableOperate } from '@/hooks/common/table';
@@ -15,6 +14,8 @@ import CustomerOperateDrawer from './modules/customer-operate-drawer.vue';
 import CustomerSearch from './modules/customer-search.vue';
 
 type CustomerListApiResponse = Awaited<ReturnType<typeof fetchCustomerList>>;
+
+import TableActionButtons from '@/components/common/table-action-buttons';
 
 defineOptions({
   name: 'ExampleCustomer'
@@ -119,45 +120,25 @@ function createAllColumns(): NaiveUI.TableColumn<Customer>[] {
       fixed: 'right',
       width: 160,
       render: row =>
-        h(
-          NPopover,
-          { trigger: 'click', placement: 'bottom-end' },
-          {
-            trigger: () =>
-              h(
-                NButton,
-                { size: 'small', tertiary: true, type: 'primary' },
-                { default: () => $t('page.example.customer.columns.operations') }
-              ),
-            default: () =>
-              h(
-                NSpace,
-                { justify: 'center', size: 'small' },
-                {
-                  default: () => [
-                    h(
-                      NButton,
-                      { size: 'small', tertiary: true, type: 'info', onClick: () => handleEdit(row.ID) },
-                      { default: () => $t('page.example.customer.columns.edit') }
-                    ),
-                    h(
-                      NPopconfirm,
-                      { onPositiveClick: () => handleDelete(row.ID) },
-                      {
-                        trigger: () =>
-                          h(
-                            NButton,
-                            { size: 'small', tertiary: true, type: 'error' },
-                            { default: () => $t('page.example.customer.columns.delete') }
-                          ),
-                        default: () => $t('page.example.customer.deleteConfirm')
-                      }
-                    )
-                  ]
-                }
-              )
-          }
-        )
+        h(TableActionButtons, {
+          actions: [
+            {
+              kind: 'edit',
+              icon: 'material-symbols:edit',
+              type: 'info',
+              onClick: () => handleEdit(row.ID)
+            },
+            {
+              kind: 'delete',
+              icon: 'material-symbols:delete',
+              type: 'error',
+              popconfirm: {
+                content: $t('page.example.customer.deleteConfirm'),
+                onPositiveClick: () => handleDelete(row.ID)
+              }
+            }
+          ]
+        })
     }
   ];
 }

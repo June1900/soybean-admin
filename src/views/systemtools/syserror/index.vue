@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, h, onMounted, reactive, ref } from 'vue';
-import { NButton, NSpace, NPopconfirm, NPopover, NTag } from 'naive-ui';
+import { NButton, NTag } from 'naive-ui';
 import { useAppStore } from '@/store/modules/app';
 import { useNaivePaginatedTable, useTableOperate } from '@/hooks/common/table';
 import { $t } from '@/locales';
@@ -17,6 +17,8 @@ import SysErrorViewDrawer from './modules/sys-error-view-drawer.vue';
 import SysErrorSearch from './modules/sys-error-search.vue';
 
 type SysErrorListApiResponse = Awaited<ReturnType<typeof fetchSysErrorList>>;
+
+import TableActionButtons from '@/components/common/table-action-buttons';
 
 defineOptions({
   name: 'SystemToolsSysError'
@@ -140,47 +142,27 @@ function createAllColumns(): NaiveUI.TableColumn<SysError>[] {
       title: $t('page.systemTools.sysError.columns.operations'),
       align: 'center',
       fixed: 'right',
-      width: 140,
+      width: 170,
       render: row =>
-        h(
-          NPopover,
-          { trigger: 'click', placement: 'bottom-end' },
-          {
-            trigger: () =>
-              h(
-                NButton,
-                { size: 'small', tertiary: true, type: 'primary' },
-                { default: () => $t('page.systemTools.sysError.columns.operations') }
-              ),
-            default: () =>
-              h(
-                NSpace,
-                { justify: 'center', size: 'small' },
-                {
-                  default: () => [
-                    h(
-                      NButton,
-                      { size: 'small', tertiary: true, onClick: () => openView(row) },
-                      { default: () => $t('page.systemTools.sysError.columns.view') }
-                    ),
-                    h(
-                      NPopconfirm,
-                      { onPositiveClick: () => handleDelete(row) },
-                      {
-                        trigger: () =>
-                          h(
-                            NButton,
-                            { size: 'small', tertiary: true, type: 'error' },
-                            { default: () => $t('page.systemTools.sysError.columns.delete') }
-                          ),
-                        default: () => $t('common.confirmDelete')
-                      }
-                    )
-                  ]
-                }
-              )
-          }
-        )
+        h(TableActionButtons, {
+          actions: [
+            {
+              label: $t('page.systemTools.sysError.columns.view'),
+              icon: 'material-symbols:visibility',
+              type: 'default',
+              onClick: () => openView(row)
+            },
+            {
+              kind: 'delete',
+              icon: 'material-symbols:delete',
+              type: 'error',
+              popconfirm: {
+                content: $t('common.confirmDelete'),
+                onPositiveClick: () => handleDelete(row)
+              }
+            }
+          ]
+        })
     }
   ];
 }

@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed, h, onMounted } from 'vue';
-import { NButton, NPopconfirm, NSpace, NTag, NTooltip } from 'naive-ui';
+import { NTag } from 'naive-ui';
 import { useAppStore } from '@/store/modules/app';
 import { useNaivePaginatedTable, useTableOperate } from '@/hooks/common/table';
 import { $t } from '@/locales';
 import { fetchCopyAuthority, fetchDeleteAuthority, fetchGetAuthorityList, type Authority } from './api';
 import AuthorityOperateDrawer from './modules/authority-operate-drawer.vue';
+
+import TableActionButtons from '@/components/common/table-action-buttons';
 
 defineOptions({
   name: 'SystemAuthority'
@@ -101,47 +103,31 @@ function createAllColumns(): NaiveUI.TableColumn<Authority>[] {
       fixed: 'right',
       width: 280,
       render: row =>
-        h(
-          NTooltip,
-          {},
-          {
-            trigger: () =>
-              h(
-                NSpace,
-                { justify: 'center', size: 'small' },
-                {
-                  default: () => [
-                    h(
-                      NButton,
-                      { size: 'small', tertiary: true, type: 'primary', onClick: () => handleEdit(row.authorityId) },
-                      { default: () => $t('page.system.authority.editRole') }
-                    ),
-                    h(
-                      NButton,
-                      { size: 'small', tertiary: true, type: 'info', onClick: () => handleCopy(row) },
-                      { default: () => $t('page.system.authority.copyRole') }
-                    ),
-                    h(
-                      NPopconfirm,
-                      { onPositiveClick: () => handleDelete(row.authorityId) },
-                      {
-                        trigger: () =>
-                          h(
-                            NButton,
-                            { size: 'small', tertiary: true, type: 'error' },
-                            {
-                              default: () => $t('page.system.authority.deleteRole')
-                            }
-                          ),
-                        default: () => $t('page.system.authority.confirmDelete')
-                      }
-                    )
-                  ]
-                }
-              ),
-            default: () => $t('page.system.authority.operation')
-          }
-        )
+        h(TableActionButtons, {
+          actions: [
+            {
+              kind: 'edit',
+              icon: 'material-symbols:edit',
+              type: 'primary',
+              onClick: () => handleEdit(row.authorityId)
+            },
+            {
+              label: $t('page.system.authority.copyRole'),
+              icon: 'material-symbols:content-copy',
+              type: 'info',
+              onClick: () => handleCopy(row)
+            },
+            {
+              kind: 'delete',
+              icon: 'material-symbols:delete',
+              type: 'error',
+              popconfirm: {
+                content: $t('page.system.authority.confirmDelete'),
+                onPositiveClick: () => handleDelete(row.authorityId)
+              }
+            }
+          ]
+        })
     }
   ];
 }

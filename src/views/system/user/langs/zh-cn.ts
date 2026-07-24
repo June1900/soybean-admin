@@ -5,6 +5,8 @@ export default {
   phone: '手机号',
   email: '邮箱',
   role: '角色',
+  department: '所属部门',
+  position: '岗位',
   status: '状态',
   createdAt: '创建时间',
   operation: '操作',
@@ -37,5 +39,11 @@ export default {
   passwordRequired: '请输入密码',
   addSuccess: '新增成功',
   editSuccess: '编辑成功',
-  deleteSuccess: '删除成功'
+  deleteSuccess: '删除成功',
+  resetPwd: '重置密码',
+  resetPwdTitle: '重置密码',
+  resetPwdNewPassword: '新密码',
+  resetPwdGenerate: '生成随机密码',
+  resetPwdConfirm: '确定要重置该用户的密码吗？',
+  resetPwdSuccess: '密码重置成功'
 };

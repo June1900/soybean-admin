@@ -67,7 +67,7 @@ const rules: FormRules = {
   email: [{ type: 'email', message: $t('page.system.user.emailInvalid'), trigger: 'blur' }]
 };
 
-/** In edit mode, password is not required and hidden */
+/** 编辑模式下密码非必填且隐藏 */
 const dynamicRules = computed(() => {
   if (props.operateType === 'edit') {
     const { password: _, ...rest } = rules;

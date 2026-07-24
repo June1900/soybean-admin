@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, h, reactive, ref } from 'vue';
-import { NButton, NPopconfirm, NPopover, NSpace, NSwitch, NTag } from 'naive-ui';
+import { NSwitch, NTag } from 'naive-ui';
 import { useAppStore } from '@/store/modules/app';
 import { $t } from '@/locales';
 import { useNaivePaginatedTable, useTableOperate } from '@/hooks/common/table';
@@ -16,6 +16,8 @@ import {
 } from './api';
 import TimedTaskOperateDrawer from './modules/timed-task-operate-drawer.vue';
 import TimedTaskSearch from './modules/timed-task-search.vue';
+
+import TableActionButtons from '@/components/common/table-action-buttons';
 
 defineOptions({
   name: 'SystemToolsTimedTask'
@@ -277,44 +279,39 @@ function createAllColumns(): NaiveUI.TableColumn<TimedTask>[] {
       title: $t('page.systemTools.timedTask.columns.operations'),
       align: 'center',
       fixed: 'right',
-      width: 250,
+      width: 300,
       render: row =>
-        h(
-          NSpace,
-          { justify: 'center', size: 'small' },
-          {
-            default: () => [
-              h(
-                NButton,
-                { size: 'small', tertiary: true, type: 'primary', onClick: () => handleTrigger(row) },
-                { default: () => $t('page.systemTools.timedTask.columns.trigger') }
-              ),
-              h(
-                NButton,
-                { size: 'small', tertiary: true, onClick: () => openLogs(row) },
-                { default: () => $t('page.systemTools.timedTask.columns.logs') }
-              ),
-              h(
-                NButton,
-                { size: 'small', tertiary: true, type: 'info', onClick: () => handleEdit(row.ID) },
-                { default: () => $t('page.systemTools.timedTask.columns.edit') }
-              ),
-              h(
-                NPopconfirm,
-                { onPositiveClick: () => handleDelete(row.ID) },
-                {
-                  trigger: () =>
-                    h(
-                      NButton,
-                      { size: 'small', tertiary: true, type: 'error' },
-                      { default: () => $t('page.systemTools.timedTask.columns.delete') }
-                    ),
-                  default: () => $t('page.systemTools.timedTask.deleteConfirm')
-                }
-              )
-            ]
-          }
-        )
+        h(TableActionButtons, {
+          actions: [
+            {
+              label: $t('page.systemTools.timedTask.columns.trigger'),
+              icon: 'material-symbols:play-arrow',
+              type: 'default',
+              onClick: () => handleTrigger(row)
+            },
+            {
+              label: $t('page.systemTools.timedTask.columns.logs'),
+              icon: 'material-symbols:article',
+              type: 'default',
+              onClick: () => openLogs(row)
+            },
+            {
+              kind: 'edit',
+              icon: 'material-symbols:edit',
+              type: 'info',
+              onClick: () => handleEdit(row.ID)
+            },
+            {
+              kind: 'delete',
+              icon: 'material-symbols:delete',
+              type: 'error',
+              popconfirm: {
+                content: $t('page.systemTools.timedTask.deleteConfirm'),
+                onPositiveClick: () => handleDelete(row.ID)
+              }
+            }
+          ]
+        })
     }
   ];
 }

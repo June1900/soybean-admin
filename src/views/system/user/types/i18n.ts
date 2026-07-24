@@ -1,9 +1,9 @@
 /**
- * i18n schema for the "system user" feature.
+ * 用户管理模块的 i18n 文案类型定义。
  *
- * Field keys MUST stay in sync with `../langs/zh-cn.ts` and `../langs/en-us.ts`.
- * This type is the single source of truth for `App.I18n.Schema['page']['system']['user']`,
- * which `src/typings/app.d.ts` references via an `import()` type.
+ * 字段 key 必须与 `../langs/zh-cn.ts` 和 `../langs/en-us.ts` 保持一致。
+ * 该类型作为 `App.I18n.Schema['page']['system']['user']` 的唯一来源，
+ * `src/typings/app.d.ts` 通过 `import()` 类型引用它。
  */
 export interface SystemUserLang {
   title: string;
@@ -12,6 +12,8 @@ export interface SystemUserLang {
   phone: string;
   email: string;
   role: string;
+  department: string;
+  position: string;
   status: string;
   createdAt: string;
   operation: string;
