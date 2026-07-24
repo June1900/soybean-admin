@@ -191,7 +191,7 @@ export function useTableOperate<TableData>(
 
   function handleEdit(id: TableData[keyof TableData]) {
     operateType.value = 'edit';
-    const findItem = data.value.find(item => item[idKey] === id) || null;
+    const findItem = findNodeById(data.value, id, idKey) ?? null;
     editingData.value = jsonClone(findItem);
 
     openDrawer();
@@ -258,6 +258,22 @@ const OPERATION_COLUMN_KEYS = ['operate', 'operation'];
 
 function isOperationColumn(column: { key?: unknown }): boolean {
   return Boolean(column.key) && OPERATION_COLUMN_KEYS.includes(String(column.key));
+}
+
+/**
+ * Recursively find a node by idKey in a (possibly nested) list.
+ * Descends into `children` only when it is an array, so flat tables behave exactly as before.
+ */
+function findNodeById<T>(list: T[], id: T[keyof T], idKey: keyof T): T | undefined {
+  for (const item of list) {
+    if (item[idKey] === id) return item;
+    const children = (item as Record<string, unknown>).children;
+    if (Array.isArray(children)) {
+      const found = findNodeById(children as T[], id, idKey);
+      if (found) return found;
+    }
+  }
+  return undefined;
 }
 
 function getColumnChecks<Column extends NaiveUI.TableColumn<any>>(

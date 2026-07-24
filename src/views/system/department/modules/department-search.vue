@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { toRaw } from 'vue';
+import { computed, toRaw } from 'vue';
 import { jsonClone } from '@sa/utils';
 import { useNaiveForm } from '@/hooks/common/form';
+import { NSelect } from 'naive-ui';
 import { $t } from '@/locales';
-import type { DepartmentSearchParams } from '../api';
+import type { DepartmentSearchParams, DepartmentStatusFilter } from '../api';
 
 defineOptions({
   name: 'DepartmentSearch'
@@ -19,6 +20,12 @@ const emit = defineEmits<Emits>();
 const { formRef, validate, restoreValidation } = useNaiveForm();
 
 const model = defineModel<DepartmentSearchParams>('model', { required: true });
+
+const statusOptions = computed<Array<{ label: string; value: DepartmentStatusFilter }>>(() => [
+  { label: $t('page.system.department.statusAll'), value: 'all' },
+  { label: $t('page.system.department.enabled'), value: 'enabled' },
+  { label: $t('page.system.department.disabled'), value: 'disabled' }
+]);
 
 const defaultModel = jsonClone(toRaw(model.value));
 
@@ -49,6 +56,13 @@ async function search() {
                 v-model:value="model.name"
                 :placeholder="$t('page.system.department.namePlaceholder')"
                 clearable
+              />
+            </NFormItemGi>
+            <NFormItemGi span="24 s:12 m:6" :label="$t('page.system.department.status')" path="status" class="pr-24px">
+              <NSelect
+                v-model:value="model.status"
+                :placeholder="$t('page.system.department.statusPlaceholder')"
+                :options="statusOptions"
               />
             </NFormItemGi>
             <NFormItemGi span="24 m:12" class="pr-24px">

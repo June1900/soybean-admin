@@ -61,7 +61,7 @@ function extractList<T>(res: unknown): T[] {
 async function loadTreeOptions() {
   // 部门与岗位均为全量拉取，供表格内树形选择框使用（对齐「部门管理 / 岗位管理」的取数方式）
   const [deptRes, posRes] = await Promise.all([
-    fetchGetDepartmentList({ page: 1, pageSize: 9999 }),
+    fetchGetDepartmentList(),
     fetchGetPositionList({ page: 1, pageSize: 1000 })
   ]);
   if (!deptRes.error) {

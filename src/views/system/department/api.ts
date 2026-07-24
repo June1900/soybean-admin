@@ -1,25 +1,24 @@
 import { request } from '@/service/request';
-import type { DepartmentForm, DepartmentListQuery, DepartmentListResponse } from './types';
+import type { DepartmentListResponse, DepartmentSubmitForm } from './types';
 
 export type {
   Department,
   DepartmentForm,
-  DepartmentListQuery,
   DepartmentListResponse,
-  DepartmentSearchParams
+  DepartmentSearchParams,
+  DepartmentStatusFilter,
+  DepartmentSubmitForm
 } from './types';
 
-/** Get paginated department list. */
-export function fetchGetDepartmentList(params?: DepartmentListQuery) {
+export function fetchGetDepartmentList() {
   return request<DepartmentListResponse>({
     url: '/department/getDepartmentList',
     method: 'post',
-    data: params
+    data: {}
   });
 }
 
-/** Create a department. */
-export function fetchCreateDepartment(data: DepartmentForm) {
+export function fetchCreateDepartment(data: DepartmentSubmitForm) {
   return request<void>({
     url: '/department/createDepartment',
     method: 'post',
@@ -27,8 +26,7 @@ export function fetchCreateDepartment(data: DepartmentForm) {
   });
 }
 
-/** Update a department. */
-export function fetchUpdateDepartment(data: DepartmentForm & { ID: number }) {
+export function fetchUpdateDepartment(data: DepartmentSubmitForm & { ID: number }) {
   return request<void>({
     url: '/department/updateDepartment',
     method: 'put',
@@ -36,7 +34,6 @@ export function fetchUpdateDepartment(data: DepartmentForm & { ID: number }) {
   });
 }
 
-/** Delete a department by id. */
 export function fetchDeleteDepartment(id: number) {
   return request<void>({
     url: '/department/deleteDepartment',
