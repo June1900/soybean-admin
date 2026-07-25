@@ -25,6 +25,9 @@ declare module "@elegant-router/types" {
     "home": "/home";
     "iframe-page": "/iframe-page/:url";
     "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?";
+    "opsmonitor": "/opsmonitor";
+    "opsmonitor_loginlog": "/opsmonitor/loginlog";
+    "opsmonitor_syserror": "/opsmonitor/syserror";
     "system": "/system";
     "system_api": "/system/api";
     "system_authority": "/system/authority";
@@ -37,8 +40,6 @@ declare module "@elegant-router/types" {
     "system_user": "/system/user";
     "systemtools": "/systemtools";
     "systemtools_apitoken": "/systemtools/apitoken";
-    "systemtools_loginlog": "/systemtools/loginlog";
-    "systemtools_syserror": "/systemtools/syserror";
     "systemtools_system": "/systemtools/system";
     "systemtools_timedtask": "/systemtools/timedtask";
     "systemtools_version": "/systemtools/version";
@@ -80,6 +81,7 @@ declare module "@elegant-router/types" {
     | "home"
     | "iframe-page"
     | "login"
+    | "opsmonitor"
     | "system"
     | "systemtools"
   >;
@@ -105,6 +107,8 @@ declare module "@elegant-router/types" {
     | "login"
     | "example_customer"
     | "home"
+    | "opsmonitor_loginlog"
+    | "opsmonitor_syserror"
     | "system_api"
     | "system_authority"
     | "system_department"
@@ -115,8 +119,6 @@ declare module "@elegant-router/types" {
     | "system_security"
     | "system_user"
     | "systemtools_apitoken"
-    | "systemtools_loginlog"
-    | "systemtools_syserror"
     | "systemtools_system"
     | "systemtools_timedtask"
     | "systemtools_version"

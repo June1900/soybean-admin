@@ -96,6 +96,35 @@ export const generatedRoutes: GeneratedRoute[] = [
     }
   },
   {
+    name: 'opsmonitor',
+    path: '/opsmonitor',
+    component: 'layout.base',
+    meta: {
+      title: 'opsmonitor',
+      i18nKey: 'route.opsmonitor'
+    },
+    children: [
+      {
+        name: 'opsmonitor_loginlog',
+        path: '/opsmonitor/loginlog',
+        component: 'view.opsmonitor_loginlog',
+        meta: {
+          title: 'opsmonitor_loginlog',
+          i18nKey: 'route.opsmonitor_loginlog'
+        }
+      },
+      {
+        name: 'opsmonitor_syserror',
+        path: '/opsmonitor/syserror',
+        component: 'view.opsmonitor_syserror',
+        meta: {
+          title: 'opsmonitor_syserror',
+          i18nKey: 'route.opsmonitor_syserror'
+        }
+      }
+    ]
+  },
+  {
     name: 'system',
     path: '/system',
     component: 'layout.base',
@@ -203,24 +232,6 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'systemtools_apitoken',
           i18nKey: 'route.systemtools_apitoken'
-        }
-      },
-      {
-        name: 'systemtools_loginlog',
-        path: '/systemtools/loginlog',
-        component: 'view.systemtools_loginlog',
-        meta: {
-          title: 'systemtools_loginlog',
-          i18nKey: 'route.systemtools_loginlog'
-        }
-      },
-      {
-        name: 'systemtools_syserror',
-        path: '/systemtools/syserror',
-        component: 'view.systemtools_syserror',
-        meta: {
-          title: 'systemtools_syserror',
-          i18nKey: 'route.systemtools_syserror'
         }
       },
       {

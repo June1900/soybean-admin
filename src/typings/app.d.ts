@@ -584,10 +584,12 @@ declare namespace App {
         systemTools: {
           apiToken: import('../../views/systemtools/apiToken/types').SystemToolsApiTokenLang;
           timedTask: import('../../views/systemtools/timedtask/types').SystemToolsTimedTaskLang;
-          sysError: import('../../views/systemtools/syserror/types').SystemToolsSysErrorLang;
-          loginLog: import('../../views/systemtools/loginlog/types').SystemToolsLoginLogLang;
           version: import('../../views/systemtools/version/types').SystemToolsVersionLang;
           system: import('../../views/systemtools/system/types').SystemToolsSystemLang;
+        };
+        opsMonitor: {
+          sysError: import('../../views/opsmonitor/syserror/types').SystemToolsSysErrorLang;
+          loginLog: import('../../views/opsmonitor/loginlog/types').SystemToolsLoginLogLang;
         };
       };
       form: {

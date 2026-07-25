@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, toRaw } from 'vue';
+import { toRaw } from 'vue';
 import { jsonClone } from '@sa/utils';
 import { useNaiveForm } from '@/hooks/common/form';
 import { $t } from '@/locales';
-import type { LoginLogSearchParams } from '../api';
+import type { SysErrorSearchParams } from '../api';
 
-defineOptions({ name: 'LoginLogSearch' });
+defineOptions({ name: 'SysErrorSearch' });
 
 interface Emits {
   (e: 'search'): void;
@@ -15,12 +15,7 @@ const emit = defineEmits<Emits>();
 
 const { formRef, validate, restoreValidation } = useNaiveForm();
 
-const model = defineModel<LoginLogSearchParams>('model', { required: true });
-
-const statusOptions = computed(() => [
-  { label: $t('page.systemTools.loginLog.search.success'), value: 'success' },
-  { label: $t('page.systemTools.loginLog.search.fail'), value: 'fail' }
-]);
+const model = defineModel<SysErrorSearchParams>('model', { required: true });
 
 const defaultModel = jsonClone(toRaw(model.value));
 
@@ -43,24 +38,24 @@ async function search() {
 <template>
   <NCard :bordered="false" size="small" class="card-wrapper">
     <NCollapse>
-      <NCollapseItem :title="$t('common.search')" name="login-log-search">
+      <NCollapseItem :title="$t('common.search')" name="sys-error-search">
         <NForm ref="formRef" :model="model" label-placement="left" :label-width="80">
           <NGrid responsive="screen" item-responsive>
             <NFormItemGi
               span="24 s:12 m:6"
-              :label="$t('page.systemTools.loginLog.search.username')"
-              path="username"
+              :label="$t('page.opsMonitor.sysError.search.form')"
+              path="form"
               class="pr-24px"
             >
-              <NInput v-model:value="model.username" clearable />
+              <NInput v-model:value="model.form" clearable />
             </NFormItemGi>
             <NFormItemGi
               span="24 s:12 m:6"
-              :label="$t('page.systemTools.loginLog.search.status')"
-              path="status"
+              :label="$t('page.opsMonitor.sysError.search.info')"
+              path="info"
               class="pr-24px"
             >
-              <NSelect v-model:value="model.status" clearable :options="statusOptions" />
+              <NInput v-model:value="model.info" clearable />
             </NFormItemGi>
             <NFormItemGi span="24 m:12" class="pr-24px">
               <NSpace class="w-full" justify="end">

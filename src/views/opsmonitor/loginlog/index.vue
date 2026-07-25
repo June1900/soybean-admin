@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { computed, h, onMounted, reactive, ref } from 'vue';
-import { NButton, NTag } from 'naive-ui';
+import { computed, h, onMounted, reactive } from 'vue';
+import dayjs from 'dayjs';
+import { NButton, NPopconfirm, NTag } from 'naive-ui';
 import { useAppStore } from '@/store/modules/app';
 import { useNaivePaginatedTable, useTableOperate } from '@/hooks/common/table';
 import { $t } from '@/locales';
 import {
   fetchLoginLogList,
   deleteLoginLog,
+  deleteLoginLogByIds,
   type LoginLog,
   type LoginLogListQuery,
   type LoginLogSearchParams
@@ -25,7 +27,10 @@ const appStore = useAppStore();
 
 const searchParams = reactive<LoginLogSearchParams>({
   username: '',
-  status: null
+  ip: '',
+  status: null,
+  startCreatedAt: '',
+  endCreatedAt: ''
 });
 
 const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagination } = useNaivePaginatedTable<
@@ -52,7 +57,11 @@ function getQueryParams(): LoginLogListQuery {
     pageSize: mobilePagination.value.pageSize ?? 10
   };
   if (searchParams.username) params.username = searchParams.username;
-  if (searchParams.status) params.status = searchParams.status;
+  if (searchParams.ip) params.ip = searchParams.ip;
+  if (searchParams.status === 'success') params.status = true;
+  else if (searchParams.status === 'fail') params.status = false;
+  if (searchParams.startCreatedAt) params.startCreatedAt = searchParams.startCreatedAt;
+  if (searchParams.endCreatedAt) params.endCreatedAt = searchParams.endCreatedAt;
   return params;
 }
 
@@ -63,28 +72,38 @@ const scrollX = computed(() =>
   }, 0)
 );
 
-const { onDeleted } = useTableOperate<LoginLog>(data, 'ID', getData);
+const { checkedRowKeys, onDeleted, onBatchDeleted } = useTableOperate<LoginLog>(data, 'ID', getData);
 
 async function handleDelete(row: LoginLog) {
   const { error } = await deleteLoginLog(row.ID);
   if (!error) await onDeleted();
 }
 
+async function handleBatchDelete() {
+  const ids = checkedRowKeys.value.map(id => Number(id));
+  const { error } = await deleteLoginLogByIds(ids);
+  if (!error) await onBatchDeleted();
+}
+
 function createAllColumns(): NaiveUI.TableColumn<LoginLog>[] {
   return [
     {
+      type: 'selection',
+      align: 'center',
+      width: 48
+    },
+    {
       key: 'index',
-      title: $t('page.systemTools.loginLog.columns.index'),
+      title: $t('page.opsMonitor.loginLog.columns.index'),
       width: 70,
       align: 'center',
       render: (_row, index) => index + 1
     },
-    { key: 'ID', title: $t('page.systemTools.loginLog.columns.id'), minWidth: 70 },
-    { key: 'username', title: $t('page.systemTools.loginLog.columns.username'), minWidth: 120 },
-    { key: 'ip', title: $t('page.systemTools.loginLog.columns.ip'), minWidth: 130 },
+    { key: 'username', title: $t('page.opsMonitor.loginLog.columns.username'), minWidth: 120 },
+    { key: 'ip', title: $t('page.opsMonitor.loginLog.columns.ip'), minWidth: 130 },
     {
       key: 'status',
-      title: $t('page.systemTools.loginLog.columns.status'),
+      title: $t('page.opsMonitor.loginLog.columns.status'),
       width: 100,
       align: 'center',
       render: row =>
@@ -93,22 +112,27 @@ function createAllColumns(): NaiveUI.TableColumn<LoginLog>[] {
           { type: row.status ? 'success' : 'error', size: 'small', bordered: false },
           {
             default: () =>
-              row.status ? $t('page.systemTools.loginLog.search.success') : $t('page.systemTools.loginLog.search.fail')
+              row.status ? $t('page.opsMonitor.loginLog.search.success') : $t('page.opsMonitor.loginLog.search.fail')
           }
         )
     },
     {
       key: 'detail',
-      title: $t('page.systemTools.loginLog.columns.detail'),
+      title: $t('page.opsMonitor.loginLog.columns.detail'),
       minWidth: 180,
       ellipsis: { tooltip: true },
-      render: row => (row.status ? $t('page.systemTools.loginLog.search.success') : row.errorMessage)
+      render: row => row.errorMessage
     },
-    { key: 'agent', title: $t('page.systemTools.loginLog.columns.agent'), minWidth: 180, ellipsis: { tooltip: true } },
-    { key: 'CreatedAt', title: $t('page.systemTools.loginLog.columns.createdAt'), minWidth: 170 },
+    { key: 'agent', title: $t('page.opsMonitor.loginLog.columns.agent'), minWidth: 180, ellipsis: { tooltip: true } },
+    {
+      key: 'CreatedAt',
+      title: $t('page.opsMonitor.loginLog.columns.createdAt'),
+      minWidth: 170,
+      render: row => dayjs(row.CreatedAt).format('YYYY-MM-DD HH:mm:ss')
+    },
     {
       key: 'operation',
-      title: $t('page.systemTools.loginLog.columns.operations'),
+      title: $t('page.opsMonitor.loginLog.columns.operations'),
       align: 'center',
       fixed: 'right',
       width: 120,
@@ -140,13 +164,24 @@ onMounted(() => {
     <LoginLogSearch v-model:model="searchParams" @search="getDataByPage" @reset="getDataByPage" />
 
     <NCard
-      :title="$t('page.systemTools.loginLog.title')"
+      :title="$t('page.opsMonitor.loginLog.title')"
       :bordered="false"
       size="small"
       class="card-wrapper sm:flex-1-hidden"
     >
       <template #header-extra>
         <div class="flex-center gap-8px">
+          <NPopconfirm :disabled="checkedRowKeys.length === 0" @positive-click="handleBatchDelete">
+            <template #trigger>
+              <NButton size="small" type="error" ghost :disabled="checkedRowKeys.length === 0">
+                <template #icon>
+                  <icon-ic-round-delete class="text-16px" />
+                </template>
+                {{ $t('common.batchDelete') }}
+              </NButton>
+            </template>
+            {{ $t('common.confirmDelete') }}
+          </NPopconfirm>
           <NButton size="small" :loading="loading" @click="getData">
             <template #icon>
               <icon-mdi-refresh class="text-16px" />
@@ -158,6 +193,7 @@ onMounted(() => {
       </template>
 
       <NDataTable
+        v-model:checked-row-keys="checkedRowKeys"
         :columns="columns"
         :data="data"
         :loading="loading"

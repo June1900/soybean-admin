@@ -1,19 +1,24 @@
-/** 登录日志（UI-only mock） */
+/** 登录日志 */
 export interface LoginLog {
   ID: number;
+  CreatedAt: string;
+  UpdatedAt?: string;
   username: string;
   ip: string;
   status: boolean;
   errorMessage: string;
   agent: string;
-  CreatedAt: string;
+  userId: number;
 }
 
 export interface LoginLogListQuery {
   page: number;
   pageSize: number;
   username?: string;
-  status?: 'success' | 'fail';
+  ip?: string;
+  status?: boolean;
+  startCreatedAt?: string;
+  endCreatedAt?: string;
 }
 
 export interface LoginLogListResponse {
@@ -23,8 +28,11 @@ export interface LoginLogListResponse {
   pageSize: number;
 }
 
-/** Frontend search form model for login log list */
+/** 前端搜索表单模型 */
 export interface LoginLogSearchParams {
   username: string;
+  ip: string;
   status: 'success' | 'fail' | null;
+  startCreatedAt: string;
+  endCreatedAt: string;
 }

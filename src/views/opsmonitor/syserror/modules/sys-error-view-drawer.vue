@@ -25,8 +25,8 @@ const statusTagType: Record<SysErrorStatus, 'warning' | 'info' | 'success' | 'er
   failed: 'error'
 };
 
-const levelLabel = computed(() => (props.data ? $t(`page.systemTools.sysError.level.${props.data.level}`) : ''));
-const statusLabel = computed(() => (props.data ? $t(`page.systemTools.sysError.status.${props.data.status}`) : ''));
+const levelLabel = computed(() => (props.data ? $t(`page.opsMonitor.sysError.level.${props.data.level}`) : ''));
+const statusLabel = computed(() => (props.data ? $t(`page.opsMonitor.sysError.status.${props.data.status}`) : ''));
 
 function closeDrawer() {
   emit('close');
@@ -35,26 +35,26 @@ function closeDrawer() {
 
 <template>
   <NDrawer :show="visible" display-directive="show" :width="520" @mask-click="closeDrawer" @close="closeDrawer">
-    <NDrawerContent :title="$t('page.systemTools.sysError.detail.title')" :native-scrollbar="false">
+    <NDrawerContent :title="$t('page.opsMonitor.sysError.detail.title')" :native-scrollbar="false">
       <NDescriptions v-if="data" label-placement="top" :column="1" bordered>
         <NDescriptionsItem label="ID">#{{ data.ID }}</NDescriptionsItem>
-        <NDescriptionsItem :label="$t('page.systemTools.sysError.detail.form')">{{ data.form }}</NDescriptionsItem>
-        <NDescriptionsItem :label="$t('page.systemTools.sysError.detail.level')">
+        <NDescriptionsItem :label="$t('page.opsMonitor.sysError.detail.form')">{{ data.form }}</NDescriptionsItem>
+        <NDescriptionsItem :label="$t('page.opsMonitor.sysError.detail.level')">
           <NTag :type="levelTagType[data.level]" size="small" :bordered="false">{{ levelLabel }}</NTag>
         </NDescriptionsItem>
-        <NDescriptionsItem :label="$t('page.systemTools.sysError.detail.status')">
+        <NDescriptionsItem :label="$t('page.opsMonitor.sysError.detail.status')">
           <NTag :type="statusTagType[data.status]" size="small" :bordered="false">{{ statusLabel }}</NTag>
         </NDescriptionsItem>
-        <NDescriptionsItem :label="$t('page.systemTools.sysError.detail.info')">
+        <NDescriptionsItem :label="$t('page.opsMonitor.sysError.detail.info')">
           <span class="break-all text-red-500">{{ data.info }}</span>
         </NDescriptionsItem>
-        <NDescriptionsItem :label="$t('page.systemTools.sysError.detail.solution')">
+        <NDescriptionsItem :label="$t('page.opsMonitor.sysError.detail.solution')">
           <span class="break-all">{{ data.solution || '-' }}</span>
         </NDescriptionsItem>
       </NDescriptions>
       <template #footer>
         <NSpace justify="end">
-          <NButton type="primary" @click="closeDrawer">{{ $t('page.systemTools.sysError.detail.close') }}</NButton>
+          <NButton type="primary" @click="closeDrawer">{{ $t('page.opsMonitor.sysError.detail.close') }}</NButton>
         </NSpace>
       </template>
     </NDrawerContent>

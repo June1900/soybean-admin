@@ -171,6 +171,9 @@ const routeMap: RouteMap = {
   "home": "/home",
   "iframe-page": "/iframe-page/:url",
   "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?",
+  "opsmonitor": "/opsmonitor",
+  "opsmonitor_loginlog": "/opsmonitor/loginlog",
+  "opsmonitor_syserror": "/opsmonitor/syserror",
   "system": "/system",
   "system_api": "/system/api",
   "system_authority": "/system/authority",
@@ -183,8 +186,6 @@ const routeMap: RouteMap = {
   "system_user": "/system/user",
   "systemtools": "/systemtools",
   "systemtools_apitoken": "/systemtools/apitoken",
-  "systemtools_loginlog": "/systemtools/loginlog",
-  "systemtools_syserror": "/systemtools/syserror",
   "systemtools_system": "/systemtools/system",
   "systemtools_timedtask": "/systemtools/timedtask",
   "systemtools_version": "/systemtools/version"

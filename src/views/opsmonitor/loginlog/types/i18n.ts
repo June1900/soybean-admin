@@ -2,7 +2,9 @@ export interface SystemToolsLoginLogLang {
   title: string;
   search: {
     username: string;
+    ip: string;
     status: string;
+    createdAtRange: string;
     search: string;
     reset: string;
     success: string;

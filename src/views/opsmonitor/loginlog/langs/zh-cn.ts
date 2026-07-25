@@ -4,7 +4,9 @@ const lang: SystemToolsLoginLogLang = {
   title: '登录日志',
   search: {
     username: '用户名',
+    ip: 'IP',
     status: '状态',
+    createdAtRange: '登录时间',
     search: '搜索',
     reset: '重置',
     success: '成功',

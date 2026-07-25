@@ -98,48 +98,48 @@ function createAllColumns(): NaiveUI.TableColumn<SysError>[] {
   return [
     {
       key: 'index',
-      title: $t('page.systemTools.sysError.columns.index'),
+      title: $t('page.opsMonitor.sysError.columns.index'),
       width: 70,
       align: 'center',
       render: (_row, index) => index + 1
     },
-    { key: 'ID', title: $t('page.systemTools.sysError.columns.id'), minWidth: 70 },
-    { key: 'CreatedAt', title: $t('page.systemTools.sysError.columns.createdAt'), minWidth: 170 },
-    { key: 'form', title: $t('page.systemTools.sysError.columns.form'), minWidth: 140 },
+    { key: 'ID', title: $t('page.opsMonitor.sysError.columns.id'), minWidth: 70 },
+    { key: 'CreatedAt', title: $t('page.opsMonitor.sysError.columns.createdAt'), minWidth: 170 },
+    { key: 'form', title: $t('page.opsMonitor.sysError.columns.form'), minWidth: 140 },
     {
       key: 'level',
-      title: $t('page.systemTools.sysError.columns.level'),
+      title: $t('page.opsMonitor.sysError.columns.level'),
       width: 90,
       align: 'center',
       render: row =>
         h(
           NTag,
           { type: levelTagType[row.level], size: 'small', bordered: false },
-          { default: () => $t(`page.systemTools.sysError.level.${row.level}`) }
+          { default: () => $t(`page.opsMonitor.sysError.level.${row.level}`) }
         )
     },
     {
       key: 'status',
-      title: $t('page.systemTools.sysError.columns.status'),
+      title: $t('page.opsMonitor.sysError.columns.status'),
       width: 100,
       align: 'center',
       render: row =>
         h(
           NTag,
           { type: statusTagType[row.status], size: 'small', bordered: false },
-          { default: () => $t(`page.systemTools.sysError.status.${row.status}`) }
+          { default: () => $t(`page.opsMonitor.sysError.status.${row.status}`) }
         )
     },
-    { key: 'info', title: $t('page.systemTools.sysError.columns.info'), minWidth: 220, ellipsis: { tooltip: true } },
+    { key: 'info', title: $t('page.opsMonitor.sysError.columns.info'), minWidth: 220, ellipsis: { tooltip: true } },
     {
       key: 'solution',
-      title: $t('page.systemTools.sysError.columns.solution'),
+      title: $t('page.opsMonitor.sysError.columns.solution'),
       minWidth: 160,
       ellipsis: { tooltip: true }
     },
     {
       key: 'operation',
-      title: $t('page.systemTools.sysError.columns.operations'),
+      title: $t('page.opsMonitor.sysError.columns.operations'),
       align: 'center',
       fixed: 'right',
       width: 170,
@@ -147,7 +147,7 @@ function createAllColumns(): NaiveUI.TableColumn<SysError>[] {
         h(TableActionButtons, {
           actions: [
             {
-              label: $t('page.systemTools.sysError.columns.view'),
+              label: $t('page.opsMonitor.sysError.columns.view'),
               icon: 'material-symbols:visibility',
               type: 'default',
               onClick: () => openView(row)
@@ -177,7 +177,7 @@ onMounted(() => {
     <SysErrorSearch v-model:model="searchParams" @search="getDataByPage" @reset="getDataByPage" />
 
     <NCard
-      :title="$t('page.systemTools.sysError.title')"
+      :title="$t('page.opsMonitor.sysError.title')"
       :bordered="false"
       size="small"
       class="card-wrapper sm:flex-1-hidden"

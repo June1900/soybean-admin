@@ -4,7 +4,9 @@ const lang: SystemToolsLoginLogLang = {
   title: 'Login Logs',
   search: {
     username: 'Username',
+    ip: 'IP',
     status: 'Status',
+    createdAtRange: 'Login Time',
     search: 'Search',
     reset: 'Reset',
     success: 'Success',

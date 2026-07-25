@@ -7,8 +7,8 @@ import positionEnUS from '@/views/system/position/langs/en-us';
 import paramsEnUS from '@/views/system/params/langs/en-us';
 import dictionaryEnUS from '@/views/system/dictionary/langs/en-us';
 import customerEnUS from '@/views/example/customer/langs/en-us';
-import sysErrorEnUS from '@/views/systemtools/syserror/langs/en-us';
-import loginLogEnUS from '@/views/systemtools/loginlog/langs/en-us';
+import sysErrorEnUS from '@/views/opsmonitor/syserror/langs/en-us';
+import loginLogEnUS from '@/views/opsmonitor/loginlog/langs/en-us';
 import versionEnUS from '@/views/systemtools/version/langs/en-us';
 import securityEnUS from '@/views/system/security/langs/en-us';
 import systemConfigEnUS from '@/views/systemtools/system/langs/en-us';
@@ -267,10 +267,11 @@ const local: App.I18n.Schema = {
     systemtools: 'System Tools',
     systemtools_apitoken: 'API Token',
     systemtools_timedtask: 'Timed Task',
-    systemtools_syserror: 'System Error Logs',
-    systemtools_loginlog: 'Login Logs',
     systemtools_version: 'Version Info',
-    systemtools_system: 'System Config'
+    systemtools_system: 'System Config',
+    opsmonitor: 'Ops Monitor',
+    opsmonitor_loginlog: 'Login Logs',
+    opsmonitor_syserror: 'System Error Logs'
   },
   page: {
     login: {
@@ -372,10 +373,12 @@ const local: App.I18n.Schema = {
     systemTools: {
       apiToken: { ...apiTokenEnUS },
       timedTask: { ...timedTaskEnUS },
-      sysError: { ...sysErrorEnUS },
-      loginLog: { ...loginLogEnUS },
       version: { ...versionEnUS },
       system: { ...systemConfigEnUS }
+    },
+    opsMonitor: {
+      sysError: { ...sysErrorEnUS },
+      loginLog: { ...loginLogEnUS }
     }
   },
   form: {

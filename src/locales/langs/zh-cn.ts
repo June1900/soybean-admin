@@ -9,8 +9,8 @@ import apiTokenZhCN from '@/views/systemtools/apiToken/langs/zh-cn';
 import timedTaskZhCN from '@/views/systemtools/timedtask/langs/zh-cn';
 import dictionaryZhCN from '@/views/system/dictionary/langs/zh-cn';
 import customerZhCN from '@/views/example/customer/langs/zh-cn';
-import sysErrorZhCN from '@/views/systemtools/syserror/langs/zh-cn';
-import loginLogZhCN from '@/views/systemtools/loginlog/langs/zh-cn';
+import sysErrorZhCN from '@/views/opsmonitor/syserror/langs/zh-cn';
+import loginLogZhCN from '@/views/opsmonitor/loginlog/langs/zh-cn';
 import versionZhCN from '@/views/systemtools/version/langs/zh-cn';
 import securityZhCN from '@/views/system/security/langs/zh-cn';
 import systemConfigZhCN from '@/views/systemtools/system/langs/zh-cn';
@@ -263,10 +263,11 @@ const local: App.I18n.Schema = {
     systemtools: '系统工具',
     systemtools_apitoken: '接口凭证',
     systemtools_timedtask: '定时任务',
-    systemtools_syserror: '系统错误日志',
-    systemtools_loginlog: '登录日志',
     systemtools_version: '版本信息',
-    systemtools_system: '系统配置'
+    systemtools_system: '系统配置',
+    opsmonitor: '运维监控',
+    opsmonitor_loginlog: '登录日志',
+    opsmonitor_syserror: '系统错误日志'
   },
   page: {
     login: {
@@ -368,10 +369,12 @@ const local: App.I18n.Schema = {
     systemTools: {
       apiToken: { ...apiTokenZhCN },
       timedTask: { ...timedTaskZhCN },
-      sysError: { ...sysErrorZhCN },
-      loginLog: { ...loginLogZhCN },
       version: { ...versionZhCN },
       system: { ...systemConfigZhCN }
+    },
+    opsMonitor: {
+      sysError: { ...sysErrorZhCN },
+      loginLog: { ...loginLogZhCN }
     }
   },
   form: {
