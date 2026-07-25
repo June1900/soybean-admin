@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { toRaw } from 'vue';
+import { computed, toRaw } from 'vue';
+import dayjs from 'dayjs';
 import { jsonClone } from '@sa/utils';
 import { useNaiveForm } from '@/hooks/common/form';
 import { $t } from '@/locales';
@@ -16,6 +17,26 @@ const emit = defineEmits<Emits>();
 const { formRef, validate, restoreValidation } = useNaiveForm();
 
 const model = defineModel<SysErrorSearchParams>('model', { required: true });
+
+/** 时间区间选择器（精确到秒），桥接时间戳与后端字符串参数 */
+const createdAtRange = computed<[number, number] | null>({
+  get() {
+    const { startCreatedAt, endCreatedAt } = model.value;
+    if (startCreatedAt && endCreatedAt) {
+      return [dayjs(startCreatedAt).valueOf(), dayjs(endCreatedAt).valueOf()] as [number, number];
+    }
+    return null;
+  },
+  set(val: [number, number] | null) {
+    if (val && val.length === 2) {
+      model.value.startCreatedAt = dayjs(val[0]).format('YYYY-MM-DD HH:mm:ss');
+      model.value.endCreatedAt = dayjs(val[1]).format('YYYY-MM-DD HH:mm:ss');
+    } else {
+      model.value.startCreatedAt = '';
+      model.value.endCreatedAt = '';
+    }
+  }
+});
 
 const defaultModel = jsonClone(toRaw(model.value));
 
@@ -42,7 +63,15 @@ async function search() {
         <NForm ref="formRef" :model="model" label-placement="left" :label-width="80">
           <NGrid responsive="screen" item-responsive>
             <NFormItemGi
-              span="24 s:12 m:6"
+              span="24 s:12 m:8"
+              :label="$t('page.opsMonitor.sysError.search.createdAtRange')"
+              path="createdAtRange"
+              class="pr-24px"
+            >
+              <NDatePicker v-model:value="createdAtRange" type="datetimerange" clearable />
+            </NFormItemGi>
+            <NFormItemGi
+              span="24 s:12 m:8"
               :label="$t('page.opsMonitor.sysError.search.form')"
               path="form"
               class="pr-24px"
@@ -50,14 +79,14 @@ async function search() {
               <NInput v-model:value="model.form" clearable />
             </NFormItemGi>
             <NFormItemGi
-              span="24 s:12 m:6"
+              span="24 s:12 m:8"
               :label="$t('page.opsMonitor.sysError.search.info')"
               path="info"
               class="pr-24px"
             >
               <NInput v-model:value="model.info" clearable />
             </NFormItemGi>
-            <NFormItemGi span="24 m:12" class="pr-24px">
+            <NFormItemGi span="24 m:24" class="pr-24px">
               <NSpace class="w-full" justify="end">
                 <NButton @click="reset">
                   <template #icon>
@@ -79,5 +108,3 @@ async function search() {
     </NCollapse>
   </NCard>
 </template>
-
-<style scoped></style>

@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { computed, h, onMounted, reactive, ref } from 'vue';
-import { NButton, NTag } from 'naive-ui';
+import dayjs from 'dayjs';
+import { NButton, NPopconfirm, NTag } from 'naive-ui';
 import { useAppStore } from '@/store/modules/app';
 import { useNaivePaginatedTable, useTableOperate } from '@/hooks/common/table';
 import { $t } from '@/locales';
 import {
   fetchSysErrorList,
+  findSysError,
   deleteSysError,
+  deleteSysErrorByIds,
+  getSysErrorSolution,
   type SysError,
   type SysErrorLevel,
   type SysErrorListQuery,
@@ -28,7 +32,9 @@ const appStore = useAppStore();
 
 const searchParams = reactive<SysErrorSearchParams>({
   form: '',
-  info: ''
+  info: '',
+  startCreatedAt: '',
+  endCreatedAt: ''
 });
 
 const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagination } = useNaivePaginatedTable<
@@ -56,6 +62,8 @@ function getQueryParams(): SysErrorListQuery {
   };
   if (searchParams.form) params.form = searchParams.form;
   if (searchParams.info) params.info = searchParams.info;
+  if (searchParams.startCreatedAt) params.startCreatedAt = searchParams.startCreatedAt;
+  if (searchParams.endCreatedAt) params.endCreatedAt = searchParams.endCreatedAt;
   return params;
 }
 
@@ -67,19 +75,52 @@ const scrollX = computed(() =>
 );
 
 /* ---------- operate ---------- */
-const { onDeleted } = useTableOperate<SysError>(data, 'ID', getData);
+const { checkedRowKeys, onDeleted, onBatchDeleted } = useTableOperate<SysError>(data, 'ID', getData);
 
 const viewVisible = ref(false);
 const viewData = ref<SysError | null>(null);
+const solutionLoading = ref(false);
 
-function openView(row: SysError) {
-  viewData.value = row;
-  viewVisible.value = true;
+async function openView(row: SysError) {
+  const { data: detail, error } = await findSysError(row.ID);
+  if (!error && detail) {
+    viewData.value = detail;
+    viewVisible.value = true;
+  }
 }
 
 async function handleDelete(row: SysError) {
   const { error } = await deleteSysError(row.ID);
   if (!error) await onDeleted();
+}
+
+async function handleBatchDelete() {
+  const ids = checkedRowKeys.value.map(id => Number(id));
+  if (ids.length === 0) return;
+  const { error } = await deleteSysErrorByIds(ids);
+  if (!error) await onBatchDeleted();
+}
+
+function handleSolution(row: SysError) {
+  window.$dialog?.warning({
+    title: $t('page.opsMonitor.sysError.solution.confirmTitle'),
+    content: $t('page.opsMonitor.sysError.solution.confirmContent'),
+    positiveText: $t('page.opsMonitor.sysError.solution.confirm'),
+    negativeText: $t('page.opsMonitor.sysError.solution.cancel'),
+    onPositiveClick: async () => {
+      if (solutionLoading.value) return;
+      solutionLoading.value = true;
+      try {
+        const { error } = await getSysErrorSolution(row.ID);
+        if (!error) {
+          window.$message?.success($t('page.opsMonitor.sysError.solution.success'));
+          await getData();
+        }
+      } finally {
+        solutionLoading.value = false;
+      }
+    }
+  });
 }
 
 const levelTagType: Record<SysErrorLevel, 'error' | 'warning'> = {
@@ -88,14 +129,25 @@ const levelTagType: Record<SysErrorLevel, 'error' | 'warning'> = {
 };
 
 const statusTagType: Record<SysErrorStatus, 'warning' | 'info' | 'success' | 'error'> = {
-  pending: 'warning',
-  processing: 'info',
-  done: 'success',
-  failed: 'error'
+  未处理: 'info',
+  处理中: 'warning',
+  处理完成: 'success',
+  处理失败: 'error'
 };
+
+function formatDate(val: string): string {
+  if (!val) return '-';
+  const d = dayjs(val);
+  return d.isValid() ? d.format('YYYY-MM-DD HH:mm:ss') : val;
+}
 
 function createAllColumns(): NaiveUI.TableColumn<SysError>[] {
   return [
+    {
+      type: 'selection',
+      align: 'center',
+      width: 48
+    },
     {
       key: 'index',
       title: $t('page.opsMonitor.sysError.columns.index'),
@@ -103,13 +155,17 @@ function createAllColumns(): NaiveUI.TableColumn<SysError>[] {
       align: 'center',
       render: (_row, index) => index + 1
     },
-    { key: 'ID', title: $t('page.opsMonitor.sysError.columns.id'), minWidth: 70 },
-    { key: 'CreatedAt', title: $t('page.opsMonitor.sysError.columns.createdAt'), minWidth: 170 },
-    { key: 'form', title: $t('page.opsMonitor.sysError.columns.form'), minWidth: 140 },
+    {
+      key: 'CreatedAt',
+      title: $t('page.opsMonitor.sysError.columns.createdAt'),
+      width: 200,
+      sorter: 'default',
+      render: row => formatDate(row.CreatedAt)
+    },
     {
       key: 'level',
       title: $t('page.opsMonitor.sysError.columns.level'),
-      width: 90,
+      width: 100,
       align: 'center',
       render: row =>
         h(
@@ -130,11 +186,12 @@ function createAllColumns(): NaiveUI.TableColumn<SysError>[] {
           { default: () => $t(`page.opsMonitor.sysError.status.${row.status}`) }
         )
     },
-    { key: 'info', title: $t('page.opsMonitor.sysError.columns.info'), minWidth: 220, ellipsis: { tooltip: true } },
+    { key: 'form', title: $t('page.opsMonitor.sysError.columns.form'), minWidth: 120 },
+    { key: 'info', title: $t('page.opsMonitor.sysError.columns.info'), minWidth: 260, ellipsis: { tooltip: true } },
     {
       key: 'solution',
       title: $t('page.opsMonitor.sysError.columns.solution'),
-      minWidth: 160,
+      minWidth: 140,
       ellipsis: { tooltip: true }
     },
     {
@@ -142,7 +199,7 @@ function createAllColumns(): NaiveUI.TableColumn<SysError>[] {
       title: $t('page.opsMonitor.sysError.columns.operations'),
       align: 'center',
       fixed: 'right',
-      width: 170,
+      width: 220,
       render: row =>
         h(TableActionButtons, {
           actions: [
@@ -184,6 +241,17 @@ onMounted(() => {
     >
       <template #header-extra>
         <div class="flex-center gap-8px">
+          <NPopconfirm :disabled="checkedRowKeys.length === 0" @positive-click="handleBatchDelete">
+            <template #trigger>
+              <NButton size="small" type="error" ghost :disabled="checkedRowKeys.length === 0">
+                <template #icon>
+                  <icon-ic-round-delete class="text-16px" />
+                </template>
+                {{ $t('common.batchDelete') }}
+              </NButton>
+            </template>
+            {{ $t('common.confirmDelete') }}
+          </NPopconfirm>
           <NButton size="small" :loading="loading" @click="getData">
             <template #icon>
               <icon-mdi-refresh class="text-16px" />
@@ -195,6 +263,7 @@ onMounted(() => {
       </template>
 
       <NDataTable
+        v-model:checked-row-keys="checkedRowKeys"
         :columns="columns"
         :data="data"
         :loading="loading"
