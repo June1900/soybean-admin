@@ -1,10 +1,16 @@
-/** i18n schema for the api (system/api) feature. */
+/** 接口管理模块 i18n 类型声明 */
 export interface SystemApiLang {
   title: string;
   addApi: string;
   editApi: string;
   deleteApi: string;
   refresh: string;
+  refreshSuccess: string;
+  batchDelete: string;
+  assignRole: string;
+  assignRoleNotice: string;
+  assignRoleSuccess: string;
+  roleTreeEmpty: string;
   colSetting: string;
   selectAll: string;
   search: string;
@@ -13,15 +19,28 @@ export interface SystemApiLang {
   operation: string;
   index: string;
   path: string;
+  drawerPath: string;
   apiGroup: string;
+  drawerApiGroup: string;
   description: string;
+  drawerDescription: string;
+  descriptionSearch: string;
   method: string;
+  drawerMethod: string;
+  drawerNotice: string;
   confirmDelete: string;
   confirmBatchDelete: string;
   pathPlaceholder: string;
+  pathSearchPlaceholder: string;
+  drawerPathPlaceholder: string;
   apiGroupPlaceholder: string;
+  apiGroupSearchPlaceholder: string;
+  drawerApiGroupPlaceholder: string;
   descriptionPlaceholder: string;
+  descriptionSearchPlaceholder: string;
+  drawerDescriptionPlaceholder: string;
   methodPlaceholder: string;
+  drawerMethodPlaceholder: string;
   addSuccess: string;
   editSuccess: string;
   deleteSuccess: string;

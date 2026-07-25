@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { toRaw } from 'vue';
+import { onMounted, ref, toRaw } from 'vue';
 import { jsonClone } from '@sa/utils';
+import { useLoading } from '@sa/hooks';
 import { useNaiveForm } from '@/hooks/common/form';
 import { $t } from '@/locales';
+import { fetchGetApiGroups } from '../api';
 import type { ApiSearchParams } from '../api';
 
 defineOptions({
@@ -28,6 +30,23 @@ const methodOptions = [
   { label: 'PATCH', value: 'PATCH' }
 ];
 
+const apiGroupMap = ref<Record<string, string>>({});
+const groupOptions = ref<{ label: string; value: string }[]>([]);
+const { loading, startLoading, endLoading } = useLoading();
+
+async function loadApiGroups() {
+  startLoading();
+  const { data, error } = await fetchGetApiGroups();
+  endLoading();
+  if (!error && data) {
+    apiGroupMap.value = data.apiGroupMap ?? {};
+    groupOptions.value = (data.groups ?? []).map(group => ({
+      label: data.apiGroupMap?.[group] ?? group,
+      value: group
+    }));
+  }
+}
+
 const defaultModel = jsonClone(toRaw(model.value));
 
 function resetModel() {
@@ -44,6 +63,10 @@ async function search() {
   await validate();
   emit('search');
 }
+
+onMounted(() => {
+  loadApiGroups();
+});
 </script>
 
 <template>
@@ -53,12 +76,26 @@ async function search() {
         <NForm ref="formRef" :model="model" label-placement="left" :label-width="80">
           <NGrid responsive="screen" item-responsive>
             <NFormItemGi span="24 s:12 m:6" :label="$t('page.system.api.path')" path="path" class="pr-24px">
-              <NInput v-model:value="model.path" :placeholder="$t('page.system.api.pathPlaceholder')" clearable />
+              <NInput v-model:value="model.path" :placeholder="$t('page.system.api.pathSearchPlaceholder')" clearable />
+            </NFormItemGi>
+            <NFormItemGi
+              span="24 s:12 m:6"
+              :label="$t('page.system.api.descriptionSearch')"
+              path="description"
+              class="pr-24px"
+            >
+              <NInput
+                v-model:value="model.description"
+                :placeholder="$t('page.system.api.descriptionSearchPlaceholder')"
+                clearable
+              />
             </NFormItemGi>
             <NFormItemGi span="24 s:12 m:6" :label="$t('page.system.api.apiGroup')" path="apiGroup" class="pr-24px">
-              <NInput
+              <NSelect
                 v-model:value="model.apiGroup"
-                :placeholder="$t('page.system.api.apiGroupPlaceholder')"
+                :placeholder="$t('page.system.api.apiGroupSearchPlaceholder')"
+                :options="groupOptions"
+                :loading="loading"
                 clearable
               />
             </NFormItemGi>
@@ -70,7 +107,7 @@ async function search() {
                 clearable
               />
             </NFormItemGi>
-            <NFormItemGi span="24 m:12" class="pr-24px">
+            <NFormItemGi span="24" class="pr-24px">
               <NSpace class="w-full" justify="end">
                 <NButton @click="reset">
                   <template #icon>

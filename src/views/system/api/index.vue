@@ -1,11 +1,19 @@
 <script setup lang="ts">
-import { computed, h, onMounted, reactive } from 'vue';
+import { computed, h, onMounted, reactive, ref } from 'vue';
 import { NTag } from 'naive-ui';
 import { useAppStore } from '@/store/modules/app';
 import { useNaivePaginatedTable, useTableOperate } from '@/hooks/common/table';
 import { $t } from '@/locales';
-import { fetchDeleteApi, fetchGetApiList, type Api, type ApiListQuery, type ApiSearchParams } from './api';
+import {
+  fetchDeleteApi,
+  fetchFreshCasbin,
+  fetchGetApiList,
+  type Api,
+  type ApiListQuery,
+  type ApiSearchParams
+} from './api';
 import ApiOperateDrawer from './modules/api-operate-drawer.vue';
+import ApiRoleAssignDrawer from './modules/api-role-assign-drawer.vue';
 import ApiSearch from './modules/api-search.vue';
 
 import TableActionButtons from '@/components/common/table-action-buttons';
@@ -16,7 +24,7 @@ defineOptions({
 
 const appStore = useAppStore();
 
-/* ---------- table ---------- */
+/* 表格与分页 */
 type ApiListResponse = Awaited<ReturnType<typeof fetchGetApiList>>;
 
 const methodTagType = (method: string): 'success' | 'primary' | 'warning' | 'error' | 'info' | 'default' => {
@@ -38,19 +46,10 @@ const methodTagType = (method: string): 'success' | 'primary' | 'warning' | 'err
 
 const searchParams = reactive<ApiSearchParams>({
   path: '',
+  description: '',
   apiGroup: '',
   method: ''
 });
-
-function getQueryParams(): ApiListQuery {
-  return {
-    path: searchParams.path || undefined,
-    apiGroup: searchParams.apiGroup || undefined,
-    method: searchParams.method || undefined,
-    page: mobilePagination.value.page,
-    pageSize: mobilePagination.value.pageSize
-  };
-}
 
 const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagination } = useNaivePaginatedTable<
   ApiListResponse,
@@ -67,6 +66,17 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
   immediate: false
 });
 
+function getQueryParams(): ApiListQuery {
+  return {
+    path: searchParams.path || undefined,
+    description: searchParams.description || undefined,
+    apiGroup: searchParams.apiGroup || undefined,
+    method: searchParams.method || undefined,
+    page: mobilePagination.value.page,
+    pageSize: mobilePagination.value.pageSize
+  };
+}
+
 const scrollX = computed(() =>
   columns.value.reduce((acc, col) => {
     const c = col as { width?: number; minWidth?: number };
@@ -74,7 +84,7 @@ const scrollX = computed(() =>
   }, 0)
 );
 
-/* ---------- operate (add / edit / delete) ---------- */
+/* 增删改操作 */
 const {
   drawerVisible,
   closeDrawer,
@@ -95,14 +105,30 @@ async function handleDelete(id: number) {
 }
 
 async function handleBatchDelete() {
-  for (const id of checkedRowKeys.value.map(id => Number(id))) {
-    // eslint-disable-next-line no-await-in-loop
+  for (const id of checkedRowKeys.value.map(key => Number(key))) {
     await fetchDeleteApi(id);
   }
   await onBatchDeleted();
 }
 
-/* ---------- columns ---------- */
+/* 顶部按钮 */
+async function handleRefreshCache() {
+  const { error } = await fetchFreshCasbin();
+  if (!error) {
+    window.$message?.success($t('page.system.api.refreshSuccess'));
+  }
+}
+
+/* 分配角色 */
+const roleDrawerVisible = ref(false);
+const currentApi = ref<Api | null>(null);
+
+function openRoleAssign(row: Api) {
+  currentApi.value = row;
+  roleDrawerVisible.value = true;
+}
+
+/* 列定义 */
 function createAllColumns(): NaiveUI.TableColumn<Api>[] {
   return [
     {
@@ -111,11 +137,11 @@ function createAllColumns(): NaiveUI.TableColumn<Api>[] {
       width: 48
     },
     {
-      key: 'index',
+      key: 'ID',
       title: $t('page.system.api.index'),
       width: 70,
       align: 'center',
-      render: (_row, index) => index + 1
+      render: row => row.ID
     },
     { key: 'path', title: $t('page.system.api.path'), minWidth: 200 },
     { key: 'apiGroup', title: $t('page.system.api.apiGroup'), minWidth: 140 },
@@ -133,7 +159,7 @@ function createAllColumns(): NaiveUI.TableColumn<Api>[] {
       title: $t('page.system.api.operation'),
       align: 'center',
       fixed: 'right',
-      width: 190,
+      width: 280,
       render: row =>
         h(TableActionButtons, {
           actions: [
@@ -142,6 +168,12 @@ function createAllColumns(): NaiveUI.TableColumn<Api>[] {
               icon: 'material-symbols:edit',
               type: 'primary',
               onClick: () => handleEdit(row.ID)
+            },
+            {
+              label: $t('page.system.api.assignRole'),
+              icon: 'material-symbols:person-add',
+              type: 'info',
+              onClick: () => openRoleAssign(row)
             },
             {
               kind: 'delete',
@@ -169,14 +201,32 @@ onMounted(() => {
 
     <NCard :title="$t('page.system.api.title')" :bordered="false" size="small" class="card-wrapper sm:flex-1-hidden">
       <template #header-extra>
-        <TableHeaderOperation
-          v-model:columns="columnChecks"
-          :disabled-delete="checkedRowKeys.length === 0"
-          :loading="loading"
-          @add="handleAdd"
-          @delete="handleBatchDelete"
-          @refresh="getData"
-        />
+        <NSpace align="center" wrap justify="end" class="lt-sm:w-200px">
+          <NButton size="small" ghost type="primary" @click="handleAdd">
+            <template #icon>
+              <icon-ic-round-plus class="text-icon" />
+            </template>
+            {{ $t('common.add') }}
+          </NButton>
+          <NPopconfirm @positive-click="handleBatchDelete">
+            <template #trigger>
+              <NButton size="small" ghost type="error" :disabled="checkedRowKeys.length === 0">
+                <template #icon>
+                  <icon-ic-round-delete class="text-icon" />
+                </template>
+                {{ $t('page.system.api.batchDelete') }}
+              </NButton>
+            </template>
+            {{ $t('page.system.api.confirmBatchDelete') }}
+          </NPopconfirm>
+          <NButton size="small" @click="handleRefreshCache">
+            <template #icon>
+              <icon-mdi-refresh class="text-icon" :class="{ 'animate-spin': loading }" />
+            </template>
+            {{ $t('page.system.api.refresh') }}
+          </NButton>
+          <TableColumnSetting v-model:columns="columnChecks" />
+        </NSpace>
       </template>
 
       <NDataTable
@@ -200,6 +250,8 @@ onMounted(() => {
         @close="closeDrawer"
         @submitted="getDataByPage"
       />
+
+      <ApiRoleAssignDrawer v-model:show="roleDrawerVisible" :api="currentApi" />
     </NCard>
   </div>
 </template>

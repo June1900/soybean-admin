@@ -1,4 +1,4 @@
-/** An API resource managed by the system. `ID` is the primary key. */
+/** 接口资源，ID 为主键 */
 export interface Api {
   ID: number;
   path: string;
@@ -8,7 +8,7 @@ export interface Api {
   createdAt?: string;
 }
 
-/** Payload for creating / updating an API. */
+/** 新增/编辑接口参数 */
 export interface ApiForm {
   ID?: number;
   path: string;
@@ -17,16 +17,17 @@ export interface ApiForm {
   method: string;
 }
 
-/** Query params for getApiList */
+/** 接口列表查询参数 */
 export interface ApiListQuery {
   page?: number;
   pageSize?: number;
   path?: string;
+  description?: string;
   apiGroup?: string;
   method?: string;
 }
 
-/** Response of getApiList */
+/** 接口列表返回结构 */
 export interface ApiListResponse {
   list: Api[];
   total: number;
@@ -34,9 +35,16 @@ export interface ApiListResponse {
   pageSize?: number;
 }
 
-/** Frontend search form model for api list */
+/** 列表搜索表单模型 */
 export interface ApiSearchParams {
   path: string;
+  description: string;
   apiGroup: string;
   method: string;
+}
+
+/** 接口分组返回结构 */
+export interface ApiGroupResponse {
+  apiGroupMap: Record<string, string>;
+  groups: string[];
 }

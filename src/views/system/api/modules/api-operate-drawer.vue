@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useLoading } from '@sa/hooks';
 import type { FormInst, FormRules } from 'naive-ui';
-import { NDrawer, NDrawerContent, NForm, NFormItem, NInput, NSelect, NSpace } from 'naive-ui';
+import { NAlert, NDrawer, NDrawerContent, NForm, NFormItem, NInput, NSelect, NSpace } from 'naive-ui';
 import { $t } from '@/locales';
-import { fetchCreateApi, fetchUpdateApi, type Api, type ApiForm } from '../api';
+import { fetchCreateApi, fetchGetApiGroups, fetchUpdateApi, type Api, type ApiForm } from '../api';
 
 defineOptions({
   name: 'ApiOperateDrawer'
@@ -32,7 +32,7 @@ function createDefaultModel(): ApiForm {
     path: '',
     apiGroup: '',
     description: '',
-    method: 'GET'
+    method: ''
   };
 }
 
@@ -44,10 +44,29 @@ const methodOptions = [
   { label: 'PATCH', value: 'PATCH' }
 ];
 
+const groupOptions = ref<{ label: string; value: string }[]>([]);
+const { loading: groupLoading, startLoading: startGroupLoading, endLoading: endGroupLoading } = useLoading();
+
+async function loadApiGroups() {
+  startGroupLoading();
+  const { data, error } = await fetchGetApiGroups();
+  endGroupLoading();
+  if (!error && data) {
+    groupOptions.value = (data.groups ?? []).map(group => ({
+      label: data.apiGroupMap?.[group] ?? group,
+      value: group
+    }));
+  }
+}
+
+onMounted(() => {
+  loadApiGroups();
+});
+
 const rules: FormRules = {
-  path: [{ required: true, message: $t('page.system.api.pathPlaceholder'), trigger: 'blur' }],
-  apiGroup: [{ required: true, message: $t('page.system.api.apiGroupPlaceholder'), trigger: 'blur' }],
-  method: [{ required: true, message: $t('page.system.api.methodPlaceholder'), trigger: 'change' }]
+  path: [{ required: true, message: $t('page.system.api.drawerPathPlaceholder'), trigger: 'blur' }],
+  method: [{ required: true, message: $t('page.system.api.drawerMethodPlaceholder'), trigger: 'change' }],
+  apiGroup: [{ required: true, message: $t('page.system.api.drawerApiGroupPlaceholder'), trigger: 'change' }]
 };
 
 watch(
@@ -92,28 +111,39 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <NDrawer :show="props.visible" display-directive="show" :width="480" @update:show="val => !val && emit('close')">
+  <NDrawer :show="props.visible" display-directive="show" width="640" @update:show="val => !val && emit('close')">
     <NDrawerContent :title="title" :native-scrollbar="false">
       <NForm ref="formRef" :model="model" :rules="rules" label-placement="left" :label-width="90">
-        <NFormItem :label="$t('page.system.api.path')" path="path">
-          <NInput v-model:value="model.path" :placeholder="$t('page.system.api.pathPlaceholder')" />
+        <NAlert v-if="props.operateType !== 'edit'" type="warning" class="mb-16px">
+          {{ $t('page.system.api.drawerNotice') }}
+        </NAlert>
+        <NFormItem :label="$t('page.system.api.drawerPath')" path="path">
+          <NInput v-model:value="model.path" :placeholder="$t('page.system.api.drawerPathPlaceholder')" />
         </NFormItem>
-        <NFormItem :label="$t('page.system.api.apiGroup')" path="apiGroup">
-          <NInput v-model:value="model.apiGroup" :placeholder="$t('page.system.api.apiGroupPlaceholder')" />
-        </NFormItem>
-        <NFormItem :label="$t('page.system.api.description')" path="description">
-          <NInput
-            v-model:value="model.description"
-            :placeholder="$t('page.system.api.descriptionPlaceholder')"
-            type="textarea"
-            :autosize="{ minRows: 2, maxRows: 4 }"
-          />
-        </NFormItem>
-        <NFormItem :label="$t('page.system.api.method')" path="method">
+        <NFormItem :label="$t('page.system.api.drawerMethod')" path="method">
           <NSelect
             v-model:value="model.method"
+            :placeholder="$t('page.system.api.drawerMethodPlaceholder')"
             :options="methodOptions"
-            :placeholder="$t('page.system.api.methodPlaceholder')"
+          />
+        </NFormItem>
+        <NFormItem :label="$t('page.system.api.drawerApiGroup')" path="apiGroup">
+          <NSelect
+            v-model:value="model.apiGroup"
+            :placeholder="$t('page.system.api.drawerApiGroupPlaceholder')"
+            :options="groupOptions"
+            :loading="groupLoading"
+            filterable
+            tag
+            clearable
+          />
+        </NFormItem>
+        <NFormItem :label="$t('page.system.api.drawerDescription')" path="description">
+          <NInput
+            v-model:value="model.description"
+            :placeholder="$t('page.system.api.drawerDescriptionPlaceholder')"
+            type="textarea"
+            :autosize="{ minRows: 2, maxRows: 4 }"
           />
         </NFormItem>
       </NForm>
@@ -129,3 +159,5 @@ async function handleSubmit() {
     </NDrawerContent>
   </NDrawer>
 </template>
+
+<style scoped></style>

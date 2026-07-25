@@ -246,13 +246,14 @@ function openBtnAssign(menu: Menu) {
 async function loadPermissionData(authorityId: number) {
   startLoading();
   try {
-    const [{ data: baseMenuData }, { data: menuAuthData }, { data: apiData }, { data: policyData }] =
-      await Promise.all([
+    const [{ data: baseMenuData }, { data: menuAuthData }, { data: apiData }, { data: policyData }] = await Promise.all(
+      [
         fetchGetBaseMenuTree(),
         fetchGetMenuAuthority(authorityId),
         fetchGetAllApis(),
         fetchGetPolicyPathByAuthorityId(authorityId)
-      ]);
+      ]
+    );
 
     menuTree.value = baseMenuData?.menus ?? [];
     // gin-vue-admin：只勾选叶子节点，避免父节点被勾选后级联全选
@@ -269,8 +270,7 @@ async function loadPermissionData(authorityId: number) {
 
     const router = props.role?.defaultRouter;
     defaultRouter.value =
-      router ||
-      (checkedMenuKeys.value.length > 0 ? findMenuNameById(menuTree.value, checkedMenuKeys.value[0]) : null);
+      router || (checkedMenuKeys.value.length > 0 ? findMenuNameById(menuTree.value, checkedMenuKeys.value[0]) : null);
   } finally {
     endLoading();
   }
