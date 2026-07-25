@@ -101,28 +101,6 @@ async function handleBatchDelete() {
   if (!error) await onBatchDeleted();
 }
 
-function handleSolution(row: SysError) {
-  window.$dialog?.warning({
-    title: $t('page.opsMonitor.sysError.solution.confirmTitle'),
-    content: $t('page.opsMonitor.sysError.solution.confirmContent'),
-    positiveText: $t('page.opsMonitor.sysError.solution.confirm'),
-    negativeText: $t('page.opsMonitor.sysError.solution.cancel'),
-    onPositiveClick: async () => {
-      if (solutionLoading.value) return;
-      solutionLoading.value = true;
-      try {
-        const { error } = await getSysErrorSolution(row.ID);
-        if (!error) {
-          window.$message?.success($t('page.opsMonitor.sysError.solution.success'));
-          await getData();
-        }
-      } finally {
-        solutionLoading.value = false;
-      }
-    }
-  });
-}
-
 const levelTagType: Record<SysErrorLevel, 'error' | 'warning'> = {
   fatal: 'error',
   error: 'warning'
