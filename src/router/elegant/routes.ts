@@ -114,6 +114,15 @@ export const generatedRoutes: GeneratedRoute[] = [
         }
       },
       {
+        name: 'opsmonitor_operation-history',
+        path: '/opsmonitor/operation-history',
+        component: 'view.opsmonitor_operation-history',
+        meta: {
+          title: 'opsmonitor_operation-history',
+          i18nKey: 'route.opsmonitor_operation-history'
+        }
+      },
+      {
         name: 'opsmonitor_syserror',
         path: '/opsmonitor/syserror',
         component: 'view.opsmonitor_syserror',

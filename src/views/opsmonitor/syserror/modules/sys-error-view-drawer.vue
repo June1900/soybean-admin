@@ -86,9 +86,7 @@ function closeDrawer() {
               </NButton>
             </div>
             <NScrollbar style="max-height: 280px">
-              <pre
-                class="whitespace-pre-wrap break-words rounded-8px border border-gray-200 bg-gray-50 p-12px font-mono text-13px text-red-500"
-              >{{ data.info }}</pre>
+              <pre class="code-block code-block--danger">{{ data.info }}</pre>
             </NScrollbar>
           </div>
 
@@ -102,9 +100,7 @@ function closeDrawer() {
               </NButton>
             </div>
             <NScrollbar style="max-height: 200px">
-              <pre
-                class="whitespace-pre-wrap break-words rounded-8px border border-gray-200 bg-gray-50 p-12px font-mono text-13px text-gray-700"
-              >{{ data.solution || '-' }}</pre>
+              <pre class="code-block">{{ data.solution || '-' }}</pre>
             </NScrollbar>
           </div>
         </div>
@@ -118,3 +114,23 @@ function closeDrawer() {
     </NDrawerContent>
   </NDrawer>
 </template>
+
+<style scoped>
+.code-block {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+  padding: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #374151;
+}
+
+.code-block--danger {
+  color: #ef4444;
+}
+</style>

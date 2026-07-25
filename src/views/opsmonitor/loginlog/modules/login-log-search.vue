@@ -23,7 +23,6 @@ const statusOptions = computed(() => [
   { label: $t('page.opsMonitor.loginLog.search.fail'), value: 'fail' }
 ]);
 
-/** 时间区间选择器（精确到秒），桥接时间戳与后端字符串参数 */
 const createdAtRange = computed<[number, number] | null>({
   get() {
     const { startCreatedAt, endCreatedAt } = model.value;

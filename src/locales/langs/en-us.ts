@@ -9,6 +9,7 @@ import dictionaryEnUS from '@/views/system/dictionary/langs/en-us';
 import customerEnUS from '@/views/example/customer/langs/en-us';
 import sysErrorEnUS from '@/views/opsmonitor/syserror/langs/en-us';
 import loginLogEnUS from '@/views/opsmonitor/loginlog/langs/en-us';
+import operationHistoryEnUS from '@/views/opsmonitor/operation-history/langs/en-us';
 import versionEnUS from '@/views/systemtools/version/langs/en-us';
 import securityEnUS from '@/views/system/security/langs/en-us';
 import systemConfigEnUS from '@/views/systemtools/system/langs/en-us';
@@ -271,7 +272,8 @@ const local: App.I18n.Schema = {
     systemtools_system: 'System Config',
     opsmonitor: 'Ops Monitor',
     opsmonitor_loginlog: 'Login Logs',
-    opsmonitor_syserror: 'System Error Logs'
+    opsmonitor_syserror: 'System Error Logs',
+    'opsmonitor_operation-history': 'Operation History'
   },
   page: {
     login: {
@@ -378,7 +380,8 @@ const local: App.I18n.Schema = {
     },
     opsMonitor: {
       sysError: { ...sysErrorEnUS },
-      loginLog: { ...loginLogEnUS }
+      loginLog: { ...loginLogEnUS },
+      operationHistory: { ...operationHistoryEnUS }
     }
   },
   form: {

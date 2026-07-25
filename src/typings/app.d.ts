@@ -590,6 +590,7 @@ declare namespace App {
         opsMonitor: {
           sysError: import('../../views/opsmonitor/syserror/types').SystemToolsSysErrorLang;
           loginLog: import('../../views/opsmonitor/loginlog/types').SystemToolsLoginLogLang;
+          operationHistory: import('../../views/opsmonitor/operation-history/types').OpsMonitorOperationHistoryLang;
         };
       };
       form: {

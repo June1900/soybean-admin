@@ -4,9 +4,9 @@ import dayjs from 'dayjs';
 import { jsonClone } from '@sa/utils';
 import { useNaiveForm } from '@/hooks/common/form';
 import { $t } from '@/locales';
-import type { SysErrorSearchParams } from '../api';
+import type { OperationRecordSearchParams } from '../api';
 
-defineOptions({ name: 'SysErrorSearch' });
+defineOptions({ name: 'OperationHistorySearch' });
 
 interface Emits {
   (e: 'search'): void;
@@ -16,7 +16,7 @@ const emit = defineEmits<Emits>();
 
 const { formRef, validate, restoreValidation } = useNaiveForm();
 
-const model = defineModel<SysErrorSearchParams>('model', { required: true });
+const model = defineModel<OperationRecordSearchParams>('model', { required: true });
 
 const createdAtRange = computed<[number, number] | null>({
   get() {
@@ -58,32 +58,40 @@ async function search() {
 <template>
   <NCard :bordered="false" size="small" class="card-wrapper">
     <NCollapse>
-      <NCollapseItem :title="$t('common.search')" name="sys-error-search">
-        <NForm ref="formRef" :model="model" label-placement="left" :label-width="80">
+      <NCollapseItem :title="$t('common.search')" name="operation-history-search">
+        <NForm ref="formRef" :model="model" label-placement="left" :label-width="120">
           <NGrid responsive="screen" item-responsive>
             <NFormItemGi
-              span="24 s:12 m:8"
-              :label="$t('page.opsMonitor.sysError.search.createdAtRange')"
+              span="24 s:12 m:6"
+              :label="$t('page.opsMonitor.operationHistory.search.createdAtRange')"
               path="createdAtRange"
               class="pr-24px"
             >
               <NDatePicker v-model:value="createdAtRange" type="datetimerange" clearable />
             </NFormItemGi>
             <NFormItemGi
-              span="24 s:12 m:8"
-              :label="$t('page.opsMonitor.sysError.search.form')"
-              path="form"
+              span="24 s:12 m:6"
+              :label="$t('page.opsMonitor.operationHistory.search.method')"
+              path="method"
               class="pr-24px"
             >
-              <NInput v-model:value="model.form" clearable />
+              <NInput v-model:value="model.method" clearable />
             </NFormItemGi>
             <NFormItemGi
-              span="24 s:12 m:8"
-              :label="$t('page.opsMonitor.sysError.search.info')"
-              path="info"
+              span="24 s:12 m:6"
+              :label="$t('page.opsMonitor.operationHistory.search.path')"
+              path="path"
               class="pr-24px"
             >
-              <NInput v-model:value="model.info" clearable />
+              <NInput v-model:value="model.path" clearable />
+            </NFormItemGi>
+            <NFormItemGi
+              span="24 s:12 m:6"
+              :label="$t('page.opsMonitor.operationHistory.search.status')"
+              path="status"
+              class="pr-24px"
+            >
+              <NInput v-model:value="model.status" clearable />
             </NFormItemGi>
             <NFormItemGi span="24 m:24" class="pr-24px">
               <NSpace class="w-full" justify="end">

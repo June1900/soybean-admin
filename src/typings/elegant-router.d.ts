@@ -27,6 +27,7 @@ declare module "@elegant-router/types" {
     "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?";
     "opsmonitor": "/opsmonitor";
     "opsmonitor_loginlog": "/opsmonitor/loginlog";
+    "opsmonitor_operation-history": "/opsmonitor/operation-history";
     "opsmonitor_syserror": "/opsmonitor/syserror";
     "system": "/system";
     "system_api": "/system/api";
@@ -108,6 +109,7 @@ declare module "@elegant-router/types" {
     | "example_customer"
     | "home"
     | "opsmonitor_loginlog"
+    | "opsmonitor_operation-history"
     | "opsmonitor_syserror"
     | "system_api"
     | "system_authority"
