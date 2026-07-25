@@ -1,5 +1,5 @@
 /** i18n schema for the timedTask feature */
-export interface SystemToolsTimedTaskLang {
+export interface OpsMonitorTimedTaskLang {
   title: string;
   search: {
     name: string;

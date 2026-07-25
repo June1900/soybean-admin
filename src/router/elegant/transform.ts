@@ -176,6 +176,7 @@ const routeMap: RouteMap = {
   "opsmonitor_operation-history": "/opsmonitor/operation-history",
   "opsmonitor_server-status": "/opsmonitor/server-status",
   "opsmonitor_syserror": "/opsmonitor/syserror",
+  "opsmonitor_timedtask": "/opsmonitor/timedtask",
   "system": "/system",
   "system_api": "/system/api",
   "system_authority": "/system/authority",
@@ -189,7 +190,6 @@ const routeMap: RouteMap = {
   "systemtools": "/systemtools",
   "systemtools_apitoken": "/systemtools/apitoken",
   "systemtools_system": "/systemtools/system",
-  "systemtools_timedtask": "/systemtools/timedtask",
   "systemtools_version": "/systemtools/version"
 };
 

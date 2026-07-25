@@ -26,6 +26,7 @@ export const views: Record<LastLevelRouteKey, RouteComponent | (() => Promise<Ro
   "opsmonitor_operation-history": () => import("@/views/opsmonitor/operation-history/index.vue"),
   "opsmonitor_server-status": () => import("@/views/opsmonitor/server-status/index.vue"),
   opsmonitor_syserror: () => import("@/views/opsmonitor/syserror/index.vue"),
+  opsmonitor_timedtask: () => import("@/views/opsmonitor/timedtask/index.vue"),
   system_api: () => import("@/views/system/api/index.vue"),
   system_authority: () => import("@/views/system/authority/index.vue"),
   system_department: () => import("@/views/system/department/index.vue"),
@@ -37,6 +38,5 @@ export const views: Record<LastLevelRouteKey, RouteComponent | (() => Promise<Ro
   system_user: () => import("@/views/system/user/index.vue"),
   systemtools_apitoken: () => import("@/views/systemtools/apiToken/index.vue"),
   systemtools_system: () => import("@/views/systemtools/system/index.vue"),
-  systemtools_timedtask: () => import("@/views/systemtools/timedtask/index.vue"),
   systemtools_version: () => import("@/views/systemtools/version/index.vue"),
 };

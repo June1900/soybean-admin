@@ -583,7 +583,6 @@ declare namespace App {
         };
         systemTools: {
           apiToken: import('../../views/systemtools/apiToken/types').SystemToolsApiTokenLang;
-          timedTask: import('../../views/systemtools/timedtask/types').SystemToolsTimedTaskLang;
           version: import('../../views/systemtools/version/types').SystemToolsVersionLang;
           system: import('../../views/systemtools/system/types').SystemToolsSystemLang;
         };
@@ -592,6 +591,7 @@ declare namespace App {
           loginLog: import('../../views/opsmonitor/loginlog/types').SystemToolsLoginLogLang;
           operationHistory: import('../../views/opsmonitor/operation-history/types').OpsMonitorOperationHistoryLang;
           serverStatus: import('../../views/opsmonitor/server-status/types').OpsMonitorServerStatusLang;
+          timedTask: import('../../views/opsmonitor/timedtask/types').OpsMonitorTimedTaskLang;
         };
       };
       form: {

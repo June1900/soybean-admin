@@ -30,6 +30,7 @@ declare module "@elegant-router/types" {
     "opsmonitor_operation-history": "/opsmonitor/operation-history";
     "opsmonitor_server-status": "/opsmonitor/server-status";
     "opsmonitor_syserror": "/opsmonitor/syserror";
+    "opsmonitor_timedtask": "/opsmonitor/timedtask";
     "system": "/system";
     "system_api": "/system/api";
     "system_authority": "/system/authority";
@@ -43,7 +44,6 @@ declare module "@elegant-router/types" {
     "systemtools": "/systemtools";
     "systemtools_apitoken": "/systemtools/apitoken";
     "systemtools_system": "/systemtools/system";
-    "systemtools_timedtask": "/systemtools/timedtask";
     "systemtools_version": "/systemtools/version";
   };
 
@@ -113,6 +113,7 @@ declare module "@elegant-router/types" {
     | "opsmonitor_operation-history"
     | "opsmonitor_server-status"
     | "opsmonitor_syserror"
+    | "opsmonitor_timedtask"
     | "system_api"
     | "system_authority"
     | "system_department"
@@ -124,7 +125,6 @@ declare module "@elegant-router/types" {
     | "system_user"
     | "systemtools_apitoken"
     | "systemtools_system"
-    | "systemtools_timedtask"
     | "systemtools_version"
   >;
 

@@ -6,7 +6,7 @@ import departmentZhCN from '@/views/system/department/langs/zh-cn';
 import positionZhCN from '@/views/system/position/langs/zh-cn';
 import paramsZhCN from '@/views/system/params/langs/zh-cn';
 import apiTokenZhCN from '@/views/systemtools/apiToken/langs/zh-cn';
-import timedTaskZhCN from '@/views/systemtools/timedtask/langs/zh-cn';
+import timedTaskZhCN from '@/views/opsmonitor/timedtask/langs/zh-cn';
 import dictionaryZhCN from '@/views/system/dictionary/langs/zh-cn';
 import customerZhCN from '@/views/example/customer/langs/zh-cn';
 import sysErrorZhCN from '@/views/opsmonitor/syserror/langs/zh-cn';
@@ -264,7 +264,7 @@ const local: App.I18n.Schema = {
     example_customer: '客户管理',
     systemtools: '系统工具',
     systemtools_apitoken: '接口凭证',
-    systemtools_timedtask: '定时任务',
+    opsmonitor_timedtask: '定时任务',
     systemtools_version: '版本信息',
     systemtools_system: '系统配置',
     opsmonitor: '运维监控',
@@ -372,7 +372,6 @@ const local: App.I18n.Schema = {
     },
     systemTools: {
       apiToken: { ...apiTokenZhCN },
-      timedTask: { ...timedTaskZhCN },
       version: { ...versionZhCN },
       system: { ...systemConfigZhCN }
     },
@@ -380,7 +379,8 @@ const local: App.I18n.Schema = {
       sysError: { ...sysErrorZhCN },
       loginLog: { ...loginLogZhCN },
       operationHistory: { ...operationHistoryZhCN },
-      serverStatus: { ...serverStatusZhCN }
+      serverStatus: { ...serverStatusZhCN },
+      timedTask: { ...timedTaskZhCN }
     }
   },
   form: {

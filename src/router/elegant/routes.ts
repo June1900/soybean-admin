@@ -139,6 +139,15 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'opsmonitor_syserror',
           i18nKey: 'route.opsmonitor_syserror'
         }
+      },
+      {
+        name: 'opsmonitor_timedtask',
+        path: '/opsmonitor/timedtask',
+        component: 'view.opsmonitor_timedtask',
+        meta: {
+          title: 'opsmonitor_timedtask',
+          i18nKey: 'route.opsmonitor_timedtask'
+        }
       }
     ]
   },
@@ -259,15 +268,6 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'systemtools_system',
           i18nKey: 'route.systemtools_system'
-        }
-      },
-      {
-        name: 'systemtools_timedtask',
-        path: '/systemtools/timedtask',
-        component: 'view.systemtools_timedtask',
-        meta: {
-          title: 'systemtools_timedtask',
-          i18nKey: 'route.systemtools_timedtask'
         }
       },
       {

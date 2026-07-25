@@ -14,7 +14,7 @@ import versionEnUS from '@/views/systemtools/version/langs/en-us';
 import securityEnUS from '@/views/system/security/langs/en-us';
 import systemConfigEnUS from '@/views/systemtools/system/langs/en-us';
 import apiTokenEnUS from '@/views/systemtools/apiToken/langs/en-us';
-import timedTaskEnUS from '@/views/systemtools/timedtask/langs/en-us';
+import timedTaskEnUS from '@/views/opsmonitor/timedtask/langs/en-us';
 import serverStatusEnUS from '@/views/opsmonitor/server-status/langs/en-us';
 
 const local: App.I18n.Schema = {
@@ -268,7 +268,7 @@ const local: App.I18n.Schema = {
     example_customer: 'Customer',
     systemtools: 'System Tools',
     systemtools_apitoken: 'API Token',
-    systemtools_timedtask: 'Timed Task',
+    opsmonitor_timedtask: 'Timed Task',
     systemtools_version: 'Version Info',
     systemtools_system: 'System Config',
     opsmonitor: 'Ops Monitor',
@@ -376,7 +376,6 @@ const local: App.I18n.Schema = {
     },
     systemTools: {
       apiToken: { ...apiTokenEnUS },
-      timedTask: { ...timedTaskEnUS },
       version: { ...versionEnUS },
       system: { ...systemConfigEnUS }
     },
@@ -384,7 +383,8 @@ const local: App.I18n.Schema = {
       sysError: { ...sysErrorEnUS },
       loginLog: { ...loginLogEnUS },
       operationHistory: { ...operationHistoryEnUS },
-      serverStatus: { ...serverStatusEnUS }
+      serverStatus: { ...serverStatusEnUS },
+      timedTask: { ...timedTaskEnUS }
     }
   },
   form: {

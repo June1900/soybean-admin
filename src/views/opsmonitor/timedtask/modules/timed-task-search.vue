@@ -18,8 +18,8 @@ const { formRef, validate, restoreValidation } = useNaiveForm();
 const model = defineModel<TimedTaskSearchParams>('model', { required: true });
 
 const executorTypeOptions = computed(() => [
-  { label: $t('page.systemTools.timedTask.search.method'), value: 'method' },
-  { label: $t('page.systemTools.timedTask.search.http'), value: 'http' }
+  { label: $t('page.opsMonitor.timedTask.search.method'), value: 'method' },
+  { label: $t('page.opsMonitor.timedTask.search.http'), value: 'http' }
 ]);
 
 const defaultModel = jsonClone(toRaw(model.value));
@@ -48,7 +48,7 @@ async function search() {
           <NGrid responsive="screen" item-responsive>
             <NFormItemGi
               span="24 s:12 m:6"
-              :label="$t('page.systemTools.timedTask.search.name')"
+              :label="$t('page.opsMonitor.timedTask.search.name')"
               path="name"
               class="pr-24px"
             >
@@ -56,7 +56,7 @@ async function search() {
             </NFormItemGi>
             <NFormItemGi
               span="24 s:12 m:6"
-              :label="$t('page.systemTools.timedTask.search.executorType')"
+              :label="$t('page.opsMonitor.timedTask.search.executorType')"
               path="executorType"
               class="pr-24px"
             >

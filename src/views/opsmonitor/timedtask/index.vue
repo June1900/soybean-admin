@@ -20,7 +20,7 @@ import TimedTaskSearch from './modules/timed-task-search.vue';
 import TableActionButtons from '@/components/common/table-action-buttons';
 
 defineOptions({
-  name: 'SystemToolsTimedTask'
+  name: 'OpsMonitorTimedTask'
 });
 
 const appStore = useAppStore();
@@ -90,7 +90,7 @@ async function handleToggle(row: TimedTask, enabled: boolean) {
   const { error } = await fetchToggleTimedTask(row.ID, enabled);
   if (!error) {
     window.$message?.success(
-      enabled ? $t('page.systemTools.timedTask.enable') : $t('page.systemTools.timedTask.disable')
+      enabled ? $t('page.opsMonitor.timedTask.enable') : $t('page.opsMonitor.timedTask.disable')
     );
   }
   await getData();
@@ -99,7 +99,7 @@ async function handleToggle(row: TimedTask, enabled: boolean) {
 async function handleTrigger(row: TimedTask) {
   const { error } = await fetchTriggerTimedTask(row.ID);
   if (!error) {
-    window.$message?.success($t('page.systemTools.timedTask.triggerSuccess'));
+    window.$message?.success($t('page.opsMonitor.timedTask.triggerSuccess'));
   }
 }
 
@@ -173,16 +173,16 @@ const logColumns: NaiveUI.TableColumn<TimedTaskLog>[] = [
         return h(
           'p',
           { class: 'text-red-500 break-all p-4' },
-          `${$t('page.systemTools.timedTask.log.error')}：${row.errorMsg}`
+          `${$t('page.opsMonitor.timedTask.log.error')}：${row.errorMsg}`
         );
       if (row.output)
-        return h('p', { class: 'break-all mt-1 p-4' }, `${$t('page.systemTools.timedTask.log.output')}：${row.output}`);
-      return h('p', { class: 'text-gray-400 p-4' }, $t('page.systemTools.timedTask.log.noDetail'));
+        return h('p', { class: 'break-all mt-1 p-4' }, `${$t('page.opsMonitor.timedTask.log.output')}：${row.output}`);
+      return h('p', { class: 'text-gray-400 p-4' }, $t('page.opsMonitor.timedTask.log.noDetail'));
     }
   },
   {
     key: 'triggerType',
-    title: $t('page.systemTools.timedTask.log.trigger'),
+    title: $t('page.opsMonitor.timedTask.log.trigger'),
     width: 90,
     render: (row: TimedTaskLog) =>
       h(
@@ -191,14 +191,14 @@ const logColumns: NaiveUI.TableColumn<TimedTaskLog>[] = [
         {
           default: () =>
             row.triggerType === 'auto'
-              ? $t('page.systemTools.timedTask.log.auto')
-              : $t('page.systemTools.timedTask.log.manual')
+              ? $t('page.opsMonitor.timedTask.log.auto')
+              : $t('page.opsMonitor.timedTask.log.manual')
         }
       )
   },
   {
     key: 'status',
-    title: $t('page.systemTools.timedTask.log.status'),
+    title: $t('page.opsMonitor.timedTask.log.status'),
     width: 90,
     render: (row: TimedTaskLog) =>
       h(
@@ -207,13 +207,13 @@ const logColumns: NaiveUI.TableColumn<TimedTaskLog>[] = [
         {
           default: () =>
             row.status === 'success'
-              ? $t('page.systemTools.timedTask.log.success')
-              : $t('page.systemTools.timedTask.log.failed')
+              ? $t('page.opsMonitor.timedTask.log.success')
+              : $t('page.opsMonitor.timedTask.log.failed')
         }
       )
   },
-  { key: 'startedAt', title: $t('page.systemTools.timedTask.log.startedAt'), width: 180 },
-  { key: 'durationMs', title: $t('page.systemTools.timedTask.log.duration'), width: 110 }
+  { key: 'startedAt', title: $t('page.opsMonitor.timedTask.log.startedAt'), width: 180 },
+  { key: 'durationMs', title: $t('page.opsMonitor.timedTask.log.duration'), width: 110 }
 ];
 
 /* ---------- columns ---------- */
@@ -226,28 +226,27 @@ function createAllColumns(): NaiveUI.TableColumn<TimedTask>[] {
     },
     {
       key: 'index',
-      title: $t('page.systemTools.timedTask.columns.id'),
+      title: $t('page.opsMonitor.timedTask.columns.id'),
       width: 70,
       align: 'center',
       render: (_row, index) => index + 1
     },
-    { key: 'ID', title: $t('page.systemTools.timedTask.columns.id'), minWidth: 80 },
     {
       key: 'name',
-      title: $t('page.systemTools.timedTask.columns.name'),
+      title: $t('page.opsMonitor.timedTask.columns.name'),
       minWidth: 140,
       ellipsis: { tooltip: true }
     },
     {
       key: 'description',
-      title: $t('page.systemTools.timedTask.columns.description'),
+      title: $t('page.opsMonitor.timedTask.columns.description'),
       minWidth: 160,
       ellipsis: { tooltip: true }
     },
-    { key: 'spec', title: $t('page.systemTools.timedTask.columns.spec'), minWidth: 120 },
+    { key: 'spec', title: $t('page.opsMonitor.timedTask.columns.spec'), minWidth: 120 },
     {
       key: 'executorType',
-      title: $t('page.systemTools.timedTask.columns.executorType'),
+      title: $t('page.opsMonitor.timedTask.columns.executorType'),
       width: 110,
       align: 'center',
       render: row =>
@@ -257,14 +256,14 @@ function createAllColumns(): NaiveUI.TableColumn<TimedTask>[] {
           {
             default: () =>
               row.executorType === 'method'
-                ? $t('page.systemTools.timedTask.columns.methodExecutor')
-                : $t('page.systemTools.timedTask.columns.httpExecutor')
+                ? $t('page.opsMonitor.timedTask.columns.methodExecutor')
+                : $t('page.opsMonitor.timedTask.columns.httpExecutor')
           }
         )
     },
     {
       key: 'enabled',
-      title: $t('page.systemTools.timedTask.columns.enabled'),
+      title: $t('page.opsMonitor.timedTask.columns.enabled'),
       width: 90,
       align: 'center',
       render: row =>
@@ -273,24 +272,24 @@ function createAllColumns(): NaiveUI.TableColumn<TimedTask>[] {
           onUpdateValue: (v: boolean) => handleToggle(row, v)
         })
     },
-    { key: 'nextRunAt', title: $t('page.systemTools.timedTask.columns.nextRunAt'), minWidth: 170 },
+    { key: 'nextRunAt', title: $t('page.opsMonitor.timedTask.columns.nextRunAt'), minWidth: 170 },
     {
       key: 'operation',
-      title: $t('page.systemTools.timedTask.columns.operations'),
+      title: $t('page.opsMonitor.timedTask.columns.operations'),
       align: 'center',
       fixed: 'right',
-      width: 300,
+      width: 320,
       render: row =>
         h(TableActionButtons, {
           actions: [
             {
-              label: $t('page.systemTools.timedTask.columns.trigger'),
+              label: $t('page.opsMonitor.timedTask.columns.trigger'),
               icon: 'material-symbols:play-arrow',
               type: 'default',
               onClick: () => handleTrigger(row)
             },
             {
-              label: $t('page.systemTools.timedTask.columns.logs'),
+              label: $t('page.opsMonitor.timedTask.columns.logs'),
               icon: 'material-symbols:article',
               type: 'default',
               onClick: () => openLogs(row)
@@ -306,7 +305,7 @@ function createAllColumns(): NaiveUI.TableColumn<TimedTask>[] {
               icon: 'material-symbols:delete',
               type: 'error',
               popconfirm: {
-                content: $t('page.systemTools.timedTask.deleteConfirm'),
+                content: $t('page.opsMonitor.timedTask.deleteConfirm'),
                 onPositiveClick: () => handleDelete(row.ID)
               }
             }
@@ -322,7 +321,7 @@ function createAllColumns(): NaiveUI.TableColumn<TimedTask>[] {
     <TimedTaskSearch v-model:model="searchParams" @search="getDataByPage" @reset="getDataByPage" />
 
     <NCard
-      :title="$t('page.systemTools.timedTask.title')"
+      :title="$t('page.opsMonitor.timedTask.title')"
       :bordered="false"
       size="small"
       class="card-wrapper sm:flex-1-hidden"
@@ -364,7 +363,7 @@ function createAllColumns(): NaiveUI.TableColumn<TimedTask>[] {
 
     <NDrawer v-model:show="logVisible" :width="640" placement="right">
       <NDrawerContent
-        :title="`${$t('page.systemTools.timedTask.log.title')}：${logTaskName}`"
+        :title="`${$t('page.opsMonitor.timedTask.log.title')}：${logTaskName}`"
         :native-scrollbar="false"
       >
         <NDataTable
