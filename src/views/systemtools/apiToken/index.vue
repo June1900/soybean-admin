@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import { useAppStore } from '@/store/modules/app';
 import { $t } from '@/locales';
 import { useNaivePaginatedTable, useTableOperate } from '@/hooks/common/table';
+import SvgIcon from '@/components/custom/svg-icon.vue';
 import {
   fetchGetApiTokenList,
   fetchDeleteApiToken,
@@ -25,13 +26,11 @@ defineOptions({
 
 const appStore = useAppStore();
 
-/* ---------- 搜索 ---------- */
 const searchParams = reactive<ApiTokenSearchParams>({
   userId: null,
   status: null
 });
 
-/* ---------- 表格 ---------- */
 const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagination } = useNaivePaginatedTable<
   ApiTokenListApiResponse,
   ApiToken
@@ -74,8 +73,7 @@ function getQueryParams(): ApiTokenListQuery {
   return params;
 }
 
-/* ---------- 签发 / 作废 ---------- */
-const { drawerVisible, closeDrawer, handleAdd, checkedRowKeys, onBatchDeleted, onDeleted } = useTableOperate<ApiToken>(
+const { drawerVisible, closeDrawer, handleAdd, checkedRowKeys, onDeleted } = useTableOperate<ApiToken>(
   data,
   'ID',
   getData
@@ -122,6 +120,7 @@ function handleInvalidate(row: ApiToken) {
     content: $t('page.systemTools.apiToken.invalidateConfirm'),
     positiveText: $t('common.confirm'),
     negativeText: $t('common.cancel'),
+    positiveButtonProps: { type: 'default' },
     onPositiveClick: () => handleDelete(row.ID)
   });
 }
@@ -177,20 +176,26 @@ function createAllColumns(): NaiveUI.TableColumn<ApiToken>[] {
       title: $t('page.systemTools.apiToken.columns.operations'),
       align: 'center',
       fixed: 'right',
-      width: 160,
+      width: 200,
       render: row =>
         h(NSpace, { justify: 'center', size: 'small' }, () => [
           h(
             NButton,
             { size: 'small', ghost: true, type: 'info', onClick: () => openCurl(row) },
-            { default: () => $t('page.systemTools.apiToken.columns.curl') }
+            {
+              icon: () => h(SvgIcon, { icon: 'material-symbols:terminal' }),
+              default: () => $t('page.systemTools.apiToken.columns.curl')
+            }
           ),
           ...(row.status
             ? [
                 h(
                   NButton,
                   { size: 'small', ghost: true, type: 'error', onClick: () => handleInvalidate(row) },
-                  { default: () => $t('page.systemTools.apiToken.columns.invalidate') }
+                  {
+                    icon: () => h(SvgIcon, { icon: 'material-symbols:block' }),
+                    default: () => $t('page.systemTools.apiToken.columns.invalidate')
+                  }
                 )
               ]
             : [])
