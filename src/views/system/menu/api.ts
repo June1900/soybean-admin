@@ -1,7 +1,7 @@
 import { request } from '@/service/request';
 import type { MenuForm, MenuListQuery, MenuListResponse } from './types';
 
-export type { Menu, MenuForm, MenuListQuery, MenuListResponse, MenuSearchParams } from './types';
+export type { Menu, MenuBtn, MenuForm, MenuListQuery, MenuListResponse, MenuSearchParams } from './types';
 
 /** Get paginated menu list (flattened from the tree response). */
 export function fetchGetMenuList(params?: MenuListQuery) {

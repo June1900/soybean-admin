@@ -350,6 +350,7 @@ declare namespace App {
         pleaseCheckValue: string;
         refresh: string;
         reset: string;
+        save: string;
         search: string;
         clear: string;
         status: string;

@@ -18,6 +18,15 @@ export interface Menu {
   hidden: boolean;
   meta: MenuMeta;
   children?: Menu[];
+  /** buttons bound to this menu (gin-vue-admin SysAuthorityBtn) */
+  menuBtn?: MenuBtn[];
+}
+
+/** A button bound to a menu (gin-vue-admin SysAuthorityBtn). */
+export interface MenuBtn {
+  ID: number;
+  name: string;
+  desc: string;
 }
 
 /** Payload for creating / updating a menu. */

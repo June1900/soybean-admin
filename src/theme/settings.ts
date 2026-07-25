@@ -27,7 +27,12 @@ export const themeSettings: App.Theme.ThemeSetting = {
     mixChildMenuWidth: 200,
     autoSelectFirstMenu: false
   },
-  footer: { visible: true, fixed: false, height: 48, right: true },
+  footer: {
+    visible: false,
+    fixed: false,
+    height: 48,
+    right: true
+  },
   watermark: {
     visible: false,
     text: 'SoybeanAdmin',

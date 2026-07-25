@@ -2,7 +2,7 @@
 import { computed, reactive, ref, watch } from 'vue';
 import { useLoading } from '@sa/hooks';
 import type { FormInst, FormRules, TreeSelectOption } from 'naive-ui';
-import { NForm, NFormItem, NInput, NTreeSelect } from 'naive-ui';
+import { NForm, NFormItem, NInput, NInputNumber, NTreeSelect } from 'naive-ui';
 import { $t } from '@/locales';
 import { fetchCreateAuthority, fetchGetAuthorityList, fetchUpdateAuthority, type Authority } from '../api';
 
@@ -20,18 +20,32 @@ const { loading, startLoading, endLoading } = useLoading();
 const formRef = ref<FormInst | null>(null);
 
 const model = reactive({
-  authorityId: '',
+  authorityId: null as number | null,
   authorityName: '',
   parentId: 0,
   dataScope: 1
 });
 
+const roleNameMap = ref<Record<number, string>>({});
 const parentOptions = ref<TreeSelectOption[]>([]);
 
 const rules: FormRules = {
   authorityId: [
-    { required: true, message: $t('page.system.authority.authorityIdPlaceholder'), trigger: 'blur' },
-    { pattern: /^[0-9]+$/, message: $t('page.system.authority.authorityIdPlaceholder'), trigger: 'blur' }
+    {
+      required: true,
+      type: 'number',
+      message: $t('page.system.authority.authorityIdPlaceholder'),
+      trigger: ['blur', 'change']
+    },
+    {
+      validator: (_rule, value) => {
+        // 仅新增时强制校验：必须为正整数
+        if (props.operateType !== 'add') return true;
+        if (typeof value === 'number' && Number.isInteger(value) && value > 0) return true;
+        return new Error($t('page.system.authority.authorityIdPositiveInt'));
+      },
+      trigger: ['blur', 'change']
+    }
   ],
   authorityName: [{ required: true, message: $t('page.system.authority.authorityNamePlaceholder'), trigger: 'blur' }]
 };
@@ -48,13 +62,65 @@ const dataScopeOptions = computed(() => [
   { label: $t('page.system.authority.customDept'), value: 5 }
 ]);
 
-function toTreeOptions(list: Authority[]): TreeSelectOption[] {
-  return (list ?? []).map(item => ({
-    label: item.authorityName ?? '',
-    value: Number(item.authorityId) || 0,
-    children: toTreeOptions(item.children ?? [])
-  }));
+/** 把角色树拍平为 { authorityId: authorityName }，用于只读展示父级角色名称 */
+function buildNameMap(list: Authority[]): Record<number, string> {
+  const map: Record<number, string> = {};
+  const walk = (items: Authority[]) => {
+    for (const it of items ?? []) {
+      map[Number(it.authorityId) || 0] = it.authorityName ?? '';
+      walk(it.children ?? []);
+    }
+  };
+  walk(list);
+  return map;
 }
+
+/** 把所有节点（含子孙）的 id 收集进 acc */
+function collectAll(items: Authority[], acc: Set<number>): void {
+  for (const it of items ?? []) {
+    acc.add(Number(it.authorityId) || 0);
+    collectAll(it.children ?? [], acc);
+  }
+}
+
+/** 收集 targetId 自身及其所有子孙的 id（用于编辑时禁用，防循环引用） */
+function collectDisabledIds(list: Authority[], targetId: number): Set<number> {
+  const result = new Set<number>();
+  const walk = (items: Authority[]): boolean => {
+    for (const it of items ?? []) {
+      const id = Number(it.authorityId) || 0;
+      if (id === targetId) {
+        result.add(id);
+        collectAll(it.children ?? [], result);
+        return true;
+      }
+      if (walk(it.children ?? [])) return true;
+    }
+    return false;
+  };
+  walk(list);
+  return result;
+}
+
+/** 构建编辑时可选择的父级角色树：disableIds 中的节点（当前节点及其子孙）禁用 */
+function buildParentOptions(list: Authority[], disableIds: Set<number>): TreeSelectOption[] {
+  return (list ?? []).map(item => {
+    const id = Number(item.authorityId) || 0;
+    const children = item.children?.length ? buildParentOptions(item.children, disableIds) : undefined;
+    return {
+      label: item.authorityName ?? '',
+      value: id,
+      disabled: disableIds.has(id),
+      children
+    };
+  });
+}
+
+/** 父级角色展示文案（只读/新增模式）：顶级=根角色，其余按 parentId 查名称 */
+const parentRoleLabel = computed(() => {
+  if (model.parentId === 0) return $t('page.system.authority.rootRole');
+  return roleNameMap.value[model.parentId] ?? '';
+});
 
 watch(
   () => props.visible,
@@ -62,7 +128,15 @@ watch(
     if (!visible) return;
 
     const { data } = await fetchGetAuthorityList();
-    parentOptions.value = [{ label: $t('page.system.authority.parentRole'), value: 0 }, ...toTreeOptions(data ?? [])];
+    roleNameMap.value = buildNameMap(data ?? []);
+    // 编辑时禁用"当前节点及其所有子孙"，避免循环引用；新增时无需禁用（字段只读）
+    const disableId =
+      props.operateType === 'edit' && props.editingData ? Number(props.editingData.authorityId) || 0 : null;
+    const disableIds = disableId != null ? collectDisabledIds(data ?? [], disableId) : new Set<number>();
+    parentOptions.value = [
+      { label: $t('page.system.authority.rootRole'), value: 0 },
+      ...buildParentOptions(data ?? [], disableIds)
+    ];
 
     if (props.operateType === 'edit' && props.editingData) {
       const d = props.editingData;
@@ -71,7 +145,7 @@ watch(
       model.parentId = d.parentId ?? 0;
       model.dataScope = d.dataScope ?? 1;
     } else {
-      model.authorityId = '';
+      model.authorityId = null;
       model.authorityName = '';
       model.parentId = props.defaultParentId ?? 0;
       model.dataScope = 1;
@@ -86,7 +160,7 @@ async function handleSubmit() {
   startLoading();
 
   const payload = {
-    authorityId: model.authorityId,
+    authorityId: model.authorityId as number,
     authorityName: model.authorityName,
     parentId: model.parentId ?? 0,
     dataScope: model.dataScope
@@ -114,7 +188,14 @@ async function handleSubmit() {
     <NDrawerContent :title="title" :native-scrollbar="false">
       <NForm ref="formRef" :model="model" :rules="rules" label-placement="top">
         <NFormItem :label="$t('page.system.authority.parentRole')" path="parentId">
+          <NInput
+            v-if="operateType === 'add'"
+            :value="parentRoleLabel"
+            readonly
+            :placeholder="$t('page.system.authority.parentRolePlaceholder')"
+          />
           <NTreeSelect
+            v-else
             v-model:value="model.parentId"
             :options="parentOptions"
             key-field="value"
@@ -123,10 +204,14 @@ async function handleSubmit() {
           />
         </NFormItem>
         <NFormItem :label="$t('page.system.authority.authorityId')" path="authorityId">
-          <NInput
+          <NInputNumber
             v-model:value="model.authorityId"
             :placeholder="$t('page.system.authority.authorityIdPlaceholder')"
             :disabled="operateType === 'edit'"
+            :min="1"
+            :precision="0"
+            :show-button="false"
+            class="w-full"
           />
         </NFormItem>
         <NFormItem :label="$t('page.system.authority.authorityName')" path="authorityName">

@@ -4,10 +4,10 @@ import { NTag } from 'naive-ui';
 import { useAppStore } from '@/store/modules/app';
 import { useNaiveTable, useTableOperate } from '@/hooks/common/table';
 import { $t } from '@/locales';
-import { fetchCopyAuthority, fetchDeleteAuthority, fetchGetAuthorityList, type Authority } from './api';
+import { fetchDeleteAuthority, fetchGetAuthorityList, type Authority } from './api';
 import AuthorityOperateDrawer from './modules/authority-operate-drawer.vue';
-import AuthorityPermissionModal from './modules/authority-permission-modal.vue';
-import AuthorityAssignUserModal from './modules/authority-assign-user-modal.vue';
+import AuthorityPermissionDrawer from './modules/authority-permission-drawer.vue';
+import AuthorityAssignUserDrawer from './modules/authority-assign-user-drawer.vue';
 
 import TableActionButtons from '@/components/common/table-action-buttons';
 
@@ -17,13 +17,10 @@ defineOptions({
 
 const appStore = useAppStore();
 
-/* ---------- table ---------- */
+/* ---------- 表格 ---------- */
 type AuthorityListResponse = Awaited<ReturnType<typeof fetchGetAuthorityList>>;
 
-const { columns, columnChecks, data, getData, loading, scrollX } = useNaiveTable<
-  AuthorityListResponse,
-  Authority
->({
+const { columns, columnChecks, data, getData, loading, scrollX } = useNaiveTable<AuthorityListResponse, Authority>({
   api: () => fetchGetAuthorityList(),
   transform: res => res.data ?? [],
   columns: () => createAllColumns(),
@@ -40,16 +37,9 @@ const dataScopeOptions = computed(() => [
 
 const dataScopeTagType = (value: number) => (value === 1 ? 'success' : value === 5 ? 'warning' : 'default');
 
-/* ---------- operate (add / edit / copy / delete) ---------- */
-const {
-  drawerVisible,
-  closeDrawer,
-  operateType,
-  handleAdd,
-  editingData,
-  handleEdit,
-  onDeleted
-} = useTableOperate<Authority>(data, 'authorityId', getData);
+/* ---------- 新增 / 编辑 / 删除 ---------- */
+const { drawerVisible, closeDrawer, operateType, handleAdd, editingData, handleEdit, onDeleted } =
+  useTableOperate<Authority>(data, 'authorityId', getData);
 
 /** 新增子角色时预置的父级角色 ID（顶级为 0） */
 const defaultParentId = ref<number | null>(null);
@@ -100,83 +90,52 @@ function createAllColumns(): NaiveUI.TableColumn<Authority>[] {
       title: $t('page.system.authority.operation'),
       align: 'center',
       fixed: 'right',
-      width: 680,
+      width: 600,
       render: row =>
-        h(
-          TableActionButtons,
-          {
-            wrap: true,
-            actions: [
-              {
-                label: $t('page.system.authority.setPermission'),
-                icon: 'material-symbols:lock-person',
-                type: 'default',
-                onClick: () => openPermission(row)
-              },
-              {
-                label: $t('page.system.authority.assignUser'),
-                icon: 'material-symbols:group-add',
-                type: 'default',
-                onClick: () => openAssignUser(row)
-              },
-              {
-                label: $t('page.system.authority.addChildRole'),
-                icon: 'material-symbols:account-tree',
-                type: 'default',
-                onClick: () => handleAddChild(row)
-              },
-              {
-                label: $t('page.system.authority.copyRole'),
-                icon: 'material-symbols:content-copy',
-                type: 'info',
-                onClick: () => handleCopy(row)
-              },
-              {
-                kind: 'edit',
-                icon: 'material-symbols:edit',
-                type: 'primary',
-                onClick: () => handleEdit(row.authorityId)
-              },
-              {
-                kind: 'delete',
-                icon: 'material-symbols:delete',
-                type: 'error',
-                popconfirm: {
-                  content: $t('page.system.authority.confirmDelete'),
-                  onPositiveClick: () => handleDelete(row.authorityId)
-                }
+        h(TableActionButtons, {
+          wrap: true,
+          actions: [
+            {
+              label: $t('page.system.authority.setPermission'),
+              icon: 'material-symbols:lock-person',
+              type: 'default',
+              onClick: () => openPermission(row)
+            },
+            {
+              label: $t('page.system.authority.assignUser'),
+              icon: 'material-symbols:group-add',
+              type: 'default',
+              onClick: () => openAssignUser(row)
+            },
+            {
+              label: $t('page.system.authority.addChildRole'),
+              icon: 'material-symbols:account-tree',
+              type: 'default',
+              onClick: () => handleAddChild(row)
+            },
+            {
+              kind: 'edit',
+              icon: 'material-symbols:edit',
+              type: 'primary',
+              onClick: () => handleEdit(row.authorityId)
+            },
+            {
+              kind: 'delete',
+              icon: 'material-symbols:delete',
+              type: 'error',
+              popconfirm: {
+                content: $t('page.system.authority.confirmDelete'),
+                onPositiveClick: () => handleDelete(row.authorityId)
               }
-            ]
-          }
-        )
+            }
+          ]
+        })
     }
   ];
 }
 
-/* ---------- actions ---------- */
-function handleCopy(row: Authority) {
-  window.$dialog?.info({
-    title: $t('page.system.authority.copyRole'),
-    content: $t('page.system.authority.confirmCopy'),
-    positiveText: $t('common.confirm'),
-    negativeText: $t('common.cancel'),
-    onPositiveClick: async () => {
-      const { error } = await fetchCopyAuthority({
-        authorityId: row.authorityId,
-        authorityName: row.authorityName,
-        parentId: row.parentId,
-        dataScope: row.dataScope,
-        oldAuthorityId: row.authorityId
-      });
-      if (!error) {
-        window.$message?.success($t('page.system.authority.copySuccess'));
-        await getData();
-      }
-    }
-  });
-}
-
-async function handleDelete(authorityId: string) {
+/* ---------- 操作 ---------- */
+async function handleDelete(authorityId: number) {
   const { error } = await fetchDeleteAuthority(authorityId);
   if (!error) {
     await onDeleted();
@@ -225,14 +184,13 @@ onMounted(() => {
         @submitted="getData"
       />
 
-      <AuthorityPermissionModal
+      <AuthorityPermissionDrawer
         :visible="permissionModalVisible"
         :role="currentRole"
         @close="permissionModalVisible = false"
-        @submitted="getData"
       />
 
-      <AuthorityAssignUserModal
+      <AuthorityAssignUserDrawer
         :visible="assignUserModalVisible"
         :role="currentRole"
         @close="assignUserModalVisible = false"

@@ -279,6 +279,7 @@ function openResetPwd(row: User) {
           v-model:columns="columnChecks"
           :disabled-delete="checkedRowKeys.length === 0"
           :loading="loading"
+          :show-batch-delete="true"
           @add="handleAdd"
           @delete="handleBatchDelete"
           @refresh="getData"

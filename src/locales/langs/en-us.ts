@@ -55,6 +55,7 @@ const local: App.I18n.Schema = {
     pleaseCheckValue: 'Please check whether the value is valid',
     refresh: 'Refresh',
     reset: 'Reset',
+    save: 'Save',
     search: 'Search',
     clear: 'Clear',
     status: 'Status',
