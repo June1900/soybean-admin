@@ -13,6 +13,7 @@ export interface SystemDictionaryLang {
   index: string;
   name: string;
   type: string;
+  typeHint: string;
   status: string;
   enabled: string;
   disabled: string;
@@ -28,8 +29,11 @@ export interface SystemDictionaryLang {
   detail: string;
   selectDictHint: string;
   addDetail: string;
+  addChildDetail: string;
   editDetail: string;
+  modifyDetail: string;
   deleteDetail: string;
+  noParent: string;
   label: string;
   value: string;
   extend: string;

@@ -1,4 +1,4 @@
-/** A system dictionary. `ID` is the primary key. */
+/** 系统字典，ID 为主键 */
 export interface Dictionary {
   ID: number;
   /** 字典名（中） */
@@ -11,7 +11,7 @@ export interface Dictionary {
   parentID?: number | null;
 }
 
-/** Payload for creating / updating a dictionary. */
+/** 新增/修改字典的提交数据 */
 export interface DictionaryForm {
   ID?: number;
   name: string;
@@ -21,19 +21,29 @@ export interface DictionaryForm {
   parentID?: number | null;
 }
 
-/** Query params for getSysDictionaryList */
-export interface DictionaryListQuery {
+/** 字典分页查询参数（服务端分页） */
+export interface DictionaryPageQuery {
+  page?: number;
+  pageSize?: number;
   name?: string;
   type?: string;
 }
 
-/** Frontend search form model for dictionary list */
+/** 字典分页查询返回 */
+export interface DictionaryPageResponse {
+  list: Dictionary[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+/** 字典列表前端搜索表单 */
 export interface DictionarySearchParams {
   name: string;
   type: string;
 }
 
-/** A dictionary detail item. `ID` is the primary key. */
+/** 字典项，ID 为主键 */
 export interface DictionaryDetail {
   ID: number;
   label: string;
@@ -44,10 +54,12 @@ export interface DictionaryDetail {
   parentID?: number | null;
   sysDictionaryID?: number;
   level?: number;
+  path?: string;
+  disabled?: boolean;
   children?: DictionaryDetail[];
 }
 
-/** Payload for creating / updating a dictionary detail. */
+/** 新增/修改字典项的提交数据 */
 export interface DictionaryDetailForm {
   ID?: number;
   label: string;
@@ -59,7 +71,12 @@ export interface DictionaryDetailForm {
   sysDictionaryID?: number;
 }
 
-/** Query params for getSysDictionaryDetailList */
+/** 字典项树查询参数 */
 export interface DictionaryDetailListQuery {
   sysDictionaryID?: number;
+}
+
+/** 字典项树查询返回 */
+export interface DictionaryDetailTreeResponse {
+  list: DictionaryDetail[];
 }

@@ -32,6 +32,7 @@ const props = defineProps<{
   editingData: DictionaryDetail | null;
   dictId: number | null;
   details: DictionaryDetail[];
+  defaultParentId?: number | null;
 }>();
 
 const emit = defineEmits<{ close: []; submitted: [] }>();
@@ -52,21 +53,60 @@ function createDefaultModel(): DictionaryDetailForm {
     extend: '',
     status: true,
     sort: 1,
-    parentID: null
+    parentID: undefined
   };
 }
 
 const rules: FormRules = {
   label: [{ required: true, message: $t('page.system.dictionary.labelPlaceholder'), trigger: 'blur' }],
   value: [{ required: true, message: $t('page.system.dictionary.valuePlaceholder'), trigger: 'blur' }],
-  sort: [{ required: true, message: $t('page.system.dictionary.sortPlaceholder'), trigger: 'blur' }]
+  sort: [
+    {
+      required: true,
+      type: 'number',
+      message: $t('page.system.dictionary.sortPlaceholder'),
+      trigger: ['input', 'blur']
+    }
+  ]
 };
 
-const parentOptions = computed<SelectOption[]>(() =>
-  props.details
-    .filter(item => !(props.operateType === 'edit' && props.editingData && item.ID === props.editingData.ID))
-    .map(item => ({ label: item.label, value: item.ID }))
-);
+/** "无父级"选项的哨兵值（真实字典项 ID 均为正数） */
+const NO_PARENT = '__no_parent__';
+
+/** 拍平（可能嵌套的）字典项树，便于作为父级候选 */
+function flattenDetails(items: DictionaryDetail[]): DictionaryDetail[] {
+  const result: DictionaryDetail[] = [];
+  for (const item of items) {
+    result.push(item);
+    if (item.children?.length) result.push(...flattenDetails(item.children));
+  }
+  return result;
+}
+
+const parentOptions = computed<SelectOption[]>(() => {
+  const nodes = flattenDetails(props.details).filter(
+    item => !(props.operateType === 'edit' && props.editingData && item.ID === props.editingData.ID)
+  );
+  return [
+    { label: $t('page.system.dictionary.noParent'), value: NO_PARENT },
+    ...nodes.map(item => ({ label: `${item.label}（${item.value}）`, value: item.ID }))
+  ];
+});
+
+const parentIdForSelect = computed<number | string>({
+  get: () => (model.value.parentID == null ? NO_PARENT : model.value.parentID),
+  set: val => {
+    model.value.parentID = val === NO_PARENT ? null : (val as number);
+  }
+});
+
+/** 排序数字的显式代理，强制写回响应式 model */
+const sortModel = computed<number | null>({
+  get: () => model.value.sort ?? null,
+  set: val => {
+    model.value.sort = val ?? 1;
+  }
+});
 
 watch(
   () => props.visible,
@@ -80,15 +120,21 @@ watch(
           value: props.editingData!.value,
           extend: props.editingData!.extend ?? '',
           status: props.editingData!.status,
-          sort: props.editingData!.sort,
-          parentID: props.editingData!.parentID ?? null
+          sort: Number.isFinite(Number(props.editingData!.sort)) ? Number(props.editingData!.sort) : 1,
+          parentID: props.editingData!.parentID ?? undefined
         }
-      : createDefaultModel();
+      : { ...createDefaultModel(), parentID: props.defaultParentId ?? undefined };
   }
 );
 
 async function handleSubmit() {
-  await formRef.value?.validate();
+  try {
+    await formRef.value?.validate();
+  } catch {
+    // 校验失败，Naive UI 已就地显示字段错误，直接终止提交
+    return;
+  }
+
   startLoading();
 
   const payload: DictionaryDetailForm & { ID?: number } = {
@@ -131,10 +177,9 @@ async function handleSubmit() {
         </NFormItem>
         <NFormItem :label="$t('page.system.dictionary.parentId')" path="parentID">
           <NSelect
-            v-model:value="model.parentID"
+            v-model:value="parentIdForSelect"
             :options="parentOptions"
             :placeholder="$t('page.system.dictionary.parentIdPlaceholder')"
-            clearable
             filterable
           />
         </NFormItem>
@@ -146,7 +191,7 @@ async function handleSubmit() {
         </NFormItem>
         <NFormItem :label="$t('page.system.dictionary.sort')" path="sort">
           <NInputNumber
-            v-model:value="model.sort"
+            v-model:value="sortModel"
             :placeholder="$t('page.system.dictionary.sortPlaceholder')"
             :min="0"
           />

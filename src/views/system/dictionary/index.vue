@@ -1,21 +1,20 @@
 <script setup lang="ts">
 import { computed, h, reactive, ref } from 'vue';
-import { NEmpty, NTag } from 'naive-ui';
+import { NTag } from 'naive-ui';
 import { useAppStore } from '@/store/modules/app';
 import { $t } from '@/locales';
 import { useNaivePaginatedTable, useTableOperate } from '@/hooks/common/table';
+import type { PaginationData } from '@sa/hooks';
 import TableHeaderOperation from '@/components/advanced/table-header-operation.vue';
 import {
   fetchDeleteDictionary,
-  fetchDeleteDictionaryDetail,
-  fetchGetDictionaryDetailList,
-  fetchGetDictionaryList,
+  fetchGetDictionaryPage,
   type Dictionary,
-  type DictionaryDetail,
+  type DictionaryPageQuery,
   type DictionarySearchParams
 } from './api';
 import DictionaryOperateDrawer from './modules/dictionary-operate-drawer.vue';
-import DictionaryDetailOperateDrawer from './modules/dictionary-detail-operate-drawer.vue';
+import DictionaryDetailDrawer from './modules/dictionary-detail-drawer.vue';
 import DictionarySearch from './modules/dictionary-search.vue';
 
 import TableActionButtons from '@/components/common/table-action-buttons';
@@ -26,36 +25,38 @@ defineOptions({
 
 const appStore = useAppStore();
 
-/* ---------- search model ---------- */
+/* 搜索条件 */
 const searchParams = reactive<DictionarySearchParams>({
   name: '',
   type: ''
 });
 
-function getQueryParams() {
-  return {
-    name: searchParams.name || undefined,
-    type: searchParams.type || undefined
-  };
-}
-
-/* ---------- dictionary list (master) ---------- */
-type DictListResponse = Awaited<ReturnType<typeof fetchGetDictionaryList>>;
+/* 字典列表 */
+type DictListResponse = Awaited<ReturnType<typeof fetchGetDictionaryPage>>;
 
 const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagination } = useNaivePaginatedTable<
   DictListResponse,
   Dictionary
 >({
-  api: () => fetchGetDictionaryList(getQueryParams()),
-  // The list api returns a plain array (no server pagination), so we paginate client-side.
-  transform: res => ({
-    data: res.data ?? [],
-    total: res.data?.length ?? 0,
-    pageNum: 1,
-    pageSize: 10
+  api: () => fetchGetDictionaryPage(getQueryParams()),
+  // 分页接口返回真实服务端分页数据，直接映射即可
+  transform: (res): PaginationData<Dictionary> => ({
+    data: res.data?.list ?? [],
+    total: res.data?.total ?? 0,
+    pageNum: res.data?.page ?? mobilePagination.value.page ?? 1,
+    pageSize: res.data?.pageSize ?? mobilePagination.value.pageSize ?? 10
   }),
   columns: () => createAllColumns()
 });
+
+function getQueryParams(): DictionaryPageQuery {
+  return {
+    page: mobilePagination.value.page,
+    pageSize: mobilePagination.value.pageSize,
+    name: searchParams.name || undefined,
+    type: searchParams.type || undefined
+  };
+}
 
 const scrollX = computed(() =>
   columns.value.reduce((acc, col) => {
@@ -76,14 +77,25 @@ const {
   onDeleted
 } = useTableOperate<Dictionary>(data, 'ID', getData);
 
+/* 字典详情抽屉 */
+const detailDrawerVisible = ref(false);
+const detailDict = ref<{ id: number; name: string } | null>(null);
+
+function openDetailDrawer(row: Dictionary) {
+  detailDict.value = { id: row.ID, name: row.name };
+  detailDrawerVisible.value = true;
+}
+
+function closeDetailDrawer() {
+  detailDrawerVisible.value = false;
+  detailDict.value = null;
+}
+
 async function handleDelete(id: number) {
   const { error } = await fetchDeleteDictionary(id);
   if (!error) {
-    if (selectedDictId.value === id) {
-      selectedDictId.value = null;
-      selectedDictName.value = '';
-      detailData.value = [];
-    }
+    // 若详情抽屉正在展示被删除的字典，则一并关闭
+    if (detailDict.value?.id === id) closeDetailDrawer();
     await onDeleted();
   }
 }
@@ -135,7 +147,7 @@ function createAllColumns(): NaiveUI.TableColumn<Dictionary>[] {
               label: $t('page.system.dictionary.detail'),
               icon: 'material-symbols:visibility',
               type: 'info',
-              onClick: () => selectDict(row.ID)
+              onClick: () => openDetailDrawer(row)
             },
             {
               kind: 'edit',
@@ -150,113 +162,6 @@ function createAllColumns(): NaiveUI.TableColumn<Dictionary>[] {
               popconfirm: {
                 content: $t('page.system.dictionary.confirmDeleteDictionary'),
                 onPositiveClick: () => handleDelete(row.ID)
-              }
-            }
-          ]
-        })
-    }
-  ];
-}
-
-/* ---------- dictionary detail list (slave) ---------- */
-const selectedDictId = ref<number | null>(null);
-const selectedDictName = ref('');
-const detailData = ref<DictionaryDetail[]>([]);
-const detailLoading = ref(false);
-
-async function getDetailData() {
-  if (!selectedDictId.value) {
-    detailData.value = [];
-    return;
-  }
-  detailLoading.value = true;
-  const { data, error } = await fetchGetDictionaryDetailList({ sysDictionaryID: selectedDictId.value });
-  if (!error) detailData.value = data ?? [];
-  detailLoading.value = false;
-}
-
-function selectDict(id: number) {
-  const dict = data.value.find(item => item.ID === id);
-  selectedDictId.value = id;
-  selectedDictName.value = dict?.name ?? '';
-  getDetailData();
-}
-
-const detailColumnList = computed(() => createDetailColumns());
-const detailScrollX = computed(() =>
-  detailColumnList.value.reduce((acc, col) => acc + Number(col.minWidth ?? col.width ?? 120), 0)
-);
-
-const {
-  drawerVisible: detailDrawerVisible,
-  closeDrawer: closeDetailDrawer,
-  operateType: detailOperateType,
-  handleAdd: handleAddDetail,
-  editingData: detailEditingData,
-  handleEdit: handleEditDetail,
-  onDeleted: onDetailDeleted
-} = useTableOperate<DictionaryDetail>(detailData, 'ID', getDetailData);
-
-async function handleDeleteDetail(id: number) {
-  const { error } = await fetchDeleteDictionaryDetail(id);
-  if (!error) await onDetailDeleted();
-}
-
-function handleAddDetailClick() {
-  if (!selectedDictId.value) {
-    window.$message?.warning($t('page.system.dictionary.selectDictHint'));
-    return;
-  }
-  handleAddDetail();
-}
-
-function createDetailColumns(): NaiveUI.TableColumn<DictionaryDetail>[] {
-  return [
-    {
-      key: 'index',
-      title: $t('page.system.dictionary.index'),
-      width: 70,
-      align: 'center',
-      render: (_row, index) => index + 1
-    },
-    { key: 'label', title: $t('page.system.dictionary.label'), minWidth: 140 },
-    { key: 'value', title: $t('page.system.dictionary.value'), minWidth: 140 },
-    { key: 'extend', title: $t('page.system.dictionary.extend'), minWidth: 120, render: row => row.extend || '-' },
-    {
-      key: 'status',
-      title: $t('page.system.dictionary.status'),
-      width: 100,
-      align: 'center',
-      render: row =>
-        h(
-          NTag,
-          { type: row.status ? 'success' : 'error' },
-          { default: () => (row.status ? $t('page.system.dictionary.enabled') : $t('page.system.dictionary.disabled')) }
-        )
-    },
-    { key: 'sort', title: $t('page.system.dictionary.sort'), width: 90, align: 'center' },
-    {
-      key: 'operation',
-      title: $t('page.system.dictionary.operation'),
-      align: 'center',
-      fixed: 'right',
-      width: 190,
-      render: row =>
-        h(TableActionButtons, {
-          actions: [
-            {
-              kind: 'edit',
-              icon: 'material-symbols:edit',
-              type: 'primary',
-              onClick: () => handleEditDetail(row.ID)
-            },
-            {
-              kind: 'delete',
-              icon: 'material-symbols:delete',
-              type: 'error',
-              popconfirm: {
-                content: $t('page.system.dictionary.confirmDeleteDetail'),
-                onPositiveClick: () => handleDeleteDetail(row.ID)
               }
             }
           ]
@@ -298,39 +203,7 @@ function createDetailColumns(): NaiveUI.TableColumn<DictionaryDetail>[] {
         remote
         :row-key="row => String(row.ID)"
         :pagination="mobilePagination"
-        :row-props="() => ({ style: 'cursor: pointer' })"
         class="sm:h-full"
-        @row-click="(row: Dictionary) => selectDict(row.ID)"
-      />
-    </NCard>
-
-    <NCard :bordered="false" size="small" class="flex-1 flex-col-stretch sm:p-16px">
-      <template #header>
-        <div class="flex items-center justify-between">
-          <span class="text-16px font-500">
-            {{ $t('page.system.dictionary.detailTitle') }}
-            <span v-if="selectedDictName" class="text-14px text-gray-400">（{{ selectedDictName }}）</span>
-          </span>
-          <NButton type="primary" size="small" :disabled="!selectedDictId" @click="handleAddDetailClick">
-            {{ $t('page.system.dictionary.addDetail') }}
-          </NButton>
-        </div>
-      </template>
-
-      <NEmpty
-        v-if="!selectedDictId"
-        :description="$t('page.system.dictionary.selectDictHint')"
-        class="flex-1 items-center justify-center"
-      />
-      <NDataTable
-        v-else
-        :columns="detailColumnList"
-        :data="detailData"
-        :loading="detailLoading"
-        :row-key="row => String(row.ID)"
-        flex-height
-        :scroll-x="detailScrollX"
-        :bordered="false"
       />
     </NCard>
 
@@ -342,14 +215,11 @@ function createDetailColumns(): NaiveUI.TableColumn<DictionaryDetail>[] {
       @submitted="getDataByPage"
     />
 
-    <DictionaryDetailOperateDrawer
+    <DictionaryDetailDrawer
       :visible="detailDrawerVisible"
-      :operate-type="detailOperateType"
-      :editing-data="detailEditingData"
-      :dict-id="selectedDictId"
-      :details="detailData"
+      :dict-id="detailDict?.id ?? null"
+      :dict-name="detailDict?.name ?? ''"
       @close="closeDetailDrawer"
-      @submitted="getDetailData"
     />
   </div>
 </template>

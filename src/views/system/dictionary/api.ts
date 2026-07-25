@@ -1,11 +1,11 @@
 import { request } from '@/service/request';
 import type {
-  Dictionary,
-  DictionaryDetail,
   DictionaryDetailForm,
   DictionaryDetailListQuery,
+  DictionaryDetailTreeResponse,
   DictionaryForm,
-  DictionaryListQuery
+  DictionaryPageQuery,
+  DictionaryPageResponse
 } from './types';
 
 export type {
@@ -13,21 +13,23 @@ export type {
   DictionaryDetail,
   DictionaryDetailForm,
   DictionaryDetailListQuery,
+  DictionaryDetailTreeResponse,
   DictionaryForm,
-  DictionaryListQuery,
+  DictionaryPageQuery,
+  DictionaryPageResponse,
   DictionarySearchParams
 } from './types';
 
-/** Get the list of system dictionaries. */
-export function fetchGetDictionaryList(params?: DictionaryListQuery) {
-  return request<Dictionary[]>({
-    url: '/sysDictionary/getSysDictionaryList',
+/** 分页查询系统字典 */
+export function fetchGetDictionaryPage(params?: DictionaryPageQuery) {
+  return request<DictionaryPageResponse>({
+    url: '/sysDictionary/getSysDictionaryPage',
     method: 'get',
     params
   });
 }
 
-/** Create a system dictionary. */
+/** 新增字典 */
 export function fetchCreateDictionary(data: DictionaryForm) {
   return request<void>({
     url: '/sysDictionary/createSysDictionary',
@@ -36,7 +38,7 @@ export function fetchCreateDictionary(data: DictionaryForm) {
   });
 }
 
-/** Update a system dictionary. */
+/** 修改字典 */
 export function fetchUpdateDictionary(data: DictionaryForm & { ID: number }) {
   return request<void>({
     url: '/sysDictionary/updateSysDictionary',
@@ -45,25 +47,25 @@ export function fetchUpdateDictionary(data: DictionaryForm & { ID: number }) {
   });
 }
 
-/** Delete a system dictionary by id. */
+/** 删除字典 */
 export function fetchDeleteDictionary(id: number) {
   return request<void>({
     url: '/sysDictionary/deleteSysDictionary',
     method: 'delete',
-    params: { ID: id }
+    data: { ID: id }
   });
 }
 
-/** Get the list of details for a dictionary. */
+/** 获取字典项树形列表 */
 export function fetchGetDictionaryDetailList(params?: DictionaryDetailListQuery) {
-  return request<DictionaryDetail[]>({
-    url: '/sysDictionaryDetail/getSysDictionaryDetailList',
+  return request<DictionaryDetailTreeResponse>({
+    url: '/sysDictionaryDetail/getDictionaryTreeList',
     method: 'get',
     params
   });
 }
 
-/** Create a dictionary detail. */
+/** 新增字典项 */
 export function fetchCreateDictionaryDetail(data: DictionaryDetailForm) {
   return request<void>({
     url: '/sysDictionaryDetail/createSysDictionaryDetail',
@@ -72,7 +74,7 @@ export function fetchCreateDictionaryDetail(data: DictionaryDetailForm) {
   });
 }
 
-/** Update a dictionary detail. */
+/** 修改字典项 */
 export function fetchUpdateDictionaryDetail(data: DictionaryDetailForm & { ID: number }) {
   return request<void>({
     url: '/sysDictionaryDetail/updateSysDictionaryDetail',
@@ -81,11 +83,11 @@ export function fetchUpdateDictionaryDetail(data: DictionaryDetailForm & { ID: n
   });
 }
 
-/** Delete a dictionary detail by id. */
+/** 删除字典项 */
 export function fetchDeleteDictionaryDetail(id: number) {
   return request<void>({
     url: '/sysDictionaryDetail/deleteSysDictionaryDetail',
     method: 'delete',
-    params: { ID: id }
+    data: { ID: id }
   });
 }

@@ -40,13 +40,24 @@ function createDefaultModel(): DictionaryForm {
 
 const rules: FormRules = {
   name: [{ required: true, message: $t('page.system.dictionary.namePlaceholder'), trigger: 'blur' }],
-  type: [{ required: true, message: $t('page.system.dictionary.typePlaceholder'), trigger: 'blur' }]
+  type: [
+    { required: true, message: $t('page.system.dictionary.typePlaceholder'), trigger: 'blur' },
+    {
+      pattern: /^[a-zA-Z][a-zA-Z0-9_.-]*$/,
+      message: $t('page.system.dictionary.typeHint'),
+      trigger: ['blur', 'input']
+    }
+  ]
 };
 
 watch(
   () => props.visible,
   val => {
-    if (!val) return;
+    if (!val) {
+      // 关闭时重置校验状态，避免下次打开残留错误提示
+      formRef.value?.restoreValidation();
+      return;
+    }
     const editing = props.operateType === 'edit' && props.editingData;
     model.value = editing
       ? {
@@ -89,11 +100,17 @@ async function handleSubmit() {
 <template>
   <NDrawer :show="props.visible" display-directive="show" :width="480" @update:show="val => !val && emit('close')">
     <NDrawerContent :title="title" :native-scrollbar="false">
-      <NForm ref="formRef" :model="model" :rules="rules" label-placement="left" :label-width="100">
+      <NForm ref="formRef" :model="model" :rules="rules" label-placement="top" :label-width="150">
         <NFormItem :label="$t('page.system.dictionary.name')" path="name">
           <NInput v-model:value="model.name" :placeholder="$t('page.system.dictionary.namePlaceholder')" />
         </NFormItem>
-        <NFormItem :label="$t('page.system.dictionary.type')" path="type">
+        <NFormItem path="type">
+          <template #label>
+            <div class="flex items-center">
+              <span>{{ $t('page.system.dictionary.type') }}</span>
+              <IconTooltip :desc="$t('page.system.dictionary.typeHint')" class="ml-1" />
+            </div>
+          </template>
           <NInput v-model:value="model.type" :placeholder="$t('page.system.dictionary.typePlaceholder')" />
         </NFormItem>
         <NFormItem :label="$t('page.system.dictionary.status')" path="status">
@@ -107,11 +124,10 @@ async function handleSubmit() {
             v-model:value="model.desc"
             :placeholder="$t('page.system.dictionary.descPlaceholder')"
             type="textarea"
-            :autosize="{ minRows: 2, maxRows: 4 }"
+            :rows="4"
           />
         </NFormItem>
       </NForm>
-
       <template #footer>
         <NSpace justify="end">
           <NButton @click="emit('close')">{{ $t('common.cancel') }}</NButton>
