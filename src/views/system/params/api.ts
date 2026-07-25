@@ -3,7 +3,7 @@ import type { ParamsForm, ParamsListQuery, ParamsListResponse } from './types';
 
 export type { Params, ParamsForm, ParamsListQuery, ParamsListResponse, ParamsSearchParams } from './types';
 
-/** Get paginated system params list. */
+/** 分页查询系统参数列表 */
 export function fetchGetParamsList(params?: ParamsListQuery) {
   return request<ParamsListResponse>({
     url: '/sysParams/getSysParamsList',
@@ -12,7 +12,7 @@ export function fetchGetParamsList(params?: ParamsListQuery) {
   });
 }
 
-/** Create a system param. */
+/** 新增系统参数 */
 export function fetchCreateParams(data: ParamsForm) {
   return request<void>({
     url: '/sysParams/createSysParams',
@@ -21,7 +21,7 @@ export function fetchCreateParams(data: ParamsForm) {
   });
 }
 
-/** Update a system param. */
+/** 更新系统参数 */
 export function fetchUpdateParams(data: ParamsForm & { ID: number }) {
   return request<void>({
     url: '/sysParams/updateSysParams',
@@ -30,7 +30,7 @@ export function fetchUpdateParams(data: ParamsForm & { ID: number }) {
   });
 }
 
-/** Delete a system param by id. */
+/** 删除系统参数 */
 export function fetchDeleteParams(id: number) {
   return request<void>({
     url: '/sysParams/deleteSysParams',

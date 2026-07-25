@@ -19,6 +19,7 @@ const enUS: import('../types/i18n').SystemParamsLang = {
   confirmBatchDelete: 'Are you sure to batch delete the selected parameters?',
   namePlaceholder: 'Please enter the parameter name',
   keyPlaceholder: 'Please enter the parameter key',
+  keyPatternError: 'Key must start with a letter and only contain letters, digits, underscores, and hyphens',
   valuePlaceholder: 'Please enter the parameter value',
   descPlaceholder: 'Please enter the description',
   addSuccess: 'Created successfully',

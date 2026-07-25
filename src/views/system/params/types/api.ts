@@ -1,4 +1,4 @@
-/** A system parameter. `ID` is the primary key. */
+/** 系统参数实体 */
 export interface Params {
   ID: number;
   name: string;
@@ -7,7 +7,7 @@ export interface Params {
   desc: string;
 }
 
-/** Payload for creating / updating a parameter. */
+/** 新增/编辑提交体 */
 export interface ParamsForm {
   ID?: number;
   name: string;
@@ -16,7 +16,7 @@ export interface ParamsForm {
   desc: string;
 }
 
-/** Query params for getSysParamsList */
+/** 列表查询参数 */
 export interface ParamsListQuery {
   page?: number;
   pageSize?: number;
@@ -24,7 +24,7 @@ export interface ParamsListQuery {
   key?: string;
 }
 
-/** Response of getSysParamsList */
+/** 列表响应 */
 export interface ParamsListResponse {
   list: Params[];
   total: number;
@@ -32,7 +32,7 @@ export interface ParamsListResponse {
   pageSize?: number;
 }
 
-/** Frontend search form model for params list */
+/** 搜索表单 */
 export interface ParamsSearchParams {
   name: string;
   key: string;

@@ -81,7 +81,7 @@ function closeDrawer() {
 </script>
 
 <template>
-  <NDrawer :show="visible" display-directive="show" :width="400" @mask-click="closeDrawer" @close="closeDrawer">
+  <NDrawer :show="visible" display-directive="show" :width="500" @mask-click="closeDrawer" @close="closeDrawer">
     <NDrawerContent :title="$t('page.systemTools.apiToken.drawer.title')" :native-scrollbar="false">
       <NForm label-placement="top">
         <NFormItem :label="$t('page.systemTools.apiToken.drawer.user')" required>

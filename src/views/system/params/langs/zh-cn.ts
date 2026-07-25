@@ -19,6 +19,7 @@ const zhCN: import('../types/i18n').SystemParamsLang = {
   confirmBatchDelete: '确定要批量删除选中的参数吗？',
   namePlaceholder: '请输入参数名称',
   keyPlaceholder: '请输入参数键',
+  keyPatternError: '参数键值必须以英文字母开头，仅支持英文、数字、下划线、中划线',
   valuePlaceholder: '请输入参数值',
   descPlaceholder: '请输入参数说明',
   addSuccess: '新增成功',

@@ -72,7 +72,11 @@ const rules: FormRules = {
 watch(
   () => props.visible,
   val => {
-    if (!val) return;
+    if (!val) {
+      // 抽屉关闭时清除表单校验状态，避免下次打开残留错误提示
+      formRef.value?.restoreValidation();
+      return;
+    }
     const editing = props.operateType === 'edit' && props.editingData;
     model.value = editing
       ? {
@@ -111,9 +115,9 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <NDrawer :show="props.visible" display-directive="show" width="640" @update:show="val => !val && emit('close')">
+  <NDrawer :show="props.visible" display-directive="show" :width="640" @update:show="val => !val && emit('close')">
     <NDrawerContent :title="title" :native-scrollbar="false">
-      <NForm ref="formRef" :model="model" :rules="rules" label-placement="left" :label-width="90">
+      <NForm ref="formRef" :model="model" :rules="rules" label-placement="top" :label-width="90">
         <NAlert v-if="props.operateType !== 'edit'" type="warning" class="mb-16px">
           {{ $t('page.system.api.drawerNotice') }}
         </NAlert>
@@ -159,5 +163,3 @@ async function handleSubmit() {
     </NDrawerContent>
   </NDrawer>
 </template>
-
-<style scoped></style>

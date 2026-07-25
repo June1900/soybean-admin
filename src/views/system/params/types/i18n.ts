@@ -1,4 +1,4 @@
-/** i18n schema for the params (system/params) feature. */
+/** 系统参数模块国际化 */
 export interface SystemParamsLang {
   title: string;
   addParam: string;
@@ -20,6 +20,7 @@ export interface SystemParamsLang {
   confirmBatchDelete: string;
   namePlaceholder: string;
   keyPlaceholder: string;
+  keyPatternError: string;
   valuePlaceholder: string;
   descPlaceholder: string;
   addSuccess: string;

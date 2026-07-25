@@ -21,20 +21,20 @@ defineOptions({
 
 const appStore = useAppStore();
 
-/* ---------- search model ---------- */
 const searchModel = reactive<ParamsSearchParams>({
   name: '',
   key: ''
 });
 
-/* ---------- table ---------- */
 type ParamsListResponse = Awaited<ReturnType<typeof fetchGetParamsList>>;
 
 function getQueryParams(): ParamsListQuery {
   return {
     name: searchModel.name || undefined,
     key: searchModel.key || undefined,
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     page: mobilePagination.value.page,
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     pageSize: mobilePagination.value.pageSize
   };
 }
@@ -61,7 +61,7 @@ const scrollX = computed(() =>
   }, 0)
 );
 
-/* ---------- operate (add / edit / delete) ---------- */
+/* 增删改 */
 const {
   drawerVisible,
   closeDrawer,
@@ -93,7 +93,6 @@ onMounted(() => {
   getData();
 });
 
-/* ---------- columns ---------- */
 function createAllColumns(): NaiveUI.TableColumn<Params>[] {
   return [
     { type: 'selection', align: 'center', width: 48 },
@@ -149,6 +148,7 @@ function createAllColumns(): NaiveUI.TableColumn<Params>[] {
           v-model:columns="columnChecks"
           :disabled-delete="checkedRowKeys.length === 0"
           :loading="loading"
+          :show-batch-delete="true"
           @add="handleAdd"
           @delete="handleBatchDelete"
           @refresh="getData"

@@ -38,8 +38,19 @@ function createDefaultModel(): ParamsForm {
 
 const rules: FormRules = {
   name: [{ required: true, message: $t('page.system.params.namePlaceholder'), trigger: 'blur' }],
-  key: [{ required: true, message: $t('page.system.params.keyPlaceholder'), trigger: 'blur' }]
+  key: [
+    { required: true, message: $t('page.system.params.keyPlaceholder'), trigger: 'blur' },
+    {
+      pattern: /^[A-Z][A-Z0-9_-]*$/,
+      message: $t('page.system.params.keyPatternError'),
+      trigger: 'blur'
+    }
+  ]
 };
+
+function handleKeyInput(val: string) {
+  model.value.key = val.toUpperCase();
+}
 
 watch(
   () => props.visible,
@@ -50,7 +61,7 @@ watch(
       ? {
           ID: props.editingData!.ID,
           name: props.editingData!.name,
-          key: props.editingData!.key,
+          key: (props.editingData!.key || '').toUpperCase(),
           value: props.editingData!.value,
           desc: props.editingData!.desc
         }
@@ -83,14 +94,30 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <NDrawer :show="props.visible" display-directive="show" :width="480" @update:show="val => !val && emit('close')">
+  <NDrawer :show="props.visible" display-directive="show" :width="640" @update:show="val => !val && emit('close')">
     <NDrawerContent :title="title" :native-scrollbar="false">
-      <NForm ref="formRef" :model="model" :rules="rules" label-placement="left" :label-width="90">
+      <NForm ref="formRef" :model="model" :rules="rules" label-placement="top" :label-width="90">
         <NFormItem :label="$t('page.system.params.name')" path="name">
           <NInput v-model:value="model.name" :placeholder="$t('page.system.params.namePlaceholder')" />
         </NFormItem>
-        <NFormItem :label="$t('page.system.params.key')" path="key">
-          <NInput v-model:value="model.key" :placeholder="$t('page.system.params.keyPlaceholder')" />
+        <NFormItem path="key">
+          <template #label>
+            <span class="inline-flex items-center gap-1">
+              {{ $t('page.system.params.key') }}
+              <NTooltip trigger="hover">
+                <template #trigger>
+                  <icon-mdi-help-circle-outline class="text-14px text-gray-400 cursor-help" />
+                </template>
+                {{ $t('page.system.params.keyPatternError') }}
+              </NTooltip>
+            </span>
+          </template>
+          <NInput
+            v-model:value="model.key"
+            :placeholder="$t('page.system.params.keyPlaceholder')"
+            :allow-input="(val: string) => /^[a-zA-Z][a-zA-Z0-9_-]*$/.test(val)"
+            @update:value="handleKeyInput"
+          />
         </NFormItem>
         <NFormItem :label="$t('page.system.params.value')" path="value">
           <NInput v-model:value="model.value" :placeholder="$t('page.system.params.valuePlaceholder')" />
@@ -100,7 +127,7 @@ async function handleSubmit() {
             v-model:value="model.desc"
             :placeholder="$t('page.system.params.descPlaceholder')"
             type="textarea"
-            :autosize="{ minRows: 2, maxRows: 4 }"
+            :rows="4"
           />
         </NFormItem>
       </NForm>
