@@ -24,6 +24,7 @@ export const views: Record<LastLevelRouteKey, RouteComponent | (() => Promise<Ro
   home: () => import("@/views/home/index.vue"),
   opsmonitor_loginlog: () => import("@/views/opsmonitor/loginlog/index.vue"),
   "opsmonitor_operation-history": () => import("@/views/opsmonitor/operation-history/index.vue"),
+  "opsmonitor_server-status": () => import("@/views/opsmonitor/server-status/index.vue"),
   opsmonitor_syserror: () => import("@/views/opsmonitor/syserror/index.vue"),
   system_api: () => import("@/views/system/api/index.vue"),
   system_authority: () => import("@/views/system/authority/index.vue"),

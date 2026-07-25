@@ -15,6 +15,7 @@ import securityEnUS from '@/views/system/security/langs/en-us';
 import systemConfigEnUS from '@/views/systemtools/system/langs/en-us';
 import apiTokenEnUS from '@/views/systemtools/apiToken/langs/en-us';
 import timedTaskEnUS from '@/views/systemtools/timedtask/langs/en-us';
+import serverStatusEnUS from '@/views/opsmonitor/server-status/langs/en-us';
 
 const local: App.I18n.Schema = {
   system: {
@@ -272,6 +273,7 @@ const local: App.I18n.Schema = {
     systemtools_system: 'System Config',
     opsmonitor: 'Ops Monitor',
     opsmonitor_loginlog: 'Login Logs',
+    'opsmonitor_server-status': 'Server Status',
     opsmonitor_syserror: 'System Error Logs',
     'opsmonitor_operation-history': 'Operation History'
   },
@@ -381,7 +383,8 @@ const local: App.I18n.Schema = {
     opsMonitor: {
       sysError: { ...sysErrorEnUS },
       loginLog: { ...loginLogEnUS },
-      operationHistory: { ...operationHistoryEnUS }
+      operationHistory: { ...operationHistoryEnUS },
+      serverStatus: { ...serverStatusEnUS }
     }
   },
   form: {

@@ -174,6 +174,7 @@ const routeMap: RouteMap = {
   "opsmonitor": "/opsmonitor",
   "opsmonitor_loginlog": "/opsmonitor/loginlog",
   "opsmonitor_operation-history": "/opsmonitor/operation-history",
+  "opsmonitor_server-status": "/opsmonitor/server-status",
   "opsmonitor_syserror": "/opsmonitor/syserror",
   "system": "/system",
   "system_api": "/system/api",

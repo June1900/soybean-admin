@@ -15,6 +15,7 @@ import operationHistoryZhCN from '@/views/opsmonitor/operation-history/langs/zh-
 import versionZhCN from '@/views/systemtools/version/langs/zh-cn';
 import securityZhCN from '@/views/system/security/langs/zh-cn';
 import systemConfigZhCN from '@/views/systemtools/system/langs/zh-cn';
+import serverStatusZhCN from '@/views/opsmonitor/server-status/langs/zh-cn';
 
 const local: App.I18n.Schema = {
   system: {
@@ -268,6 +269,7 @@ const local: App.I18n.Schema = {
     systemtools_system: '系统配置',
     opsmonitor: '运维监控',
     opsmonitor_loginlog: '登录日志',
+    'opsmonitor_server-status': '服务器状态',
     opsmonitor_syserror: '系统错误日志',
     'opsmonitor_operation-history': '操作历史'
   },
@@ -377,7 +379,8 @@ const local: App.I18n.Schema = {
     opsMonitor: {
       sysError: { ...sysErrorZhCN },
       loginLog: { ...loginLogZhCN },
-      operationHistory: { ...operationHistoryZhCN }
+      operationHistory: { ...operationHistoryZhCN },
+      serverStatus: { ...serverStatusZhCN }
     }
   },
   form: {

@@ -123,6 +123,15 @@ export const generatedRoutes: GeneratedRoute[] = [
         }
       },
       {
+        name: 'opsmonitor_server-status',
+        path: '/opsmonitor/server-status',
+        component: 'view.opsmonitor_server-status',
+        meta: {
+          title: 'opsmonitor_server-status',
+          i18nKey: 'route.opsmonitor_server-status'
+        }
+      },
+      {
         name: 'opsmonitor_syserror',
         path: '/opsmonitor/syserror',
         component: 'view.opsmonitor_syserror',
