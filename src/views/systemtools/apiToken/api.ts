@@ -1,12 +1,5 @@
 import { request } from '@/service/request';
-import type {
-  ApiTokenListQuery,
-  ApiTokenListResponse,
-  ApiTokenForm,
-  ApiTokenCreateResponse,
-  ApiTokenUserOption
-} from './types';
-import { fetchGetUserList } from '@/views/system/user/api';
+import type { ApiTokenListQuery, ApiTokenListResponse, ApiTokenForm, ApiTokenCreateResponse } from './types';
 
 export type {
   ApiToken,
@@ -14,11 +7,10 @@ export type {
   ApiTokenListResponse,
   ApiTokenForm,
   ApiTokenCreateResponse,
-  ApiTokenUserOption,
   ApiTokenSearchParams
 } from './types';
 
-/** Get paginated API token list */
+/** 获取凭证分页列表（POST /sysApiToken/getApiTokenList） */
 export function fetchGetApiTokenList(params?: ApiTokenListQuery) {
   return request<ApiTokenListResponse>({
     url: '/sysApiToken/getApiTokenList',
@@ -27,7 +19,7 @@ export function fetchGetApiTokenList(params?: ApiTokenListQuery) {
   });
 }
 
-/** Issue (create) an API token */
+/** 签发凭证（POST /sysApiToken/createApiToken） */
 export function fetchCreateApiToken(data: ApiTokenForm) {
   return request<ApiTokenCreateResponse>({
     url: '/sysApiToken/createApiToken',
@@ -36,18 +28,11 @@ export function fetchCreateApiToken(data: ApiTokenForm) {
   });
 }
 
-/** Invalidate (delete) an API token */
+/** 作废凭证（POST /sysApiToken/deleteApiToken） */
 export function fetchDeleteApiToken(id: number) {
   return request<void>({
     url: '/sysApiToken/deleteApiToken',
     method: 'post',
     data: { ID: id }
   });
-}
-
-/** Fetch users for the issue drawer (capped page) */
-export async function fetchUserOptions() {
-  const { data, error } = await fetchGetUserList({ page: 1, pageSize: 999 });
-  if (error || !data) return [] as ApiTokenUserOption[];
-  return data.list as ApiTokenUserOption[];
 }

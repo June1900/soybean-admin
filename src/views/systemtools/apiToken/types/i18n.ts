@@ -11,6 +11,7 @@ export interface SystemToolsApiTokenLang {
   };
   issue: string;
   columns: {
+    index: string;
     id: string;
     user: string;
     authorityId: string;
@@ -57,4 +58,12 @@ export interface SystemToolsApiTokenLang {
   issueSuccess: string;
   copySuccess: string;
   pleaseSelectUserAndAuthority: string;
+  userPicker: {
+    title: string;
+    username: string;
+    nickname: string;
+    select: string;
+    selected: string;
+    notSelected: string;
+  };
 }

@@ -10,6 +10,7 @@ const apiTokenEnUS = {
   },
   issue: 'Issue',
   columns: {
+    index: 'No.',
     id: 'ID',
     user: 'User',
     authorityId: 'Authority ID',
@@ -55,7 +56,15 @@ const apiTokenEnUS = {
   invalidateSuccess: 'Invalidated successfully',
   issueSuccess: 'Issued successfully',
   copySuccess: 'Copied successfully',
-  pleaseSelectUserAndAuthority: 'Please select a user and an authority'
+  pleaseSelectUserAndAuthority: 'Please select a user and an authority',
+  userPicker: {
+    title: 'Select User',
+    username: 'Username',
+    nickname: 'Nickname',
+    select: 'Select',
+    selected: 'Selected',
+    notSelected: 'Not selected'
+  }
 };
 
 export default apiTokenEnUS;

@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import { $t } from '@/locales';
-import { fetchUserOptions, fetchCreateApiToken } from '../api';
-import type { ApiTokenUserOption, ApiTokenForm } from '../types';
+import { fetchCreateApiToken } from '../api';
+import type { ApiTokenForm } from '../types';
+import type { User } from '@/views/system/user/api';
+import ApiTokenUserPickerModal from './api-token-user-picker-modal.vue';
 
 defineOptions({ name: 'ApiTokenOperateDrawer' });
 
@@ -17,40 +19,45 @@ const emit = defineEmits<{
 
 const model = reactive<ApiTokenForm>({
   userId: 0,
-  authorityId: 0,
+  authorityId: null,
   days: 30,
   remark: ''
 });
 
-const userOptions = ref<ApiTokenUserOption[]>([]);
-const authorityOptions = ref<ApiTokenUserOption['authorities']>([]);
+const selectedUser = ref<User | null>(null);
+const userPickerVisible = ref(false);
 const loading = ref(false);
 
-async function loadUsers() {
-  userOptions.value = await fetchUserOptions();
-}
+const userDisplay = computed(() => {
+  if (!selectedUser.value) return '';
+  return `${selectedUser.value.nickName} (${selectedUser.value.userName})`;
+});
+
+const authorityOptions = computed(() => {
+  const list = selectedUser.value?.authorities ?? [];
+  return list.map(a => ({
+    label: `${a.authorityName ?? ''} (${a.authorityId ?? ''})`,
+    value: Number(a.authorityId)
+  }));
+});
 
 watch(
   () => props.visible,
   val => {
     if (val) {
       model.userId = 0;
-      model.authorityId = 0;
+      model.authorityId = null;
       model.days = 30;
       model.remark = '';
-      authorityOptions.value = [];
-      loadUsers();
+      selectedUser.value = null;
     }
   }
 );
 
-function handleUserChange(val: number | null) {
-  model.authorityId = 0;
-  const user = userOptions.value.find(u => u.ID === val);
-  authorityOptions.value = user?.authorities ?? [];
-  if (authorityOptions.value.length > 0) {
-    model.authorityId = authorityOptions.value[0].authorityId;
-  }
+function handleUserSelected(user: User) {
+  selectedUser.value = user;
+  model.userId = user.ID;
+  model.authorityId = null;
 }
 
 async function handleSubmit() {
@@ -78,25 +85,19 @@ function closeDrawer() {
     <NDrawerContent :title="$t('page.systemTools.apiToken.drawer.title')" :native-scrollbar="false">
       <NForm label-placement="top">
         <NFormItem :label="$t('page.systemTools.apiToken.drawer.user')" required>
-          <NSelect
-            v-model:value="model.userId"
-            :placeholder="$t('page.systemTools.apiToken.drawer.selectUser')"
-            filterable
-            :options="userOptions.map(u => ({ label: `${u.nickName} (${u.userName})`, value: u.ID }))"
-            @update:value="handleUserChange"
-          />
+          <NInputGroup>
+            <NInput :value="userDisplay" :placeholder="$t('page.systemTools.apiToken.drawer.selectUser')" readonly />
+            <NButton type="primary" @click="userPickerVisible = true">
+              {{ $t('page.systemTools.apiToken.userPicker.select') }}
+            </NButton>
+          </NInputGroup>
         </NFormItem>
         <NFormItem :label="$t('page.systemTools.apiToken.drawer.authority')" required>
           <NSelect
             v-model:value="model.authorityId"
             :placeholder="$t('page.systemTools.apiToken.drawer.selectAuthority')"
             :disabled="!model.userId"
-            :options="
-              (authorityOptions ?? []).map(a => ({
-                label: `${a.authorityName} (${a.authorityId})`,
-                value: a.authorityId
-              }))
-            "
+            :options="authorityOptions"
           />
         </NFormItem>
         <NFormItem :label="$t('page.systemTools.apiToken.drawer.days')">
@@ -125,4 +126,6 @@ function closeDrawer() {
       </template>
     </NDrawerContent>
   </NDrawer>
+
+  <ApiTokenUserPickerModal v-model:show="userPickerVisible" @select="handleUserSelected" />
 </template>

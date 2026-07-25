@@ -55,7 +55,12 @@ async function search() {
               path="userId"
               class="pr-24px"
             >
-              <NInputNumber v-model:value="model.userId" :min="1" clearable class="w-full" />
+              <NInput
+                v-model:value="model.userId"
+                :placeholder="$t('page.systemTools.apiToken.search.userId')"
+                clearable
+                class="w-full"
+              />
             </NFormItemGi>
             <NFormItemGi
               span="24 s:12 m:6"

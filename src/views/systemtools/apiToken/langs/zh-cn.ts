@@ -10,6 +10,7 @@ const apiTokenZhCN = {
   },
   issue: '签发',
   columns: {
+    index: '序号',
     id: 'ID',
     user: '用户',
     authorityId: '角色ID',
@@ -55,7 +56,15 @@ const apiTokenZhCN = {
   invalidateSuccess: '作废成功',
   issueSuccess: '签发成功',
   copySuccess: '复制成功',
-  pleaseSelectUserAndAuthority: '请选择用户和角色'
+  pleaseSelectUserAndAuthority: '请选择用户和角色',
+  userPicker: {
+    title: '选择用户',
+    username: '用户名',
+    nickname: '昵称',
+    select: '选择',
+    selected: '已选择',
+    notSelected: '未选择'
+  }
 };
 
 export default apiTokenZhCN;

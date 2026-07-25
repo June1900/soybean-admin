@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, h, reactive, ref } from 'vue';
-import { NButton, NDivider, NSpace, NTag } from 'naive-ui';
+import { NButton, NSpace, NTag } from 'naive-ui';
+import dayjs from 'dayjs';
 import { useAppStore } from '@/store/modules/app';
 import { $t } from '@/locales';
 import { useNaivePaginatedTable, useTableOperate } from '@/hooks/common/table';
@@ -13,10 +14,10 @@ import {
 } from './api';
 import ApiTokenOperateDrawer from './modules/api-token-operate-drawer.vue';
 import ApiTokenSearch from './modules/api-token-search.vue';
+import ApiTokenResultModal from './modules/api-token-result-modal.vue';
+import ApiTokenCurlDrawer from './modules/api-token-curl-drawer.vue';
 
 type ApiTokenListApiResponse = Awaited<ReturnType<typeof fetchGetApiTokenList>>;
-
-import TableActionButtons from '@/components/common/table-action-buttons';
 
 defineOptions({
   name: 'SystemToolsApiToken'
@@ -24,13 +25,13 @@ defineOptions({
 
 const appStore = useAppStore();
 
-/* ---------- search ---------- */
+/* ---------- 搜索 ---------- */
 const searchParams = reactive<ApiTokenSearchParams>({
   userId: null,
   status: null
 });
 
-/* ---------- table ---------- */
+/* ---------- 表格 ---------- */
 const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagination } = useNaivePaginatedTable<
   ApiTokenListApiResponse,
   ApiToken
@@ -64,24 +65,21 @@ function getQueryParams(): ApiTokenListQuery {
     page: mobilePagination.value.page,
     pageSize: mobilePagination.value.pageSize
   };
-  if (searchParams.userId != null) params.userId = searchParams.userId;
+  if (searchParams.userId) {
+    const uid = Number(searchParams.userId);
+    if (!Number.isNaN(uid)) params.userId = uid;
+  }
   if (searchParams.status === 'valid') params.status = true;
   if (searchParams.status === 'invalid') params.status = false;
   return params;
 }
 
-/* ---------- operate (issue / revoke) ---------- */
-const {
-  drawerVisible,
-  closeDrawer,
-  operateType,
-  handleAdd,
-  editingData,
-  handleEdit,
-  checkedRowKeys,
-  onBatchDeleted,
-  onDeleted
-} = useTableOperate<ApiToken>(data, 'ID', getData);
+/* ---------- 签发 / 作废 ---------- */
+const { drawerVisible, closeDrawer, handleAdd, checkedRowKeys, onBatchDeleted, onDeleted } = useTableOperate<ApiToken>(
+  data,
+  'ID',
+  getData
+);
 
 async function handleDelete(id: number) {
   const { error } = await fetchDeleteApiToken(id);
@@ -90,62 +88,54 @@ async function handleDelete(id: number) {
   }
 }
 
-async function handleBatchDelete() {
-  const ids = checkedRowKeys.value.map(id => Number(id)) as number[];
-  for (const id of ids) {
-    const { error } = await fetchDeleteApiToken(id);
-    if (error) return;
-  }
-  await onBatchDeleted();
-}
-
-/* ---------- token dialog + curl drawer ---------- */
-const tokenDialogVisible = ref(false);
+/* ---------- Token 弹窗 + Curl 抽屉 ---------- */
+const resultModalVisible = ref(false);
 const tokenResult = ref('');
 
 const curlDrawerVisible = ref(false);
-const curlHeader = ref('');
-const curlCookie = ref('');
+const curlToken = ref('');
 
 function handleIssued(token: string) {
   tokenResult.value = token;
-  tokenDialogVisible.value = true;
+  resultModalVisible.value = true;
   getData();
 }
 
 function openCurl(row: ApiToken) {
-  const origin = window.location.origin;
-  const url = `${origin}/api/menu/getMenu`;
-  const token = row.token ?? '';
-  curlHeader.value = `curl -X POST "${url}" -H "x-token: ${token}" -H "Content-Type: application/json"`;
-  curlCookie.value = `curl -X POST "${url}" -b "x-token=${token}" -H "Content-Type: application/json"`;
+  curlToken.value = row.token ?? '';
   curlDrawerVisible.value = true;
 }
 
-async function copyText(text: string) {
-  try {
-    await navigator.clipboard.writeText(text);
-    window.$message?.success($t('page.systemTools.apiToken.copySuccess'));
-  } catch {
-    window.$message?.error('Copy failed');
-  }
+/* 格式化过期时间：永久令牌显示「永久」，空值显示「-」 */
+function formatExpiresAt(val?: string): string {
+  if (!val) return '-';
+  const d = dayjs(val);
+  if (!d.isValid()) return val;
+  if (d.year() >= 9999) return $t('page.systemTools.apiToken.drawer.permanent');
+  return d.format('YYYY-MM-DD HH:mm:ss');
 }
 
+/* 作废确认弹窗 */
+function handleInvalidate(row: ApiToken) {
+  window.$dialog?.warning({
+    title: $t('page.systemTools.apiToken.columns.invalidate'),
+    content: $t('page.systemTools.apiToken.invalidateConfirm'),
+    positiveText: $t('common.confirm'),
+    negativeText: $t('common.cancel'),
+    onPositiveClick: () => handleDelete(row.ID)
+  });
+}
+
+/* ---------- 列定义 ---------- */
 function createAllColumns(): NaiveUI.TableColumn<ApiToken>[] {
   return [
     {
-      type: 'selection',
-      align: 'center',
-      width: 48
-    },
-    {
       key: 'index',
-      title: $t('page.systemTools.apiToken.columns.id'),
+      title: $t('page.systemTools.apiToken.columns.index'),
       width: 70,
       align: 'center',
       render: (_row, index) => index + 1
     },
-    { key: 'ID', title: $t('page.systemTools.apiToken.columns.id'), minWidth: 80 },
     {
       key: 'user',
       title: $t('page.systemTools.apiToken.columns.user'),
@@ -170,7 +160,12 @@ function createAllColumns(): NaiveUI.TableColumn<ApiToken>[] {
           }
         )
     },
-    { key: 'expiresAt', title: $t('page.systemTools.apiToken.columns.expiresAt'), minWidth: 180 },
+    {
+      key: 'expiresAt',
+      title: $t('page.systemTools.apiToken.columns.expiresAt'),
+      minWidth: 180,
+      render: row => formatExpiresAt(row.expiresAt)
+    },
     {
       key: 'remark',
       title: $t('page.systemTools.apiToken.columns.remark'),
@@ -182,31 +177,24 @@ function createAllColumns(): NaiveUI.TableColumn<ApiToken>[] {
       title: $t('page.systemTools.apiToken.columns.operations'),
       align: 'center',
       fixed: 'right',
-      width: 220,
+      width: 160,
       render: row =>
-        h(TableActionButtons, {
-          actions: [
-            {
-              label: $t('page.systemTools.apiToken.columns.curl'),
-              icon: 'material-symbols:terminal',
-              type: 'info',
-              onClick: () => openCurl(row)
-            },
-            ...(row.status
-              ? [
-                  {
-                    label: $t('page.systemTools.apiToken.columns.invalidate'),
-                    icon: 'material-symbols:block',
-                    type: 'error' as const,
-                    popconfirm: {
-                      content: $t('page.systemTools.apiToken.invalidateConfirm'),
-                      onPositiveClick: () => handleDelete(row.ID)
-                    }
-                  }
-                ]
-              : [])
-          ]
-        })
+        h(NSpace, { justify: 'center', size: 'small' }, () => [
+          h(
+            NButton,
+            { size: 'small', ghost: true, type: 'info', onClick: () => openCurl(row) },
+            { default: () => $t('page.systemTools.apiToken.columns.curl') }
+          ),
+          ...(row.status
+            ? [
+                h(
+                  NButton,
+                  { size: 'small', ghost: true, type: 'error', onClick: () => handleInvalidate(row) },
+                  { default: () => $t('page.systemTools.apiToken.columns.invalidate') }
+                )
+              ]
+            : [])
+        ])
     }
   ];
 }
@@ -225,12 +213,17 @@ function createAllColumns(): NaiveUI.TableColumn<ApiToken>[] {
       <template #header-extra>
         <TableHeaderOperation
           v-model:columns="columnChecks"
-          :disabled-delete="checkedRowKeys.length === 0"
           :loading="loading"
-          @add="handleAdd"
-          @delete="handleBatchDelete"
+          :show-batch-delete="false"
           @refresh="getData"
-        />
+        >
+          <NButton size="small" ghost type="primary" @click="handleAdd">
+            <template #icon>
+              <icon-ic-round-plus class="text-icon" />
+            </template>
+            {{ $t('page.systemTools.apiToken.issue') }}
+          </NButton>
+        </TableHeaderOperation>
       </template>
 
       <NDataTable
@@ -251,38 +244,7 @@ function createAllColumns(): NaiveUI.TableColumn<ApiToken>[] {
       <ApiTokenOperateDrawer :visible="drawerVisible" @close="closeDrawer" @submitted="handleIssued" />
     </NCard>
 
-    <NModal
-      v-model:show="tokenDialogVisible"
-      :title="$t('page.systemTools.apiToken.tokenDialog.title')"
-      preset="card"
-      style="width: 520px"
-    >
-      <NAlert type="warning" :show-icon="true" :title="$t('page.systemTools.apiToken.tokenDialog.warning')" />
-      <NInput type="textarea" :rows="6" :value="tokenResult" readonly class="mt-12px" />
-      <template #footer>
-        <NSpace justify="end">
-          <NButton @click="copyText(tokenResult)">{{ $t('page.systemTools.apiToken.tokenDialog.copy') }}</NButton>
-          <NButton type="primary" @click="tokenDialogVisible = false">
-            {{ $t('page.systemTools.apiToken.tokenDialog.close') }}
-          </NButton>
-        </NSpace>
-      </template>
-    </NModal>
-
-    <NDrawer v-model:show="curlDrawerVisible" :width="520" placement="right">
-      <NDrawerContent :title="$t('page.systemTools.apiToken.curlDrawer.title')" :native-scrollbar="false">
-        <p class="mb-8px font-500">{{ $t('page.systemTools.apiToken.curlDrawer.headerMode') }}</p>
-        <NInput type="textarea" :rows="4" :value="curlHeader" readonly />
-        <NButton size="small" class="mt-4px" @click="copyText(curlHeader)">
-          {{ $t('page.systemTools.apiToken.curlDrawer.copy') }}
-        </NButton>
-        <NDivider />
-        <p class="mb-8px font-500">{{ $t('page.systemTools.apiToken.curlDrawer.cookieMode') }}</p>
-        <NInput type="textarea" :rows="4" :value="curlCookie" readonly />
-        <NButton size="small" class="mt-4px" @click="copyText(curlCookie)">
-          {{ $t('page.systemTools.apiToken.curlDrawer.copy') }}
-        </NButton>
-      </NDrawerContent>
-    </NDrawer>
+    <ApiTokenResultModal v-model:show="resultModalVisible" v-model:token="tokenResult" />
+    <ApiTokenCurlDrawer v-model:show="curlDrawerVisible" :token="curlToken" />
   </div>
 </template>

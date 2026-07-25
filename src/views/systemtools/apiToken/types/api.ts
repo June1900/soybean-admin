@@ -9,14 +9,6 @@ export interface ApiToken {
   token?: string;
 }
 
-/** User option for the issue drawer (user + its authorities) */
-export interface ApiTokenUserOption {
-  ID: number;
-  nickName: string;
-  userName: string;
-  authorities?: { authorityId: number; authorityName: string }[];
-}
-
 /** Query params for getApiTokenList */
 export interface ApiTokenListQuery {
   page?: number;
@@ -36,14 +28,14 @@ export interface ApiTokenListResponse {
 /** Form payload for issuing (create) an API token */
 export interface ApiTokenForm {
   userId: number;
-  authorityId: number;
+  authorityId: number | null;
   days: number;
   remark?: string;
 }
 
 /** Frontend search form model for API token list (mapped to ApiTokenListQuery in index) */
 export interface ApiTokenSearchParams {
-  userId: number | null;
+  userId: string | null;
   status: string | null;
 }
 
