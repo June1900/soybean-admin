@@ -1,56 +1,176 @@
 export interface SystemToolsSystemLang {
   title: string;
-  save: string;
-  saved: string;
-  tabs: {
+  action: {
+    update: string;
+    reload: string;
+    updating: string;
+    reloading: string;
+    updated: string;
+    reloaded: string;
+  };
+  menu: {
     system: string;
+    basic: string;
+    switches: string;
+    service: string;
     jwt: string;
     zap: string;
-    redis: string;
-    captcha: string;
     email: string;
+    storage: string;
+    redis: string;
+    database: string;
+    oss: string;
+    mongo: string;
+    other: string;
+    autocode: string;
   };
-  system: {
-    addr: string;
+  basic: {
+    title: string;
+    desc: string;
+    port: string;
     dbType: string;
     ossType: string;
-    useMultipoint: string;
-    useRedis: string;
-    useMongo: string;
     limitCount: string;
     limitTime: string;
+    routerPrefix: string;
+  };
+  switches: {
+    title: string;
+    desc: string;
+    multipoint: string;
+    redis: string;
+    mongo: string;
+    strictAuth: string;
+    disableAutoMigrate: string;
   };
   jwt: {
+    title: string;
+    desc: string;
     signingKey: string;
-    expiresAt: string;
+    generate: string;
+    expiresTime: string;
     bufferTime: string;
     issuer: string;
   };
   zap: {
+    title: string;
+    desc: string;
     level: string;
     format: string;
+    encodeLevel: string;
+    stacktraceKey: string;
     prefix: string;
     director: string;
     retentionDay: string;
     showLine: string;
     logInConsole: string;
-  };
-  redis: {
-    db: string;
-    addr: string;
-    password: string;
-  };
-  captcha: {
-    keyLong: string;
-    imgWidth: string;
-    imgHeight: string;
+    accessReqBody: string;
+    accessRespData: string;
+    accessReqHeaders: string;
+    maxBytes: string;
+    fileOnlyModules: string;
   };
   email: {
+    title: string;
+    desc: string;
     to: string;
     port: string;
     from: string;
     host: string;
-    isSsl: string;
     secret: string;
+    nickname: string;
+    isSsl: string;
+    isLoginauth: string;
+    test: string;
+    testSuccess: string;
+  };
+  redis: {
+    title: string;
+    desc: string;
+    name: string;
+    addr: string;
+    password: string;
+    db: string;
+    useCluster: string;
+    clusterAddrs: string;
+  };
+  mongo: {
+    title: string;
+    desc: string;
+    coll: string;
+    options: string;
+    database: string;
+    username: string;
+    password: string;
+    authSource: string;
+    minPoolSize: string;
+    maxPoolSize: string;
+    socketTimeout: string;
+    connectTimeout: string;
+    isZap: string;
+    hosts: string;
+  };
+  database: {
+    title: string;
+    desc: string;
+    username: string;
+    password: string;
+    address: string;
+    database: string;
+    prefix: string;
+    singular: string;
+    engine: string;
+    maxIdleConns: string;
+    maxOpenConns: string;
+    connMaxLifetime: string;
+    logMode: string;
+    config: string;
+    port: string;
+  };
+  oss: {
+    title: string;
+    desc: string;
+    localPath: string;
+    storePath: string;
+    endpoint: string;
+    accessKey: string;
+    secretKey: string;
+    bucket: string;
+    bucketName: string;
+    bucketUrl: string;
+    basePath: string;
+    zone: string;
+    imgPath: string;
+    useHttps: string;
+    useCdnDomains: string;
+    region: string;
+    baseUrl: string;
+    pathPrefix: string;
+    path: string;
+    accountId: string;
+    accessKeyId: string;
+    accessKeySecret: string;
+    secretAccessKey: string;
+    forcePathStyle: string;
+    disableSsl: string;
+    useSsl: string;
+  };
+  autocode: {
+    title: string;
+    desc: string;
+    root: string;
+    server: string;
+    web: string;
+    module: string;
+    aiPath: string;
+  };
+  common: {
+    inputPlaceholder: string;
+    selectPlaceholder: string;
+    enabled: string;
+    disabled: string;
+    reloadConfirmTitle: string;
+    reloadConfirmContent: string;
+    emailTestFailed: string;
   };
 }

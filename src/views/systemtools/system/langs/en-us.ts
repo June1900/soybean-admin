@@ -2,58 +2,178 @@ import type { SystemToolsSystemLang } from '../types';
 
 const lang: SystemToolsSystemLang = {
   title: 'System Config',
-  save: 'Save Config',
-  saved: 'System config saved (local demo)',
-  tabs: {
+  action: {
+    update: 'Update Now',
+    reload: 'Reload Service',
+    updating: 'Updating...',
+    reloading: 'Reloading...',
+    updated: 'Config updated',
+    reloaded: 'Service reloaded'
+  },
+  menu: {
     system: 'System',
+    basic: 'Basic',
+    switches: 'Switches',
+    service: 'Service',
     jwt: 'JWT',
     zap: 'Zap Log',
+    email: 'Email',
+    storage: 'Storage',
     redis: 'Redis',
-    captcha: 'Captcha',
-    email: 'Email'
+    database: 'Database',
+    oss: 'OSS',
+    mongo: 'Mongo',
+    other: 'Other',
+    autocode: 'AutoCode'
   },
-  system: {
-    addr: 'Listen Addr',
+  basic: {
+    title: 'Basic Settings',
+    desc: 'Core params: port, db/oss type, rate limit',
+    port: 'Port',
     dbType: 'DB Type',
     ossType: 'OSS Type',
-    useMultipoint: 'Multi-point Login',
-    useRedis: 'Use Redis',
-    useMongo: 'Use MongoDB',
     limitCount: 'Limit Count',
-    limitTime: 'Limit Time (s)'
+    limitTime: 'Limit Time (s)',
+    routerPrefix: 'Router Prefix'
+  },
+  switches: {
+    title: 'Feature Switches',
+    desc: 'Toggle system features on demand',
+    multipoint: 'Multi-point Login',
+    redis: 'Enable Redis',
+    mongo: 'Enable Mongo',
+    strictAuth: 'Strict Role Mode',
+    disableAutoMigrate: 'Disable Auto Migrate'
   },
   jwt: {
+    title: 'JWT Config',
+    desc: 'Token signing key and expiration',
     signingKey: 'Signing Key',
-    expiresAt: 'Expires At (h)',
-    bufferTime: 'Buffer Time (h)',
+    generate: 'Generate',
+    expiresTime: 'Expires',
+    bufferTime: 'Buffer',
     issuer: 'Issuer'
   },
   zap: {
+    title: 'Log Output',
+    desc: 'Zap log level, format and destination',
     level: 'Level',
     format: 'Format',
+    encodeLevel: 'Encode Level',
+    stacktraceKey: 'Stacktrace Key',
     prefix: 'Prefix',
     director: 'Directory',
     retentionDay: 'Retention (day)',
     showLine: 'Show Line',
-    logInConsole: 'Log In Console'
-  },
-  redis: {
-    db: 'DB Index',
-    addr: 'Addr',
-    password: 'Password'
-  },
-  captcha: {
-    keyLong: 'Key Length',
-    imgWidth: 'Image Width',
-    imgHeight: 'Image Height'
+    logInConsole: 'Log In Console',
+    accessReqBody: 'Log Req Body',
+    accessRespData: 'Log Resp Data',
+    accessReqHeaders: 'Log Req Headers',
+    maxBytes: 'Max Log Bytes',
+    fileOnlyModules: 'File-only Modules'
   },
   email: {
+    title: 'Email Config',
+    desc: 'SMTP params, can send a test email',
     to: 'To',
     port: 'Port',
     from: 'From',
     host: 'SMTP Host',
+    secret: 'Secret',
+    nickname: 'Nickname',
     isSsl: 'Use SSL',
-    secret: 'Secret'
+    isLoginauth: 'Login Auth',
+    test: 'Send Test Email',
+    testSuccess: 'Test email sent'
+  },
+  redis: {
+    title: 'Redis Config',
+    desc: 'Cache and distributed features',
+    name: 'Name',
+    addr: 'Addr',
+    password: 'Password',
+    db: 'DB Index',
+    useCluster: 'Use Cluster',
+    clusterAddrs: 'Cluster Addrs'
+  },
+  mongo: {
+    title: 'Mongo Database',
+    desc: 'Document database params',
+    coll: 'Collection',
+    options: 'Options',
+    database: 'Database',
+    username: 'Username',
+    password: 'Password',
+    authSource: 'Auth Source',
+    minPoolSize: 'Min Pool Size',
+    maxPoolSize: 'Max Pool Size',
+    socketTimeout: 'Socket Timeout (ms)',
+    connectTimeout: 'Connect Timeout (ms)',
+    isZap: 'Enable Log',
+    hosts: 'Hosts'
+  },
+  database: {
+    title: 'Database Config',
+    desc: 'Connection params of selected engine',
+    username: 'Username',
+    password: 'Password',
+    address: 'Address',
+    database: 'Database',
+    prefix: 'Table Prefix',
+    singular: 'Singular Table',
+    engine: 'Engine',
+    maxIdleConns: 'Max Idle Conns',
+    maxOpenConns: 'Max Open Conns',
+    connMaxLifetime: 'Conn Max Lifetime',
+    logMode: 'Log Mode',
+    config: 'Extra Config',
+    port: 'Port'
+  },
+  oss: {
+    title: 'OSS Config',
+    desc: 'Params of selected object storage',
+    localPath: 'Local Path',
+    storePath: 'Store Path',
+    endpoint: 'Endpoint',
+    accessKey: 'AccessKey',
+    secretKey: 'SecretKey',
+    bucket: 'Bucket',
+    bucketName: 'Bucket Name',
+    bucketUrl: 'Bucket URL',
+    basePath: 'Base Path',
+    zone: 'Zone',
+    imgPath: 'Img Path',
+    useHttps: 'Use HTTPS',
+    useCdnDomains: 'Use CDN',
+    region: 'Region',
+    baseUrl: 'Base URL',
+    pathPrefix: 'Path Prefix',
+    path: 'Path',
+    accountId: 'Account ID',
+    accessKeyId: 'AccessKeyId',
+    accessKeySecret: 'AccessKeySecret',
+    secretAccessKey: 'SecretAccessKey',
+    forcePathStyle: 'Force Path Style',
+    disableSsl: 'Disable SSL',
+    useSsl: 'Use SSL'
+  },
+  autocode: {
+    title: 'AutoCode',
+    desc: 'Code generator dirs and module',
+    root: 'Root',
+    server: 'Server',
+    web: 'Web',
+    module: 'Module',
+    aiPath: 'AI Path'
+  },
+  common: {
+    inputPlaceholder: 'Please input',
+    selectPlaceholder: 'Please select',
+    enabled: 'On',
+    disabled: 'Off',
+    reloadConfirmTitle: 'Warning',
+    reloadConfirmContent: 'Reload the service? It will be briefly unavailable.',
+    emailTestFailed: 'Test email failed'
   }
 };
 

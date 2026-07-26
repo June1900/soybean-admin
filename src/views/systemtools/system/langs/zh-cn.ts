@@ -2,58 +2,178 @@ import type { SystemToolsSystemLang } from '../types';
 
 const lang: SystemToolsSystemLang = {
   title: '系统配置',
-  save: '保存配置',
-  saved: '系统配置已保存（本地演示）',
-  tabs: {
-    system: '系统',
+  action: {
+    update: '立即更新',
+    reload: '重载服务',
+    updating: '更新中...',
+    reloading: '重载中...',
+    updated: '配置文件设置成功',
+    reloaded: '重载服务成功'
+  },
+  menu: {
+    system: '系统设置',
+    basic: '基础设置',
+    switches: '功能开关',
+    service: '服务',
     jwt: 'JWT 签名',
     zap: 'Zap 日志',
+    email: '邮箱配置',
+    storage: '存储',
     redis: 'Redis',
-    captcha: '验证码',
-    email: '邮箱'
+    database: '数据库配置',
+    oss: 'OSS 配置',
+    mongo: 'Mongo 数据库',
+    other: '其他',
+    autocode: '自动化代码'
   },
-  system: {
-    addr: '监听地址',
+  basic: {
+    title: '基础设置',
+    desc: '服务端口、数据库与存储类型、限流等核心参数',
+    port: '端口值',
     dbType: '数据库类型',
     ossType: 'OSS 类型',
-    useMultipoint: '多点登录',
-    useRedis: '使用 Redis',
-    useMongo: '使用 MongoDB',
     limitCount: '限流次数',
-    limitTime: '限流时间(秒)'
+    limitTime: '限流时间(秒)',
+    routerPrefix: '全局路由前缀'
+  },
+  switches: {
+    title: '功能开关',
+    desc: '按需开启或关闭系统功能',
+    multipoint: '多点登录拦截',
+    redis: '开启 Redis',
+    mongo: '开启 Mongo',
+    strictAuth: '严格角色模式',
+    disableAutoMigrate: '禁用自动迁移数据库表结构'
   },
   jwt: {
-    signingKey: '签名密钥',
-    expiresAt: '过期时间(小时)',
-    bufferTime: '缓冲时间(小时)',
+    title: 'JWT 配置',
+    desc: 'Token 签名密钥与有效期设置',
+    signingKey: 'JWT 签名',
+    generate: '生成',
+    expiresTime: '有效期',
+    bufferTime: '缓冲期',
     issuer: '签发者'
   },
   zap: {
-    level: '日志级别',
-    format: '日志格式',
+    title: '日志输出',
+    desc: 'Zap 日志的级别、格式与输出位置',
+    level: '级别',
+    format: '输出格式',
+    encodeLevel: '编码级别',
+    stacktraceKey: 'Stacktrace 键名',
     prefix: '日志前缀',
     director: '日志目录',
     retentionDay: '保留天数',
     showLine: '显示行号',
-    logInConsole: '控制台输出'
-  },
-  redis: {
-    db: '数据库索引',
-    addr: '连接地址',
-    password: '密码'
-  },
-  captcha: {
-    keyLong: '字符长度',
-    imgWidth: '图片宽度',
-    imgHeight: '图片高度'
+    logInConsole: '控制台输出',
+    accessReqBody: '记录请求体',
+    accessRespData: '记录响应数据',
+    accessReqHeaders: '记录请求头',
+    maxBytes: '访问日志单行最大字节',
+    fileOnlyModules: '仅写文件模块'
   },
   email: {
+    title: '邮箱配置',
+    desc: 'SMTP 发件参数，可发送测试邮件验证',
     to: '收件人',
     port: '端口',
     from: '发件人',
     host: 'SMTP 主机',
+    secret: '授权码',
+    nickname: '昵称',
     isSsl: '启用 SSL',
-    secret: '授权码'
+    isLoginauth: '登录鉴权',
+    test: '发送测试邮件',
+    testSuccess: '测试邮件发送成功'
+  },
+  redis: {
+    title: 'Redis 配置',
+    desc: '缓存与分布式能力依赖',
+    name: '名称',
+    addr: '连接地址',
+    password: '密码',
+    db: '数据库索引',
+    useCluster: '启用集群',
+    clusterAddrs: '集群地址'
+  },
+  mongo: {
+    title: 'Mongo 数据库',
+    desc: '文档型数据库参数',
+    coll: '集合',
+    options: '选项',
+    database: '数据库',
+    username: '用户名',
+    password: '密码',
+    authSource: '鉴权源',
+    minPoolSize: '最小连接池',
+    maxPoolSize: '最大连接池',
+    socketTimeout: 'Socket 超时(ms)',
+    connectTimeout: '连接超时(ms)',
+    isZap: '启用日志',
+    hosts: '节点列表'
+  },
+  database: {
+    title: '数据库配置',
+    desc: '当前选中的数据库引擎连接参数',
+    username: '用户名',
+    password: '密码',
+    address: '地址',
+    database: '数据库名',
+    prefix: '表前缀',
+    singular: '单数表名',
+    engine: '引擎',
+    maxIdleConns: '最大空闲连接',
+    maxOpenConns: '最大打开连接',
+    connMaxLifetime: '连接最大存活时间',
+    logMode: '日志模式',
+    config: '额外配置',
+    port: '端口'
+  },
+  oss: {
+    title: 'OSS 配置',
+    desc: '当前选中的对象存储参数',
+    localPath: '本地路径',
+    storePath: '存储路径',
+    endpoint: 'Endpoint',
+    accessKey: 'AccessKey',
+    secretKey: 'SecretKey',
+    bucket: 'Bucket',
+    bucketName: 'Bucket 名称',
+    bucketUrl: 'Bucket 域名',
+    basePath: '基础路径',
+    zone: '存储区域',
+    imgPath: '图片路径',
+    useHttps: '启用 HTTPS',
+    useCdnDomains: '启用 CDN',
+    region: '区域',
+    baseUrl: '基础域名',
+    pathPrefix: '路径前缀',
+    path: '路径',
+    accountId: 'Account ID',
+    accessKeyId: 'AccessKeyId',
+    accessKeySecret: 'AccessKeySecret',
+    secretAccessKey: 'SecretAccessKey',
+    forcePathStyle: '强制路径风格',
+    disableSsl: '禁用 SSL',
+    useSsl: '启用 SSL'
+  },
+  autocode: {
+    title: '自动化代码',
+    desc: '代码生成器的工作目录与服务模块',
+    root: '项目根目录',
+    server: '服务端目录',
+    web: '前端目录',
+    module: '模块名',
+    aiPath: 'AI 路径'
+  },
+  common: {
+    inputPlaceholder: '请输入',
+    selectPlaceholder: '请选择',
+    enabled: '开启',
+    disabled: '关闭',
+    reloadConfirmTitle: '警告',
+    reloadConfirmContent: '确定要重载服务？重载后服务会短暂不可用。',
+    emailTestFailed: '测试邮件发送失败'
   }
 };
 
