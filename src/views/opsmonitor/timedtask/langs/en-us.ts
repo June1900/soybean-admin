@@ -64,18 +64,38 @@ const timedTaskEnUS = {
   deleteSuccess: 'Deleted',
   log: {
     title: 'Execution Logs',
-    trigger: 'Trigger',
-    auto: 'Schedule',
-    manual: 'Manual',
-    status: 'Status',
-    success: 'Success',
-    failed: 'Failed',
-    startedAt: 'Started At',
-    duration: 'Duration (ms)',
-    close: 'Close',
-    noDetail: 'No details',
-    error: 'Error',
-    output: 'Output'
+    search: {
+      triggerType: 'Trigger',
+      status: 'Status',
+      timeRange: 'Execution Time',
+      search: 'Search',
+      reset: 'Reset',
+      manual: 'Manual',
+      auto: 'Schedule',
+      success: 'Success',
+      failed: 'Failed'
+    },
+    columns: {
+      triggerType: 'Trigger',
+      status: 'Status',
+      startedAt: 'Started At',
+      finishedAt: 'Finished At',
+      duration: 'Duration (ms)',
+      createdAt: 'Created At',
+      view: 'Detail'
+    },
+    detail: {
+      title: 'Execution Detail',
+      triggerType: 'Trigger',
+      status: 'Status',
+      startedAt: 'Started At',
+      finishedAt: 'Finished At',
+      duration: 'Duration (ms)',
+      createdAt: 'Created At',
+      error: 'Error',
+      output: 'Output',
+      close: 'Close'
+    }
   }
 };
 

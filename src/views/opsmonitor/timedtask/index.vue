@@ -9,13 +9,12 @@ import {
   fetchDeleteTimedTask,
   fetchToggleTimedTask,
   fetchTriggerTimedTask,
-  fetchGetTimedTaskLogList,
   type TimedTask,
-  type TimedTaskLog,
   type TimedTaskSearchParams
 } from './api';
 import TimedTaskOperateDrawer from './modules/timed-task-operate-drawer.vue';
 import TimedTaskSearch from './modules/timed-task-search.vue';
+import TimedTaskLogDrawer from './modules/timed-task-log-drawer.vue';
 
 import TableActionButtons from '@/components/common/table-action-buttons';
 
@@ -123,102 +122,16 @@ async function handleBatchDelete() {
   await onBatchDeleted();
 }
 
-/* ---------- 日志抽屉（独立分页） ---------- */
+/* ---------- 日志抽屉（独立组件） ---------- */
 const logVisible = ref(false);
-const logData = ref<TimedTaskLog[]>([]);
-const logLoading = ref(false);
-const logTaskName = ref('');
-const logPagination = reactive({
-  page: 1,
-  pageSize: 10,
-  itemCount: 0,
-  showSizePicker: true,
-  pageSizes: [10, 20, 30],
-  onUpdatePage(page: number) {
-    logPagination.page = page;
-    loadLogs();
-  },
-  onUpdatePageSize(size: number) {
-    logPagination.pageSize = size;
-    logPagination.page = 1;
-    loadLogs();
-  }
-});
-
 const logTaskId = ref(0);
-
-async function loadLogs() {
-  logLoading.value = true;
-  const { data: resp, error } = await fetchGetTimedTaskLogList({
-    page: logPagination.page,
-    pageSize: logPagination.pageSize,
-    taskId: logTaskId.value
-  });
-  logLoading.value = false;
-  if (!error && resp) {
-    logData.value = resp.list ?? [];
-    logPagination.itemCount = resp.total ?? 0;
-  }
-}
+const logTaskName = ref('');
 
 function openLogs(row: TimedTask) {
   logTaskId.value = row.ID;
   logTaskName.value = row.name;
-  logPagination.page = 1;
   logVisible.value = true;
-  loadLogs();
 }
-
-const logColumns: NaiveUI.TableColumn<TimedTaskLog>[] = [
-  {
-    type: 'expand',
-    renderExpand: (row: TimedTaskLog) => {
-      if (row.errorMsg)
-        return h(
-          'p',
-          { class: 'text-red-500 break-all p-4' },
-          `${$t('page.opsMonitor.timedTask.log.error')}：${row.errorMsg}`
-        );
-      if (row.output)
-        return h('p', { class: 'break-all mt-1 p-4' }, `${$t('page.opsMonitor.timedTask.log.output')}：${row.output}`);
-      return h('p', { class: 'text-gray-400 p-4' }, $t('page.opsMonitor.timedTask.log.noDetail'));
-    }
-  },
-  {
-    key: 'triggerType',
-    title: $t('page.opsMonitor.timedTask.log.trigger'),
-    width: 90,
-    render: (row: TimedTaskLog) =>
-      h(
-        NTag,
-        { type: row.triggerType === 'auto' ? 'info' : 'warning', size: 'small', bordered: false },
-        {
-          default: () =>
-            row.triggerType === 'auto'
-              ? $t('page.opsMonitor.timedTask.log.auto')
-              : $t('page.opsMonitor.timedTask.log.manual')
-        }
-      )
-  },
-  {
-    key: 'status',
-    title: $t('page.opsMonitor.timedTask.log.status'),
-    width: 90,
-    render: (row: TimedTaskLog) =>
-      h(
-        NTag,
-        { type: row.status === 'success' ? 'success' : 'error', size: 'small', bordered: false },
-        {
-          default: () =>
-            row.status === 'success'
-              ? $t('page.opsMonitor.timedTask.log.success')
-              : $t('page.opsMonitor.timedTask.log.failed')
-        }
-      )
-  },
-  { key: 'startedAt', title: $t('page.opsMonitor.timedTask.log.startedAt'), width: 180 },
-  { key: 'durationMs', title: $t('page.opsMonitor.timedTask.log.duration'), width: 110 }
-];
 
 /* ---------- 列定义 ---------- */
 function createAllColumns(): NaiveUI.TableColumn<TimedTask>[] {
@@ -370,20 +283,6 @@ function createAllColumns(): NaiveUI.TableColumn<TimedTask>[] {
       />
     </NCard>
 
-    <NDrawer v-model:show="logVisible" :width="640" placement="right">
-      <NDrawerContent :title="`${$t('page.opsMonitor.timedTask.log.title')}：${logTaskName}`" :native-scrollbar="false">
-        <NDataTable
-          :columns="logColumns"
-          :data="logData"
-          :loading="logLoading"
-          :row-key="row => String(row.ID ?? row.startedAt)"
-          flex-height
-          :bordered="false"
-        />
-        <div class="flex justify-end mt-16px">
-          <NPagination v-bind="logPagination" />
-        </div>
-      </NDrawerContent>
-    </NDrawer>
+    <TimedTaskLogDrawer v-model:show="logVisible" :task-id="logTaskId" :task-name="logTaskName" />
   </div>
 </template>

@@ -17,6 +17,7 @@ export type {
   TimedTaskLog,
   TimedTaskLogListQuery,
   TimedTaskLogListResponse,
+  TimedTaskLogSearchParams,
   RegisteredMethodsResponse,
   RegisteredMethod,
   TimedTaskSearchParams

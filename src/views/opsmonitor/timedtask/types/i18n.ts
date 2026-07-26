@@ -65,17 +65,37 @@ export interface OpsMonitorTimedTaskLang {
   deleteSuccess: string;
   log: {
     title: string;
-    trigger: string;
-    auto: string;
-    manual: string;
-    status: string;
-    success: string;
-    failed: string;
-    startedAt: string;
-    duration: string;
-    close: string;
-    noDetail: string;
-    error: string;
-    output: string;
+    search: {
+      triggerType: string;
+      status: string;
+      timeRange: string;
+      search: string;
+      reset: string;
+      manual: string;
+      auto: string;
+      success: string;
+      failed: string;
+    };
+    columns: {
+      triggerType: string;
+      status: string;
+      startedAt: string;
+      finishedAt: string;
+      duration: string;
+      createdAt: string;
+      view: string;
+    };
+    detail: {
+      title: string;
+      triggerType: string;
+      status: string;
+      startedAt: string;
+      finishedAt: string;
+      duration: string;
+      createdAt: string;
+      error: string;
+      output: string;
+      close: string;
+    };
   };
 }

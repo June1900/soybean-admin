@@ -64,18 +64,38 @@ const timedTaskZhCN = {
   deleteSuccess: '删除成功',
   log: {
     title: '执行日志',
-    trigger: '触发',
-    auto: '调度',
-    manual: '手动',
-    status: '状态',
-    success: '成功',
-    failed: '失败',
-    startedAt: '开始时间',
-    duration: '耗时(ms)',
-    close: '关闭',
-    noDetail: '无详情',
-    error: '错误',
-    output: '输出'
+    search: {
+      triggerType: '触发方式',
+      status: '执行结果',
+      timeRange: '执行时间',
+      search: '查询',
+      reset: '重置',
+      manual: '手动',
+      auto: '调度',
+      success: '成功',
+      failed: '失败'
+    },
+    columns: {
+      triggerType: '触发',
+      status: '状态',
+      startedAt: '开始时间',
+      finishedAt: '结束时间',
+      duration: '耗时(ms)',
+      createdAt: '记录时间',
+      view: '详情'
+    },
+    detail: {
+      title: '执行详情',
+      triggerType: '触发方式',
+      status: '执行结果',
+      startedAt: '开始时间',
+      finishedAt: '结束时间',
+      duration: '耗时(ms)',
+      createdAt: '记录时间',
+      error: '错误信息',
+      output: '输出内容',
+      close: '关闭'
+    }
   }
 };
 

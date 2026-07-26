@@ -20,10 +20,14 @@ export interface TimedTask {
 /** 定时任务执行日志 */
 export interface TimedTaskLog {
   ID?: number;
+  CreatedAt?: string;
+  UpdatedAt?: string;
   taskId?: number;
+  taskName?: string;
   triggerType: 'auto' | 'manual';
   status: 'success' | 'failed';
   startedAt?: string;
+  finishedAt?: string;
   durationMs?: number;
   errorMsg?: string;
   output?: string;
@@ -65,6 +69,10 @@ export interface TimedTaskLogListQuery {
   page?: number;
   pageSize?: number;
   taskId?: number;
+  triggerType?: 'manual' | 'auto';
+  status?: 'success' | 'failed';
+  startCreatedAt?: string;
+  endCreatedAt?: string;
 }
 
 /** 日志列表响应结构 */
@@ -73,6 +81,15 @@ export interface TimedTaskLogListResponse {
   total: number;
   page: number;
   pageSize: number;
+}
+
+/** 执行日志前端搜索表单模型 */
+export interface TimedTaskLogSearchParams {
+  taskId: number | null;
+  triggerType: '' | 'manual' | 'auto';
+  status: '' | 'success' | 'failed';
+  startCreatedAt: string;
+  endCreatedAt: string;
 }
 
 /** 已注册方法列表响应 */
