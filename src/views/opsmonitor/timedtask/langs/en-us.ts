@@ -3,6 +3,7 @@ const timedTaskEnUS = {
   search: {
     name: 'Name',
     executorType: 'Executor',
+    enabled: 'Enabled',
     method: 'Method',
     http: 'HTTP',
     search: 'Search',
@@ -23,7 +24,8 @@ const timedTaskEnUS = {
     trigger: 'Trigger',
     logs: 'Logs',
     edit: 'Edit',
-    delete: 'Delete'
+    delete: 'Delete',
+    cannotDeleteEnabled: 'Enabled tasks cannot be deleted'
   },
   form: {
     title: 'New Timed Task',

@@ -22,6 +22,11 @@ const executorTypeOptions = computed(() => [
   { label: $t('page.opsMonitor.timedTask.search.http'), value: 'http' }
 ]);
 
+const enabledOptions = computed(() => [
+  { label: $t('page.opsMonitor.timedTask.enable'), value: '1' },
+  { label: $t('page.opsMonitor.timedTask.disable'), value: '0' }
+]);
+
 const defaultModel = jsonClone(toRaw(model.value));
 
 function resetModel() {
@@ -62,7 +67,15 @@ async function search() {
             >
               <NSelect v-model:value="model.executorType" clearable :options="executorTypeOptions" />
             </NFormItemGi>
-            <NFormItemGi span="24 m:12" class="pr-24px">
+            <NFormItemGi
+              span="24 s:12 m:6"
+              :label="$t('page.opsMonitor.timedTask.search.enabled')"
+              path="enabled"
+              class="pr-24px"
+            >
+              <NSelect v-model:value="model.enabled" clearable :options="enabledOptions" />
+            </NFormItemGi>
+            <NFormItemGi span="24 m:6" class="pr-24px">
               <NSpace class="w-full" justify="end">
                 <NButton @click="reset">
                   <template #icon>

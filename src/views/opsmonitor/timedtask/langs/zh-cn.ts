@@ -3,6 +3,7 @@ const timedTaskZhCN = {
   search: {
     name: '任务名',
     executorType: '执行器',
+    enabled: '是否启用',
     method: '注册方法',
     http: 'HTTP',
     search: '查询',
@@ -23,7 +24,8 @@ const timedTaskZhCN = {
     trigger: '触发',
     logs: '日志',
     edit: '编辑',
-    delete: '删除'
+    delete: '删除',
+    cannotDeleteEnabled: '启用中的任务不可删除'
   },
   form: {
     title: '新增定时任务',

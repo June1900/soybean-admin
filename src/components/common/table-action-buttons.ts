@@ -1,5 +1,5 @@
 import { defineComponent, h, type PropType, type VNode } from 'vue';
-import { NButton, NPopconfirm, NSpace } from 'naive-ui';
+import { NButton, NPopconfirm, NTooltip, NSpace } from 'naive-ui';
 import SvgIcon from '@/components/custom/svg-icon.vue';
 import { $t } from '@/locales';
 
@@ -20,6 +20,11 @@ export interface TableActionItem {
   type?: TableActionButtonType;
   /** Disable the button. */
   disabled?: boolean;
+  /**
+   * 鼠标悬停时显示的提示文字。通常用于解释按钮为何不可用（如被禁用）。
+   * 提示会用 span 包裹按钮，使按钮在禁用状态下也能正常显示提示（禁用按钮本身会吞掉鼠标事件）。
+   */
+  tooltip?: string;
   /** Click handler for a plain button. */
   onClick?: () => void;
   /** When provided, render the button as a confirm-before-action (delete) button. */
@@ -84,6 +89,20 @@ export const TableActionButtons = defineComponent({
         }
       );
 
+      // 用 span 包裹按钮并挂上 tooltip，使按钮在禁用状态下悬停也能显示提示
+      // （禁用的 NButton 会吞掉鼠标事件，套一层 span 即可正常触发）
+      let node: VNode = button;
+      if (action.tooltip) {
+        node = h(
+          NTooltip,
+          { trigger: 'hover' },
+          {
+            trigger: () => h('span', { style: 'display: inline-block' }, () => button),
+            default: () => action.tooltip!
+          }
+        );
+      }
+
       if (action.popconfirm) {
         return h(
           NPopconfirm,
@@ -93,13 +112,13 @@ export const TableActionButtons = defineComponent({
             negativeText: action.popconfirm.negativeText
           },
           {
-            trigger: () => button,
+            trigger: () => node,
             default: () => action.popconfirm!.content
           }
         );
       }
 
-      return button;
+      return node;
     }
 
     return () =>

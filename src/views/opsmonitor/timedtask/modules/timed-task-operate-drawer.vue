@@ -107,9 +107,7 @@ function closeDrawer() {
   <NDrawer :show="visible" display-directive="show" :width="520" @mask-click="closeDrawer" @close="closeDrawer">
     <NDrawerContent
       :title="
-        $t(
-          operateType === 'edit' ? 'page.opsMonitor.timedTask.form.editTitle' : 'page.opsMonitor.timedTask.form.title'
-        )
+        $t(operateType === 'edit' ? 'page.opsMonitor.timedTask.form.editTitle' : 'page.opsMonitor.timedTask.form.title')
       "
       :native-scrollbar="false"
     >

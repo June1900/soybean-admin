@@ -4,6 +4,7 @@ export interface OpsMonitorTimedTaskLang {
   search: {
     name: string;
     executorType: string;
+    enabled: string;
     method: string;
     http: string;
     search: string;
@@ -25,6 +26,7 @@ export interface OpsMonitorTimedTaskLang {
     logs: string;
     edit: string;
     delete: string;
+    cannotDeleteEnabled: string;
   };
   form: {
     title: string;

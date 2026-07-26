@@ -25,13 +25,14 @@ defineOptions({
 
 const appStore = useAppStore();
 
-/* ---------- search ---------- */
+/* ---------- 搜索区 ---------- */
 const searchParams = reactive<TimedTaskSearchParams>({
   name: '',
-  executorType: ''
+  executorType: '',
+  enabled: ''
 });
 
-/* ---------- table ---------- */
+/* ---------- 表格 ---------- */
 type TimedTaskListApiResponse = Awaited<ReturnType<typeof fetchGetTimedTaskList>>;
 
 const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagination } = useNaivePaginatedTable<
@@ -69,10 +70,13 @@ function getQueryParams() {
   };
   if (searchParams.name) params.name = searchParams.name;
   if (searchParams.executorType) params.executorType = searchParams.executorType;
+  // NSelect 不支持布尔值，这里把字符串 '1'/'0' 转成布尔传给后端
+  if (searchParams.enabled === '1') params.enabled = true;
+  else if (searchParams.enabled === '0') params.enabled = false;
   return params;
 }
 
-/* ---------- operate (add / edit / delete) ---------- */
+/* ---------- 操作（新增 / 编辑 / 删除） ---------- */
 const {
   drawerVisible,
   closeDrawer,
@@ -85,7 +89,7 @@ const {
   onDeleted
 } = useTableOperate<TimedTask>(data, 'ID', getData);
 
-/* ---------- row actions ---------- */
+/* ---------- 行内操作 ---------- */
 async function handleToggle(row: TimedTask, enabled: boolean) {
   const { error } = await fetchToggleTimedTask(row.ID, enabled);
   if (!error) {
@@ -119,7 +123,7 @@ async function handleBatchDelete() {
   await onBatchDeleted();
 }
 
-/* ---------- log drawer (separate pagination) ---------- */
+/* ---------- 日志抽屉（独立分页） ---------- */
 const logVisible = ref(false);
 const logData = ref<TimedTaskLog[]>([]);
 const logLoading = ref(false);
@@ -216,13 +220,15 @@ const logColumns: NaiveUI.TableColumn<TimedTaskLog>[] = [
   { key: 'durationMs', title: $t('page.opsMonitor.timedTask.log.duration'), width: 110 }
 ];
 
-/* ---------- columns ---------- */
+/* ---------- 列定义 ---------- */
 function createAllColumns(): NaiveUI.TableColumn<TimedTask>[] {
   return [
     {
       type: 'selection',
       align: 'center',
-      width: 48
+      width: 48,
+      // 启用状态的任务不允许删除，故禁用其复选框
+      disabled: (row: TimedTask) => row.enabled === true
     },
     {
       key: 'index',
@@ -304,6 +310,8 @@ function createAllColumns(): NaiveUI.TableColumn<TimedTask>[] {
               kind: 'delete',
               icon: 'material-symbols:delete',
               type: 'error',
+              disabled: row.enabled,
+              tooltip: row.enabled ? $t('page.opsMonitor.timedTask.columns.cannotDeleteEnabled') : undefined,
               popconfirm: {
                 content: $t('page.opsMonitor.timedTask.deleteConfirm'),
                 onPositiveClick: () => handleDelete(row.ID)
@@ -331,6 +339,7 @@ function createAllColumns(): NaiveUI.TableColumn<TimedTask>[] {
           v-model:columns="columnChecks"
           :disabled-delete="checkedRowKeys.length === 0"
           :loading="loading"
+          :show-batch-delete="true"
           @add="handleAdd"
           @delete="handleBatchDelete"
           @refresh="getData"
@@ -362,10 +371,7 @@ function createAllColumns(): NaiveUI.TableColumn<TimedTask>[] {
     </NCard>
 
     <NDrawer v-model:show="logVisible" :width="640" placement="right">
-      <NDrawerContent
-        :title="`${$t('page.opsMonitor.timedTask.log.title')}：${logTaskName}`"
-        :native-scrollbar="false"
-      >
+      <NDrawerContent :title="`${$t('page.opsMonitor.timedTask.log.title')}：${logTaskName}`" :native-scrollbar="false">
         <NDataTable
           :columns="logColumns"
           :data="logData"

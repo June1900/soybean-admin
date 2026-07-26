@@ -22,7 +22,7 @@ export type {
   TimedTaskSearchParams
 } from './types';
 
-/** Get paginated timed task list (GET) */
+/** 获取定时任务分页列表（GET） */
 export function fetchGetTimedTaskList(params?: TimedTaskListQuery) {
   return request<TimedTaskListResponse>({
     url: '/timedTask/getTimedTaskList',
@@ -31,7 +31,7 @@ export function fetchGetTimedTaskList(params?: TimedTaskListQuery) {
   });
 }
 
-/** Create a timed task */
+/** 新建定时任务 */
 export function fetchCreateTimedTask(data: TimedTaskForm) {
   return request<void>({
     url: '/timedTask/createTimedTask',
@@ -40,7 +40,7 @@ export function fetchCreateTimedTask(data: TimedTaskForm) {
   });
 }
 
-/** Update a timed task */
+/** 更新定时任务 */
 export function fetchUpdateTimedTask(data: TimedTaskForm) {
   return request<void>({
     url: '/timedTask/updateTimedTask',
@@ -49,7 +49,7 @@ export function fetchUpdateTimedTask(data: TimedTaskForm) {
   });
 }
 
-/** Delete a timed task */
+/** 删除定时任务 */
 export function fetchDeleteTimedTask(id: number) {
   return request<void>({
     url: '/timedTask/deleteTimedTask',
@@ -58,7 +58,7 @@ export function fetchDeleteTimedTask(id: number) {
   });
 }
 
-/** Enable / disable a timed task */
+/** 启用 / 停用定时任务 */
 export function fetchToggleTimedTask(id: number, enabled: boolean) {
   return request<void>({
     url: '/timedTask/toggleTimedTask',
@@ -67,7 +67,7 @@ export function fetchToggleTimedTask(id: number, enabled: boolean) {
   });
 }
 
-/** Trigger a task immediately (run once) */
+/** 立即触发任务（执行一次） */
 export function fetchTriggerTimedTask(id: number) {
   return request<void>({
     url: '/timedTask/triggerTimedTask',
@@ -76,7 +76,7 @@ export function fetchTriggerTimedTask(id: number) {
   });
 }
 
-/** Get execution logs for a task (GET) */
+/** 获取任务执行日志（GET） */
 export function fetchGetTimedTaskLogList(params?: TimedTaskLogListQuery) {
   return request<TimedTaskLogListResponse>({
     url: '/timedTask/getTimedTaskLogList',
@@ -85,7 +85,7 @@ export function fetchGetTimedTaskLogList(params?: TimedTaskLogListQuery) {
   });
 }
 
-/** Get registered task methods on the backend */
+/** 获取后端已注册的任务方法 */
 export async function fetchRegisteredMethods() {
   const { data, error } = await request<RegisteredMethodsResponse>({
     url: '/timedTask/getRegisteredMethods',
