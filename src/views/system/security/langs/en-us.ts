@@ -3,7 +3,7 @@ import type { SystemSecurityLang } from '../types';
 const lang: SystemSecurityLang = {
   title: 'Security Settings',
   save: 'Save',
-  saved: 'Security config saved (local demo)',
+  saved: 'Security config saved',
   tabs: {
     captcha: 'Captcha',
     password: 'Password Policy',
@@ -12,32 +12,33 @@ const lang: SystemSecurityLang = {
     expire: 'Password Expiry'
   },
   captcha: {
-    open: 'Enable Captcha',
-    timeout: 'Captcha TTL (s)',
-    keyLong: 'Key Length',
-    imgWidth: 'Image Width',
-    imgHeight: 'Image Height'
+    open: 'Show captcha after N failures',
+    openTip: '0 = captcha required every time',
+    timeout: 'Count cache timeout (s)',
+    keyLong: 'Captcha length',
+    imgWidth: 'Captcha width',
+    imgHeight: 'Captcha height'
   },
   password: {
-    minLength: 'Min Length',
-    requireUpper: 'Require Uppercase',
-    requireLower: 'Require Lowercase',
-    requireDigit: 'Require Digit',
-    requireSpecial: 'Require Special'
+    minLength: 'Min length',
+    requireUpper: 'Require uppercase',
+    requireLower: 'Require lowercase',
+    requireDigit: 'Require digit',
+    requireSpecial: 'Require special char'
   },
   rateLimit: {
-    enable: 'Enable Rate Limit',
+    enable: 'Enable rate limit',
     window: 'Window (s)',
-    count: 'Max Count'
+    count: 'Max count in window'
   },
   lock: {
-    enable: 'Enable Lockout',
-    threshold: 'Threshold (times)',
-    duration: 'Duration (min)'
+    enable: 'Enable failure lock',
+    threshold: 'Failure threshold',
+    duration: 'Lock duration (min)'
   },
   expire: {
-    enable: 'Enable Expiry',
-    days: 'Expiry Days'
+    enable: 'Enable password expiry',
+    days: 'Valid days'
   }
 };
 

@@ -1,6 +1,6 @@
 /** 安全设置（UI-only mock，无真实接口） */
 export interface SecurityConfig {
-  captchaOpen: boolean;
+  captchaOpen: number;
   captchaTimeout: number;
   keyLong: number;
   imgWidth: number;

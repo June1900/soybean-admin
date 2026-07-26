@@ -3,7 +3,7 @@ import type { SystemSecurityLang } from '../types';
 const lang: SystemSecurityLang = {
   title: '安全设置',
   save: '保存',
-  saved: '安全配置已保存（本地演示）',
+  saved: '安全配置已保存',
   tabs: {
     captcha: '验证码',
     password: '密码复杂度',
@@ -12,11 +12,12 @@ const lang: SystemSecurityLang = {
     expire: '密码过期'
   },
   captcha: {
-    open: '启用验证码',
-    timeout: '验证码有效期(秒)',
-    keyLong: '字符长度',
-    imgWidth: '图片宽度',
-    imgHeight: '图片高度'
+    open: '错误N次后出验证码',
+    openTip: '0 = 每次都需要验证码',
+    timeout: '计数缓存超时(秒)',
+    keyLong: '验证码长度',
+    imgWidth: '验证码宽度',
+    imgHeight: '验证码高度'
   },
   password: {
     minLength: '最小长度',
@@ -26,18 +27,18 @@ const lang: SystemSecurityLang = {
     requireSpecial: '需特殊字符'
   },
   rateLimit: {
-    enable: '启用限流',
-    window: '时间窗口(秒)',
-    count: '最大次数'
+    enable: '开启限流',
+    window: '窗口(秒)',
+    count: '窗口内最大次数'
   },
   lock: {
-    enable: '启用失败锁定',
-    threshold: '锁定阈值(次)',
+    enable: '开启失败锁定',
+    threshold: '失败次数阈值',
     duration: '锁定时长(分钟)'
   },
   expire: {
-    enable: '启用密码过期',
-    days: '过期天数'
+    enable: '开启密码过期',
+    days: '有效天数'
   }
 };
 

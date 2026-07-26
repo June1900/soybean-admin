@@ -11,6 +11,7 @@ export interface SystemSecurityLang {
   };
   captcha: {
     open: string;
+    openTip: string;
     timeout: string;
     keyLong: string;
     imgWidth: string;

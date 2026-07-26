@@ -1,13 +1,21 @@
-import type { FlatResponseData } from '@sa/axios';
+import { request } from '@/service/request';
 import type { SecurityConfig } from './types';
 
 export type { SecurityConfig } from './types';
 
-/** UI-only：保存为本地 mock，不对接真实接口 */
-function resolve<T>(data: T): FlatResponseData<any, T> {
-  return { data, error: null } as unknown as FlatResponseData<any, T>;
+/** 获取安全配置 */
+export function fetchGetSecurityConfig() {
+  return request<SecurityConfig>({
+    url: '/securityConfig/getSecurityConfig',
+    method: 'get'
+  });
 }
 
-export async function saveSecurityConfig(_config: SecurityConfig): Promise<FlatResponseData<any, null>> {
-  return resolve(null);
+/** 保存安全配置 */
+export function saveSecurityConfig(config: SecurityConfig) {
+  return request<null>({
+    url: '/securityConfig/setSecurityConfig',
+    method: 'post',
+    data: config
+  });
 }
