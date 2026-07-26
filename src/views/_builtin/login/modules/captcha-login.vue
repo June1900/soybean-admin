@@ -26,30 +26,26 @@ const model: FormModel = reactive({
   code: ''
 });
 
-/** base64 image data url of the captcha */
+/** 验证码图片的 base64 data url */
 const picPath = ref('');
-/** captcha id returned by `/base/captcha`, used when submitting login */
+/** 由 `/base/captcha` 返回的验证码 id，登录提交时使用 */
 const captchaId = ref('');
-/** expected length of the captcha code, used to limit the input */
+/** 验证码预期长度，用于限制输入位数 */
 const captchaLength = ref(0);
 
 const rules = computed<Record<keyof FormModel, App.Global.FormRule[]>>(() => {
-  // inside computed to make locale reactive, if not apply i18n, you can define it without computed
-  const { formRules } = useFormRules();
+  const { formRules, createRequiredRule } = useFormRules();
 
   return {
     userName: formRules.userName,
     password: formRules.pwd,
-    code: formRules.code
+    code: [createRequiredRule($t('form.code.required'))]
   };
 });
 
-/** Fetch captcha from `/base/captcha` and refresh the image */
 async function getCaptcha() {
   startLoading();
-
   const { error, data } = await fetchGetCaptcha();
-
   if (!error && data) {
     picPath.value = data.picPath;
     captchaId.value = data.captchaId;
@@ -57,7 +53,6 @@ async function getCaptcha() {
   } else {
     window.$message?.error($t('page.login.captchaLogin.getCaptchaFail'));
   }
-
   endLoading();
 }
 
@@ -65,8 +60,7 @@ async function handleSubmit() {
   await validate();
   const pass = await authStore.loginByCaptcha(model.userName, model.password, model.code, captchaId.value, true);
   if (!pass) {
-    // login failed (e.g. wrong captcha), refresh captcha for retry
-    getCaptcha();
+    await getCaptcha();
   }
 }
 
@@ -122,5 +116,3 @@ onMounted(() => {
     </NSpace>
   </NForm>
 </template>
-
-<style scoped></style>
