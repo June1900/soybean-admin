@@ -3,11 +3,21 @@ import { localStg } from '@/utils/storage';
 import { fetchRefreshToken } from '../api';
 import type { RequestInstanceState } from './type';
 
-export function getAuthorization() {
+/**
+ * 根据 env 配置返回携带 token 的请求头
+ *
+ * - 字段名由 `VITE_TOKEN_HEADER_NAME` 控制（默认 `Authorization`）
+ */
+export function getAuthorizationHeaders(): Record<string, string> {
   const token = localStg.get('token');
-  const Authorization = token ? `Bearer ${token}` : null;
+  if (!token) {
+    return {};
+  }
 
-  return Authorization;
+  const headerName = import.meta.env.VITE_TOKEN_HEADER_NAME || 'Authorization';
+  const value = headerName === 'Authorization' ? `Bearer ${token}` : token;
+
+  return { [headerName]: value };
 }
 
 /** refresh token */
@@ -22,7 +32,7 @@ async function handleRefreshToken() {
     return true;
   }
 
-  resetStore();
+  await resetStore();
 
   return false;
 }

@@ -120,6 +120,12 @@ declare namespace Env {
      * Backend RSA public key (single-line base64, no PEM headers/footers, no line breaks) used to encrypt the request AES key.
      */
     readonly VITE_APP_RSA_PUBLIC_KEY?: string;
+    /**
+     * The request header name used to carry the auth token.
+     *
+     * Defaults to `Authorization` (with `Bearer ` prefix). gin-vue-admin uses `x-token` with the raw token.
+     */
+    readonly VITE_TOKEN_HEADER_NAME?: string;
   }
 }
 

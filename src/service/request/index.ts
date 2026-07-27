@@ -1,10 +1,9 @@
 import type { AxiosResponse } from 'axios';
 import { BACKEND_ERROR_CODE, createFlatRequest, createRequest } from '@sa/axios';
 import { useAuthStore } from '@/store/modules/auth';
-import { localStg } from '@/utils/storage';
 import { getServiceBaseURL } from '@/utils/service';
 import { $t } from '@/locales';
-import { getAuthorization, handleExpiredRequest, showErrorMsg } from './shared';
+import { getAuthorizationHeaders, handleExpiredRequest, showErrorMsg } from './shared';
 import { decryptResponse, encryptRequest } from '@/utils/cryptox/encrypt-interceptor';
 import type { RequestInstanceState } from './type';
 
@@ -13,10 +12,7 @@ const { baseURL, otherBaseURL } = getServiceBaseURL(import.meta.env, isHttpProxy
 
 export const request = createFlatRequest(
   {
-    baseURL,
-    headers: {
-      apifoxToken: 'XL299LiMEDZ0H5h3A29PxwQXdMJqWyY2'
-    }
+    baseURL
   },
   {
     defaultState: {
@@ -27,8 +23,7 @@ export const request = createFlatRequest(
       return response.data.data;
     },
     async onRequest(config) {
-      const Authorization = getAuthorization();
-      Object.assign(config.headers, { Authorization });
+      Object.assign(config.headers, getAuthorizationHeaders());
 
       // 非侵入式加解密:仅对标记 isEncrypt 的请求(验证码/登录)加密请求体
       await encryptRequest(config);
@@ -99,8 +94,7 @@ export const request = createFlatRequest(
       if (expiredTokenCodes.includes(responseCode)) {
         const success = await handleExpiredRequest(request.state);
         if (success) {
-          const Authorization = getAuthorization();
-          Object.assign(response.config.headers, { Authorization });
+          Object.assign(response.config.headers, getAuthorizationHeaders());
 
           return (await instance.request(response.config)) as unknown as Promise<AxiosResponse>;
         }
@@ -149,9 +143,7 @@ export const demoRequest = createRequest(
       const { headers } = config;
 
       // set token
-      const token = localStg.get('token');
-      const Authorization = token ? `Bearer ${token}` : null;
-      Object.assign(headers, { Authorization });
+      Object.assign(headers, getAuthorizationHeaders());
 
       return config;
     },
