@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, h, onMounted, reactive, ref } from 'vue';
-import dayjs from 'dayjs';
 import { NButton, NPopconfirm, NTag } from 'naive-ui';
 import { useAppStore } from '@/store/modules/app';
 import { useNaivePaginatedTable, useTableOperate } from '@/hooks/common/table';
 import { $t } from '@/locales';
+import { formatDateTime } from '@/utils/date';
 import {
   fetchOperationRecordList,
   deleteOperationRecord,
@@ -104,12 +104,6 @@ function statusTagType(status: number): 'success' | 'info' | 'warning' | 'error'
   return 'default';
 }
 
-function formatDate(val: string): string {
-  if (!val) return '-';
-  const d = dayjs(val);
-  return d.isValid() ? d.format('YYYY-MM-DD HH:mm:ss') : val;
-}
-
 /** 操作人显示：userName(nickName) */
 function operatorLabel(row: OperationRecord): string {
   if (!row.user) return '-';
@@ -148,7 +142,7 @@ function createAllColumns(): NaiveUI.TableColumn<OperationRecord>[] {
       title: $t('page.opsMonitor.operationHistory.columns.createdAt'),
       width: 180,
       sorter: 'default',
-      render: row => formatDate(row.CreatedAt)
+      render: row => formatDateTime(row.CreatedAt)
     },
     {
       key: 'status',

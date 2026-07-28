@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import dayjs from 'dayjs';
 import { NButton, NDescriptions, NDescriptionsItem, NDrawer, NDrawerContent, NScrollbar, NSpace, NTag } from 'naive-ui';
 import { $t } from '@/locales';
 import type { SysError, SysErrorLevel, SysErrorStatus } from '../api';
+import { formatDateTime } from '@/utils/date';
 
 defineOptions({ name: 'SysErrorViewDrawer' });
 
@@ -28,12 +28,6 @@ const statusTagType: Record<SysErrorStatus, 'warning' | 'info' | 'success' | 'er
 
 const levelLabel = computed(() => (props.data ? $t(`page.opsMonitor.sysError.level.${props.data.level}`) : ''));
 const statusLabel = computed(() => (props.data ? $t(`page.opsMonitor.sysError.status.${props.data.status}`) : ''));
-
-function formatDate(val: string): string {
-  if (!val) return '-';
-  const d = dayjs(val);
-  return d.isValid() ? d.format('YYYY-MM-DD HH:mm:ss') : val;
-}
 
 async function copyText(text: string) {
   if (!text) return;
@@ -64,10 +58,10 @@ function closeDrawer() {
           <NDescriptionsItem label="ID">#{{ data.ID }}</NDescriptionsItem>
           <NDescriptionsItem :label="$t('page.opsMonitor.sysError.detail.form')">{{ data.form }}</NDescriptionsItem>
           <NDescriptionsItem :label="$t('page.opsMonitor.sysError.detail.createdAt')">
-            {{ formatDate(data.CreatedAt) }}
+            {{ formatDateTime(data.CreatedAt) }}
           </NDescriptionsItem>
           <NDescriptionsItem :label="$t('page.opsMonitor.sysError.detail.updatedAt')">
-            {{ formatDate(data.UpdatedAt) }}
+            {{ formatDateTime(data.UpdatedAt) }}
           </NDescriptionsItem>
           <NDescriptionsItem :label="$t('page.opsMonitor.sysError.detail.requestId')" :span="2">
             <span class="break-all font-mono text-12px text-gray-500">{{ data.request_id || '-' }}</span>

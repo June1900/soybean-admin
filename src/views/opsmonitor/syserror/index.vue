@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, h, onMounted, reactive, ref } from 'vue';
-import dayjs from 'dayjs';
 import { NButton, NPopconfirm, NTag } from 'naive-ui';
 import { useAppStore } from '@/store/modules/app';
 import { useNaivePaginatedTable, useTableOperate } from '@/hooks/common/table';
@@ -10,7 +9,6 @@ import {
   findSysError,
   deleteSysError,
   deleteSysErrorByIds,
-  getSysErrorSolution,
   type SysError,
   type SysErrorLevel,
   type SysErrorListQuery,
@@ -23,6 +21,7 @@ import SysErrorSearch from './modules/sys-error-search.vue';
 type SysErrorListApiResponse = Awaited<ReturnType<typeof fetchSysErrorList>>;
 
 import TableActionButtons from '@/components/common/table-action-buttons';
+import { formatDateTime } from '@/utils/date';
 
 defineOptions({
   name: 'SystemToolsSysError'
@@ -79,7 +78,6 @@ const { checkedRowKeys, onDeleted, onBatchDeleted } = useTableOperate<SysError>(
 
 const viewVisible = ref(false);
 const viewData = ref<SysError | null>(null);
-const solutionLoading = ref(false);
 
 async function openView(row: SysError) {
   const { data: detail, error } = await findSysError(row.ID);
@@ -113,12 +111,6 @@ const statusTagType: Record<SysErrorStatus, 'warning' | 'info' | 'success' | 'er
   处理失败: 'error'
 };
 
-function formatDate(val: string): string {
-  if (!val) return '-';
-  const d = dayjs(val);
-  return d.isValid() ? d.format('YYYY-MM-DD HH:mm:ss') : val;
-}
-
 function createAllColumns(): NaiveUI.TableColumn<SysError>[] {
   return [
     {
@@ -138,7 +130,7 @@ function createAllColumns(): NaiveUI.TableColumn<SysError>[] {
       title: $t('page.opsMonitor.sysError.columns.createdAt'),
       width: 200,
       sorter: 'default',
-      render: row => formatDate(row.CreatedAt)
+      render: row => formatDateTime(row.CreatedAt)
     },
     {
       key: 'level',

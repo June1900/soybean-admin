@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, h, onMounted, reactive, ref } from 'vue';
-import dayjs from 'dayjs';
 import { NButton, NPopconfirm, NTag } from 'naive-ui';
 import { useAppStore } from '@/store/modules/app';
 import { useNaivePaginatedTable, useTableOperate } from '@/hooks/common/table';
@@ -19,6 +18,7 @@ import LoginLogViewDrawer from './modules/login-log-view-drawer.vue';
 type LoginLogListApiResponse = Awaited<ReturnType<typeof fetchLoginLogList>>;
 
 import TableActionButtons from '@/components/common/table-action-buttons';
+import { formatDateTime } from '@/utils/date';
 
 defineOptions({
   name: 'SystemToolsLoginLog'
@@ -137,7 +137,7 @@ function createAllColumns(): NaiveUI.TableColumn<LoginLog>[] {
       key: 'CreatedAt',
       title: $t('page.opsMonitor.loginLog.columns.createdAt'),
       minWidth: 170,
-      render: row => dayjs(row.CreatedAt).format('YYYY-MM-DD HH:mm:ss')
+      render: row => formatDateTime(row.CreatedAt)
     },
     {
       key: 'operation',

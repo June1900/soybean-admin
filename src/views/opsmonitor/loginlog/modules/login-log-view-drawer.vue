@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import dayjs from 'dayjs';
 import { NButton, NDescriptions, NDescriptionsItem, NDrawer, NDrawerContent, NSpace, NTag } from 'naive-ui';
 import { $t } from '@/locales';
+import { formatDateTime } from '@/utils/date';
 import type { LoginLog } from '../api';
 
 defineOptions({ name: 'LoginLogViewDrawer' });
@@ -19,12 +19,6 @@ const statusTagType = computed<'success' | 'error'>(() => (props.data?.status ? 
 const statusText = computed(() =>
   props.data?.status ? $t('page.opsMonitor.loginLog.search.success') : $t('page.opsMonitor.loginLog.search.fail')
 );
-
-function formatDate(val: string): string {
-  if (!val) return '-';
-  const d = dayjs(val);
-  return d.isValid() ? d.format('YYYY-MM-DD HH:mm:ss') : val;
-}
 
 function displayField(val: string): string {
   if (!val || val === '') return $t('page.opsMonitor.loginLog.placeholder.none');
@@ -51,7 +45,7 @@ function closeDrawer() {
             </NTag>
           </NDescriptionsItem>
           <NDescriptionsItem :label="$t('page.opsMonitor.loginLog.detail.createdAt')">
-            {{ formatDate(data.CreatedAt) }}
+            {{ formatDateTime(data.CreatedAt) }}
           </NDescriptionsItem>
           <NDescriptionsItem :label="$t('page.opsMonitor.loginLog.detail.username')">
             {{ data.username || '-' }}

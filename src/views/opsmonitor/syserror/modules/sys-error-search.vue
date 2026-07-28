@@ -5,6 +5,7 @@ import { jsonClone } from '@sa/utils';
 import { useNaiveForm } from '@/hooks/common/form';
 import { $t } from '@/locales';
 import type { SysErrorSearchParams } from '../api';
+import { formatDateTime } from '@/utils/date';
 
 defineOptions({ name: 'SysErrorSearch' });
 
@@ -28,8 +29,8 @@ const createdAtRange = computed<[number, number] | null>({
   },
   set(val: [number, number] | null) {
     if (val && val.length === 2) {
-      model.value.startCreatedAt = dayjs(val[0]).format('YYYY-MM-DD HH:mm:ss');
-      model.value.endCreatedAt = dayjs(val[1]).format('YYYY-MM-DD HH:mm:ss');
+      model.value.startCreatedAt = formatDateTime(val[0]);
+      model.value.endCreatedAt = formatDateTime(val[1]);
     } else {
       model.value.startCreatedAt = '';
       model.value.endCreatedAt = '';

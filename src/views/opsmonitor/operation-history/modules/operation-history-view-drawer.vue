@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import dayjs from 'dayjs';
 import { NButton, NDescriptions, NDescriptionsItem, NDrawer, NDrawerContent, NScrollbar, NSpace, NTag } from 'naive-ui';
 import { $t } from '@/locales';
+import { formatDateTime } from '@/utils/date';
 import type { OperationRecord } from '../api';
 
 defineOptions({ name: 'OperationHistoryViewDrawer' });
@@ -37,12 +37,6 @@ const operatorLabel = computed(() => {
   const { userName, nickName } = props.data.user;
   return nickName ? `${userName}(${nickName})` : userName;
 });
-
-function formatDate(val: string): string {
-  if (!val) return '-';
-  const d = dayjs(val);
-  return d.isValid() ? d.format('YYYY-MM-DD HH:mm:ss') : val;
-}
 
 function displayField(val: string): string {
   if (!val || val === '') return $t('page.opsMonitor.operationHistory.placeholder.none');
@@ -91,10 +85,10 @@ function closeDrawer() {
             {{ data.latency_ms }} ms
           </NDescriptionsItem>
           <NDescriptionsItem :label="$t('page.opsMonitor.operationHistory.detail.createdAt')">
-            {{ formatDate(data.CreatedAt) }}
+            {{ formatDateTime(data.CreatedAt) }}
           </NDescriptionsItem>
           <NDescriptionsItem :label="$t('page.opsMonitor.operationHistory.detail.updatedAt')">
-            {{ formatDate(data.UpdatedAt) }}
+            {{ formatDateTime(data.UpdatedAt) }}
           </NDescriptionsItem>
           <NDescriptionsItem :label="$t('page.opsMonitor.operationHistory.detail.deviceId')">
             {{ displayField(data.device_id) }}
