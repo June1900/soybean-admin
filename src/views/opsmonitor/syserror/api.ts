@@ -42,15 +42,6 @@ export function deleteSysErrorByIds(ids: number[]) {
   return request<void>({
     url: '/sysError/deleteSysErrorByIds',
     method: 'delete',
-    params: { IDs: ids.join(',') }
-  });
-}
-
-/** 触发 AI 错误处理（异步） */
-export function getSysErrorSolution(id: number) {
-  return request<void>({
-    url: '/sysError/getSysErrorSolution',
-    method: 'get',
-    params: { id }
+    data: { IDs: ids.map(id => String(id)) }
   });
 }

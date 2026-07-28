@@ -4,6 +4,7 @@ import { NButton, NDescriptions, NDescriptionsItem, NDrawer, NDrawerContent, NSc
 import { $t } from '@/locales';
 import { formatDateTime } from '@/utils/date';
 import type { OperationRecord } from '../api';
+import { statusTagType } from '../share';
 
 defineOptions({ name: 'OperationHistoryViewDrawer' });
 
@@ -13,24 +14,6 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{ close: [] }>();
-
-/** 状态码 → tag 类型 */
-function statusTagType(status: number): 'success' | 'info' | 'warning' | 'error' | 'default' {
-  if (status >= 200 && status < 300) return 'success';
-  if (status >= 300 && status < 400) return 'info';
-  if (status >= 400 && status < 500) return 'warning';
-  if (status >= 500) return 'error';
-  return 'default';
-}
-
-/** 状态码 → 文案 */
-function statusText(status: number): string {
-  if (status >= 200 && status < 300) return $t('page.opsMonitor.operationHistory.statusText.success');
-  if (status >= 300 && status < 400) return $t('page.opsMonitor.operationHistory.statusText.redirect');
-  if (status >= 400 && status < 500) return $t('page.opsMonitor.operationHistory.statusText.clientError');
-  if (status >= 500) return $t('page.opsMonitor.operationHistory.statusText.serverError');
-  return String(status);
-}
 
 const operatorLabel = computed(() => {
   if (!props.data?.user) return '-';
@@ -64,16 +47,19 @@ function closeDrawer() {
       <div v-if="data" class="flex flex-col gap-16px">
         <NDescriptions label-placement="top" :column="2" bordered>
           <NDescriptionsItem label="ID">#{{ data.ID }}</NDescriptionsItem>
+          <NDescriptionsItem :label="$t('page.opsMonitor.operationHistory.detail.ip')">
+            {{ data.ip || '-' }}
+          </NDescriptionsItem>
+          <NDescriptionsItem :label="$t('page.opsMonitor.operationHistory.detail.userId')">
+            {{ data.user_id }}
+          </NDescriptionsItem>
           <NDescriptionsItem :label="$t('page.opsMonitor.operationHistory.detail.operator')">
             {{ operatorLabel }}
           </NDescriptionsItem>
           <NDescriptionsItem :label="$t('page.opsMonitor.operationHistory.detail.statusCode')">
             <NTag :type="statusTagType(data.status)" size="small" :bordered="false" round>
-              {{ data.status }} {{ statusText(data.status) }}
+              {{ data.status }}
             </NTag>
-          </NDescriptionsItem>
-          <NDescriptionsItem :label="$t('page.opsMonitor.operationHistory.detail.ip')">
-            {{ data.ip || '-' }}
           </NDescriptionsItem>
           <NDescriptionsItem :label="$t('page.opsMonitor.operationHistory.detail.method')">
             <NTag type="default" size="small" :bordered="false">{{ data.method }}</NTag>
@@ -87,14 +73,8 @@ function closeDrawer() {
           <NDescriptionsItem :label="$t('page.opsMonitor.operationHistory.detail.createdAt')">
             {{ formatDateTime(data.CreatedAt) }}
           </NDescriptionsItem>
-          <NDescriptionsItem :label="$t('page.opsMonitor.operationHistory.detail.updatedAt')">
-            {{ formatDateTime(data.UpdatedAt) }}
-          </NDescriptionsItem>
           <NDescriptionsItem :label="$t('page.opsMonitor.operationHistory.detail.deviceId')">
             {{ displayField(data.device_id) }}
-          </NDescriptionsItem>
-          <NDescriptionsItem :label="$t('page.opsMonitor.operationHistory.detail.userId')">
-            {{ data.user_id }}
           </NDescriptionsItem>
         </NDescriptions>
 

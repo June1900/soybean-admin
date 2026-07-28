@@ -19,6 +19,7 @@ import OperationHistorySearch from './modules/operation-history-search.vue';
 type OperationHistoryListApiResponse = Awaited<ReturnType<typeof fetchOperationRecordList>>;
 
 import TableActionButtons from '@/components/common/table-action-buttons';
+import { statusTagType } from '@/views/opsmonitor/operation-history/share';
 
 defineOptions({
   name: 'OpsMonitorOperationHistory'
@@ -72,7 +73,6 @@ const scrollX = computed(() =>
   }, 0)
 );
 
-/* ---------- operate ---------- */
 const { checkedRowKeys, onDeleted, onBatchDeleted } = useTableOperate<OperationRecord>(data, 'ID', getData);
 
 const viewVisible = ref(false);
@@ -93,15 +93,6 @@ async function handleBatchDelete() {
   if (ids.length === 0) return;
   const { error } = await deleteOperationRecordByIds(ids);
   if (!error) await onBatchDeleted();
-}
-
-/** 状态码 → tag 类型 */
-function statusTagType(status: number): 'success' | 'info' | 'warning' | 'error' | 'default' {
-  if (status >= 200 && status < 300) return 'success';
-  if (status >= 300 && status < 400) return 'info';
-  if (status >= 400 && status < 500) return 'warning';
-  if (status >= 500) return 'error';
-  return 'default';
 }
 
 /** 操作人显示：userName(nickName) */
@@ -163,6 +154,19 @@ function createAllColumns(): NaiveUI.TableColumn<OperationRecord>[] {
       ellipsis: { tooltip: true }
     },
     {
+      key: 'method',
+      title: $t('page.opsMonitor.operationHistory.columns.method'),
+      width: 100,
+      align: 'center',
+      render: row => h(NTag, { type: 'default', size: 'small', bordered: false }, { default: () => row.method })
+    },
+    {
+      key: 'path',
+      title: $t('page.opsMonitor.operationHistory.columns.path'),
+      minWidth: 200,
+      ellipsis: { tooltip: true }
+    },
+    {
       key: 'request_id',
       title: $t('page.opsMonitor.operationHistory.columns.requestId'),
       width: 220,
@@ -182,19 +186,6 @@ function createAllColumns(): NaiveUI.TableColumn<OperationRecord>[] {
       width: 100,
       align: 'center',
       render: row => displayField(row.device_id)
-    },
-    {
-      key: 'method',
-      title: $t('page.opsMonitor.operationHistory.columns.method'),
-      width: 100,
-      align: 'center',
-      render: row => h(NTag, { type: 'default', size: 'small', bordered: false }, { default: () => row.method })
-    },
-    {
-      key: 'path',
-      title: $t('page.opsMonitor.operationHistory.columns.path'),
-      minWidth: 200,
-      ellipsis: { tooltip: true }
     },
     {
       key: 'operation',
