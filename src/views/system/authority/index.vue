@@ -17,7 +17,6 @@ defineOptions({
 
 const appStore = useAppStore();
 
-/* ---------- 表格 ---------- */
 type AuthorityListResponse = Awaited<ReturnType<typeof fetchGetAuthorityList>>;
 
 const { columns, columnChecks, data, getData, loading, scrollX } = useNaiveTable<AuthorityListResponse, Authority>({
@@ -37,7 +36,6 @@ const dataScopeOptions = computed(() => [
 
 const dataScopeTagType = (value: number) => (value === 1 ? 'success' : value === 5 ? 'warning' : 'default');
 
-/* ---------- 新增 / 编辑 / 删除 ---------- */
 const { drawerVisible, closeDrawer, operateType, handleAdd, editingData, handleEdit, onDeleted } =
   useTableOperate<Authority>(data, 'authorityId', getData);
 
@@ -134,7 +132,6 @@ function createAllColumns(): NaiveUI.TableColumn<Authority>[] {
   ];
 }
 
-/* ---------- 操作 ---------- */
 async function handleDelete(authorityId: number) {
   const { error } = await fetchDeleteAuthority(authorityId);
   if (!error) {

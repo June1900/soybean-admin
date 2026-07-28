@@ -64,7 +64,6 @@ function cpuBarColor(percentage: number): string {
   return themeVars.value.primaryColor;
 }
 
-/* ---------- 渐变卡片模板（参考 home 风格） ---------- */
 interface GradientBgProps {
   gradientColor: string;
 }
@@ -134,7 +133,6 @@ const cardData = computed<StatCard[]>(() => {
 
 <template>
   <div class="min-h-500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
-    <!-- ========== 渐变指标卡片 ========== -->
     <DefineGradientBg v-slot="{ $slots, gradientColor }">
       <div
         class="h-full px-16px py-14px text-white"
@@ -169,9 +167,8 @@ const cardData = computed<StatCard[]>(() => {
       <div v-else class="h-200px flex-center text-14px c-gray-400"></div>
     </NSpin>
 
-    <!-- ========== 中间区域：CPU + 磁盘 ========== -->
+    <!-- ========== CPU + 磁盘 ========== -->
     <div v-if="serverInfo" class="grid grid-cols-[1fr_450px] gap-16px lt-xl:grid-cols-1">
-      <!-- CPU 核心负载 -->
       <NCard
         :title="$t('page.opsMonitor.serverStatus.cpuLoad.title')"
         :bordered="false"
@@ -239,7 +236,7 @@ const cardData = computed<StatCard[]>(() => {
       </NCard>
     </div>
 
-    <!-- ========== 底部系统信息 ========== -->
+    <!--  系统信息  -->
     <div v-if="serverInfo" class="flex items-center gap-24px text-13px c-gray-500 lt-sm:flex-wrap">
       <span>{{ $t('page.opsMonitor.serverStatus.systemInfo.os') }} {{ serverInfo.os.goos }}</span>
       <span>{{ $t('page.opsMonitor.serverStatus.systemInfo.goVersion') }} {{ serverInfo.os.goVersion }}</span>
@@ -247,7 +244,7 @@ const cardData = computed<StatCard[]>(() => {
       <span>{{ $t('page.opsMonitor.serverStatus.systemInfo.logicalCores') }} {{ serverInfo.os.numCpu }}</span>
     </div>
 
-    <!-- ========== 底部刷新提示 ========== -->
+    <!--  刷新提示  -->
     <div v-if="lastUpdateTime" class="text-right text-12px c-gray-350">
       {{ refreshInterval }} {{ $t('page.opsMonitor.serverStatus.footer.autoRefresh') }} ·
       {{ $t('page.opsMonitor.serverStatus.footer.lastUpdate') }} {{ lastUpdateTime }}

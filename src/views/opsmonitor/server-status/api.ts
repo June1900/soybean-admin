@@ -1,5 +1,5 @@
 import { request } from '@/service/request';
-import type { ServerInfoResponse, ServerInfo } from './types';
+import type { ServerInfoResponse } from './types';
 
 export type {
   ServerInfo,

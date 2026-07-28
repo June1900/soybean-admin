@@ -32,7 +32,6 @@ const emit = defineEmits<{
   (e: 'update:show', value: boolean): void;
 }>();
 
-/* ---------- 列表数据（按任务独立分页） ---------- */
 const logData = ref<TimedTaskLog[]>([]);
 const logLoading = ref(false);
 const logSearchParams = reactive<TimedTaskLogSearchParams>({
@@ -98,7 +97,6 @@ function formatTime(v?: string) {
   return v ? dayjs(v).format('YYYY-MM-DD HH:mm:ss') : '-';
 }
 
-/* ---------- 详情抽屉 ---------- */
 const detailVisible = ref(false);
 const detailData = ref<TimedTaskLog | null>(null);
 
@@ -107,7 +105,6 @@ function openDetail(row: TimedTaskLog) {
   detailVisible.value = true;
 }
 
-/* ---------- 列定义 ---------- */
 const logColumns: NaiveUI.TableColumn<TimedTaskLog>[] = [
   {
     key: 'triggerType',
@@ -182,7 +179,6 @@ const logScrollX = computed(() =>
 
 const logMaxHeight = computed(() => Math.max(360, (typeof window !== 'undefined' ? window.innerHeight : 800) - 280));
 
-/* ---------- 打开抽屉时重置筛选并加载 ---------- */
 watch(
   () => [props.show, props.taskId] as const,
   ([val]) => {

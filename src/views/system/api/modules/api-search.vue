@@ -129,5 +129,3 @@ onMounted(() => {
     </NCollapse>
   </NCard>
 </template>
-
-<style scoped></style>

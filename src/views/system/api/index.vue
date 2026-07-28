@@ -24,7 +24,6 @@ defineOptions({
 
 const appStore = useAppStore();
 
-/* 表格与分页 */
 type ApiListResponse = Awaited<ReturnType<typeof fetchGetApiList>>;
 
 const methodTagType = (method: string): 'success' | 'primary' | 'warning' | 'error' | 'info' | 'default' => {
@@ -128,7 +127,6 @@ function openRoleAssign(row: Api) {
   roleDrawerVisible.value = true;
 }
 
-/* 列定义 */
 function createAllColumns(): NaiveUI.TableColumn<Api>[] {
   return [
     {
@@ -255,5 +253,3 @@ onMounted(() => {
     </NCard>
   </div>
 </template>
-
-<style scoped></style>

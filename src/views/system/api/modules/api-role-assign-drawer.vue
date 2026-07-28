@@ -120,5 +120,3 @@ watch(
     </NDrawerContent>
   </NDrawer>
 </template>
-
-<style scoped></style>

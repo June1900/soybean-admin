@@ -24,14 +24,12 @@ defineOptions({
 
 const appStore = useAppStore();
 
-/* ---------- 搜索区 ---------- */
 const searchParams = reactive<TimedTaskSearchParams>({
   name: '',
   executorType: '',
   enabled: ''
 });
 
-/* ---------- 表格 ---------- */
 type TimedTaskListApiResponse = Awaited<ReturnType<typeof fetchGetTimedTaskList>>;
 
 const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagination } = useNaivePaginatedTable<
@@ -75,7 +73,6 @@ function getQueryParams() {
   return params;
 }
 
-/* ---------- 操作（新增 / 编辑 / 删除） ---------- */
 const {
   drawerVisible,
   closeDrawer,
@@ -88,7 +85,6 @@ const {
   onDeleted
 } = useTableOperate<TimedTask>(data, 'ID', getData);
 
-/* ---------- 行内操作 ---------- */
 async function handleToggle(row: TimedTask, enabled: boolean) {
   const { error } = await fetchToggleTimedTask(row.ID, enabled);
   if (!error) {
@@ -122,7 +118,6 @@ async function handleBatchDelete() {
   await onBatchDeleted();
 }
 
-/* ---------- 日志抽屉（独立组件） ---------- */
 const logVisible = ref(false);
 const logTaskId = ref(0);
 const logTaskName = ref('');
@@ -133,7 +128,6 @@ function openLogs(row: TimedTask) {
   logVisible.value = true;
 }
 
-/* ---------- 列定义 ---------- */
 function createAllColumns(): NaiveUI.TableColumn<TimedTask>[] {
   return [
     {
@@ -141,7 +135,7 @@ function createAllColumns(): NaiveUI.TableColumn<TimedTask>[] {
       align: 'center',
       width: 48,
       // 启用状态的任务不允许删除，故禁用其复选框
-      disabled: (row: TimedTask) => row.enabled === true
+      disabled: (row: TimedTask) => row.enabled
     },
     {
       key: 'index',
