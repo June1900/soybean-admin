@@ -22,8 +22,23 @@ const lang: SystemToolsLoginLogLang = {
     agent: 'Browser / Device',
     createdAt: 'Login Time',
     operations: 'Actions',
+    view: 'View',
     delete: 'Delete'
-  }
+  },
+  detail: {
+    title: 'Login Detail',
+    id: 'Record ID',
+    username: 'Username',
+    userId: 'User ID',
+    status: 'Status',
+    ip: 'Login IP',
+    errorMessage: 'Detail',
+    agent: 'Browser / Device',
+    createdAt: 'Login Time',
+    updatedAt: 'Updated At',
+    close: 'Close'
+  },
+  placeholder: { none: 'None' }
 };
 
 export default lang;

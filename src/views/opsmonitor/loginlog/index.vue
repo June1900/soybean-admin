@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, h, onMounted, reactive } from 'vue';
+import { computed, h, onMounted, reactive, ref } from 'vue';
 import dayjs from 'dayjs';
 import { NButton, NPopconfirm, NTag } from 'naive-ui';
 import { useAppStore } from '@/store/modules/app';
@@ -14,6 +14,7 @@ import {
   type LoginLogSearchParams
 } from './api';
 import LoginLogSearch from './modules/login-log-search.vue';
+import LoginLogViewDrawer from './modules/login-log-view-drawer.vue';
 
 type LoginLogListApiResponse = Awaited<ReturnType<typeof fetchLoginLogList>>;
 
@@ -73,6 +74,14 @@ const scrollX = computed(() =>
 );
 
 const { checkedRowKeys, onDeleted, onBatchDeleted } = useTableOperate<LoginLog>(data, 'ID', getData);
+
+const viewVisible = ref(false);
+const viewData = ref<LoginLog | null>(null);
+
+function openView(row: LoginLog) {
+  viewData.value = row;
+  viewVisible.value = true;
+}
 
 async function handleDelete(row: LoginLog) {
   const { error } = await deleteLoginLog(row.ID);
@@ -135,10 +144,16 @@ function createAllColumns(): NaiveUI.TableColumn<LoginLog>[] {
       title: $t('page.opsMonitor.loginLog.columns.operations'),
       align: 'center',
       fixed: 'right',
-      width: 120,
+      width: 180,
       render: row =>
         h(TableActionButtons, {
           actions: [
+            {
+              label: $t('page.opsMonitor.loginLog.columns.view'),
+              icon: 'material-symbols:visibility',
+              type: 'default',
+              onClick: () => openView(row)
+            },
             {
               kind: 'delete',
               icon: 'material-symbols:delete',
@@ -206,5 +221,7 @@ onMounted(() => {
         class="sm:h-full"
       />
     </NCard>
+
+    <LoginLogViewDrawer :visible="viewVisible" :data="viewData" @close="viewVisible = false" />
   </div>
 </template>

@@ -22,8 +22,23 @@ const lang: SystemToolsLoginLogLang = {
     agent: '浏览器/设备',
     createdAt: '登录时间',
     operations: '操作',
+    view: '查看',
     delete: '删除'
-  }
+  },
+  detail: {
+    title: '登录详情',
+    id: '记录ID',
+    username: '用户名',
+    userId: '用户ID',
+    status: '状态',
+    ip: '登录IP',
+    errorMessage: '详情',
+    agent: '浏览器/设备',
+    createdAt: '登录时间',
+    updatedAt: '更新时间',
+    close: '关闭'
+  },
+  placeholder: { none: '无' }
 };
 
 export default lang;
