@@ -6,7 +6,7 @@ export type { Menu, MenuBtn, MenuForm, MenuListQuery, MenuListResponse, MenuSear
 /** Get paginated menu list (flattened from the tree response). */
 export function fetchGetMenuList(params?: MenuListQuery) {
   return request<MenuListResponse>({
-    url: '/menu/getMenuList',
+    url: '/v2/menu/getMenuList',
     method: 'post',
     data: params
   });
