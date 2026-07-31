@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { computed, h, onMounted, reactive } from 'vue';
-import { NTag } from 'naive-ui';
+import { computed, h, onMounted, ref } from 'vue';
+import { NTag, NTooltip } from 'naive-ui';
 import { useAppStore } from '@/store/modules/app';
-import { useNaivePaginatedTable, useTableOperate } from '@/hooks/common/table';
+import { useNaiveTable, useTableOperate } from '@/hooks/common/table';
 import { $t } from '@/locales';
-import { fetchDeleteMenu, fetchGetMenuList, type Menu, type MenuSearchParams } from './api';
+import { fetchDeleteMenu, fetchGetMenuList, type Menu } from './api';
 import MenuOperateDrawer from './modules/menu-operate-drawer.vue';
-import MenuSearch from './modules/menu-search.vue';
 
 import TableActionButtons from '@/components/common/table-action-buttons';
+import SvgIcon from '@/components/custom/svg-icon.vue';
 
 defineOptions({
   name: 'SystemMenu'
@@ -16,49 +16,12 @@ defineOptions({
 
 const appStore = useAppStore();
 
-/* ---------- table ---------- */
-type MenuListResponse = Awaited<ReturnType<typeof fetchGetMenuList>>;
+/* ---------- table (tree) ---------- */
+type MenuTreeResponse = Awaited<ReturnType<typeof fetchGetMenuList>>;
 
-/** Flatten a menu tree into a flat list for the table. */
-function flattenMenus(list: Menu[] = [], acc: Menu[] = []): Menu[] {
-  for (const item of list) {
-    acc.push(item);
-    if (item.children?.length) {
-      flattenMenus(item.children, acc);
-    }
-  }
-  return acc;
-}
-
-const searchParams = reactive<MenuSearchParams>({
-  title: '',
-  name: '',
-  component: ''
-});
-
-const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagination } = useNaivePaginatedTable<
-  MenuListResponse,
-  Menu
->({
+const { columns, columnChecks, data, getData, loading } = useNaiveTable<MenuTreeResponse, Menu>({
   api: () => fetchGetMenuList(),
-  transform: res => {
-    const flat = flattenMenus(res.data?.list ?? []);
-    const keyword = (searchParams.title || searchParams.name || searchParams.component).toLowerCase();
-    const filtered = keyword
-      ? flat.filter(
-          m =>
-            m.meta?.title?.toLowerCase().includes(keyword) ||
-            m.name?.toLowerCase().includes(keyword) ||
-            m.component?.toLowerCase().includes(keyword)
-        )
-      : flat;
-    return {
-      data: filtered,
-      total: filtered.length,
-      pageNum: 1,
-      pageSize: filtered.length || 10
-    };
-  },
+  transform: res => res.data ?? [],
   columns: () => createAllColumns(),
   immediate: false
 });
@@ -71,17 +34,8 @@ const scrollX = computed(() =>
 );
 
 /* ---------- operate (add / edit / delete) ---------- */
-const {
-  drawerVisible,
-  closeDrawer,
-  operateType,
-  handleAdd,
-  editingData,
-  handleEdit,
-  checkedRowKeys,
-  onBatchDeleted,
-  onDeleted
-} = useTableOperate<Menu>(data, 'ID', getData);
+const { drawerVisible, closeDrawer, operateType, handleAdd, editingData, handleEdit, onDeleted } =
+  useTableOperate<Menu>(data, 'ID', getData);
 
 async function handleDelete(id: number) {
   const { error } = await fetchDeleteMenu(id);
@@ -90,57 +44,104 @@ async function handleDelete(id: number) {
   }
 }
 
-async function handleBatchDelete() {
-  for (const id of checkedRowKeys.value.map(id => Number(id))) {
-    // eslint-disable-next-line no-await-in-loop
-    await fetchDeleteMenu(id);
-  }
-  await onBatchDeleted();
-}
-
 /* ---------- columns ---------- */
+const defaultParentId = ref<number>(0);
+
 function createAllColumns(): NaiveUI.TableColumn<Menu>[] {
   return [
     {
-      type: 'selection',
+      key: 'id',
+      title: $t('page.system.menu.id'),
+      width: 100,
       align: 'center',
-      width: 48
+      render: row => row.ID
     },
-    {
-      key: 'index',
-      title: $t('page.system.menu.index'),
-      width: 70,
-      align: 'center',
-      render: (_row, index) => index + 1
-    },
-    { key: 'title', title: $t('page.system.menu.titleField'), minWidth: 160, render: row => row.meta?.title ?? '-' },
-    { key: 'name', title: $t('page.system.menu.name'), minWidth: 140 },
-    { key: 'path', title: $t('page.system.menu.path'), minWidth: 160 },
-    { key: 'component', title: $t('page.system.menu.component'), minWidth: 180 },
-    { key: 'sort', title: $t('page.system.menu.sort'), width: 80, align: 'center', render: row => row.sort ?? '-' },
     {
       key: 'icon',
       title: $t('page.system.menu.icon'),
-      width: 120,
-      render: row =>
-        row.meta?.icon ? h(NTag, { size: 'small', bordered: false }, { default: () => row.meta.icon }) : '-'
-    },
-    {
-      key: 'keepAlive',
-      title: $t('page.system.menu.keepAlive'),
       width: 100,
       align: 'center',
+      render: row => {
+        const icon = row.meta?.icon;
+        if (!icon) return '-';
+        const iconName = `material-symbols:${icon.startsWith('icon-') ? '' : icon}`;
+        return h(
+          NTooltip,
+          { showArrow: false },
+          {
+            trigger: () =>
+              h('span', { class: 'inline-flex items-center gap-4px', style: 'max-width: 100%; overflow: hidden;' }, [
+                h(SvgIcon, { icon: iconName }),
+                h('span', { style: 'overflow: hidden; text-overflow: ellipsis; white-space: nowrap;' }, () => icon)
+              ]),
+            default: () => icon
+          }
+        );
+      }
+    },
+    {
+      key: 'title',
+      title: $t('page.system.menu.titleField'),
+      minWidth: 160,
+      render: row => {
+        const text = row.meta?.title ?? '-';
+        return h(
+          NTooltip,
+          { showArrow: false },
+          {
+            trigger: () =>
+              h(
+                'span',
+                { style: 'display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;' },
+                text
+              ),
+            default: () => text
+          }
+        );
+      }
+    },
+    {
+      key: 'name',
+      title: $t('page.system.menu.name'),
+      minWidth: 130,
       render: row =>
         h(
-          NTag,
-          { size: 'small', type: row.meta?.keepAlive ? 'success' : 'default', bordered: false },
-          { default: () => (row.meta?.keepAlive ? $t('common.yesOrNo.yes') : $t('common.yesOrNo.no')) }
+          NTooltip,
+          { showArrow: false },
+          {
+            trigger: () =>
+              h(
+                'span',
+                { style: 'display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;' },
+                row.name
+              ),
+            default: () => row.name
+          }
+        )
+    },
+    {
+      key: 'path',
+      title: $t('page.system.menu.path'),
+      minWidth: 130,
+      render: row =>
+        h(
+          NTooltip,
+          { showArrow: false },
+          {
+            trigger: () =>
+              h(
+                'span',
+                { style: 'display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;' },
+                row.path
+              ),
+            default: () => row.path
+          }
         )
     },
     {
       key: 'visibility',
       title: $t('page.system.menu.visibility'),
-      width: 100,
+      width: 90,
       align: 'center',
       render: row =>
         h(
@@ -150,19 +151,54 @@ function createAllColumns(): NaiveUI.TableColumn<Menu>[] {
         )
     },
     {
+      key: 'component',
+      title: $t('page.system.menu.component'),
+      minWidth: 200,
+      render: row =>
+        h(
+          NTooltip,
+          { showArrow: false },
+          {
+            trigger: () =>
+              h(
+                'span',
+                { style: 'display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;' },
+                row.component
+              ),
+            default: () => row.component
+          }
+        )
+    },
+    {
       key: 'operation',
       title: $t('page.system.menu.operation'),
       align: 'center',
       fixed: 'right',
-      width: 190,
+      width: 400,
       render: row =>
         h(TableActionButtons, {
+          wrap: false,
           actions: [
+            {
+              label: $t('page.system.menu.addChild'),
+              icon: 'material-symbols:add',
+              type: 'primary',
+              onClick: () => {
+                defaultParentId.value = row.ID;
+                handleAdd();
+              }
+            },
             {
               kind: 'edit',
               icon: 'material-symbols:edit',
-              type: 'primary',
+              type: 'info',
               onClick: () => handleEdit(row.ID)
+            },
+            {
+              label: $t('page.system.menu.assignRole'),
+              icon: 'material-symbols:group-add',
+              type: 'warning',
+              onClick: () => {}
             },
             {
               kind: 'delete',
@@ -186,31 +222,22 @@ onMounted(() => {
 
 <template>
   <div class="min-h-500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
-    <MenuSearch v-model:model="searchParams" @search="getDataByPage" @reset="getDataByPage" />
-
     <NCard :title="$t('page.system.menu.title')" :bordered="false" size="small" class="card-wrapper sm:flex-1-hidden">
       <template #header-extra>
-        <TableHeaderOperation
-          v-model:columns="columnChecks"
-          :disabled-delete="checkedRowKeys.length === 0"
-          :loading="loading"
-          @add="handleAdd"
-          @delete="handleBatchDelete"
-          @refresh="getData"
-        />
+        <TableHeaderOperation v-model:columns="columnChecks" :loading="loading" @add="handleAdd" @refresh="getData" />
       </template>
 
       <NDataTable
-        v-model:checked-row-keys="checkedRowKeys"
         :columns="columns"
         :data="data"
         size="small"
         :flex-height="!appStore.isMobile"
         :scroll-x="scrollX"
         :loading="loading"
-        remote
         :row-key="row => String(row.ID)"
-        :pagination="mobilePagination"
+        is-tree-table
+        children-key="children"
+        :cascade="false"
         class="sm:h-full"
       />
 
@@ -218,8 +245,9 @@ onMounted(() => {
         :visible="drawerVisible"
         :operate-type="operateType"
         :editing-data="editingData"
+        :default-parent-id="defaultParentId"
         @close="closeDrawer"
-        @submitted="getDataByPage"
+        @submitted="getData"
       />
     </NCard>
   </div>

@@ -12,7 +12,7 @@ export interface SystemMenuLang {
   searchTitle: string;
   reset: string;
   operation: string;
-  index: string;
+  id: string;
   name: string;
   titleField: string;
   path: string;
@@ -32,10 +32,58 @@ export interface SystemMenuLang {
   titlePlaceholder: string;
   pathPlaceholder: string;
   componentPlaceholder: string;
+  componentType: string;
+  componentTypeDirectory: string;
+  componentTypeFile: string;
+  componentTypeManual: string;
+  componentDirPlaceholder: string;
+  componentFilePlaceholder: string;
   parentIdPlaceholder: string;
   sortPlaceholder: string;
   iconPlaceholder: string;
   addSuccess: string;
   editSuccess: string;
   deleteSuccess: string;
+  /* table operations */
+  addChild: string;
+  assignRole: string;
+  /* drawer sections */
+  rootDirectory: string;
+  selectPath: string;
+  manualInput: string;
+  componentTip: string;
+  clickToSet: string;
+  addMenuWarning: string;
+  sectionBasic: string;
+  sectionRoute: string;
+  sectionDisplay: string;
+  sectionAdvanced: string;
+  sectionParams: string;
+  sectionButtons: string;
+  /* drawer fields */
+  addParam: string;
+  sortLabel: string;
+  activeName: string;
+  activeNamePlaceholder: string;
+  transitionType: string;
+  followGlobal: string;
+  /* form validation */
+  titleRequired: string;
+  nameRequired: string;
+  componentRequired: string;
+  parentIdRequired: string;
+  pathRequired: string;
+  /* parameter table */
+  paramType: string;
+  paramKey: string;
+  paramValue: string;
+  addParamBtn: string;
+  paramEmptyTip: string;
+  paramRequiredTip: string;
+  /* button table */
+  btnName: string;
+  btnDesc: string;
+  addBtnBtn: string;
+  btnEmptyTip: string;
+  btnRequiredTip: string;
 }

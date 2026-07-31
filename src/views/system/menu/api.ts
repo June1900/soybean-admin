@@ -1,21 +1,26 @@
 import { request } from '@/service/request';
-import type { MenuForm, MenuListQuery, MenuListResponse } from './types';
+import type { Menu, MenuBtn, MenuForm } from './types';
 
-export type { Menu, MenuBtn, MenuForm, MenuListQuery, MenuListResponse, MenuSearchParams } from './types';
+export type { Menu, MenuBtn, MenuForm } from './types';
 
-/** Get paginated menu list (flattened from the tree response). */
-export function fetchGetMenuList(params?: MenuListQuery) {
-  return request<MenuListResponse>({
+/**
+ * Get the full menu tree.
+ *
+ * gin-vue-admin returns `{ code, data: Menu[], msg }`; the `request` helper's
+ * `transform` unwraps it to `response.data.data`, so the transformed payload is
+ * the `Menu[]` tree (with `children` nested) directly.
+ */
+export function fetchGetMenuList() {
+  return request<Menu[]>({
     url: '/v2/menu/getMenuList',
-    method: 'post',
-    data: params
+    method: 'post'
   });
 }
 
 /** Create a base menu. */
 export function fetchCreateMenu(data: MenuForm) {
   return request<void>({
-    url: '/menu/addBaseMenu',
+    url: '/v2/menu/addBaseMenu',
     method: 'post',
     data
   });

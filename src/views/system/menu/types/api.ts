@@ -5,6 +5,8 @@ export interface MenuMeta {
   keepAlive: boolean;
   closeTab: boolean;
   defaultMenu: boolean;
+  activeName?: string;
+  transitionType?: string;
 }
 
 /** A menu item. `ID` is the primary key (uppercase, gin-vue-admin convention). */
@@ -17,9 +19,12 @@ export interface Menu {
   sort: number;
   hidden: boolean;
   meta: MenuMeta;
-  children?: Menu[];
+  /** nested children; `null` on leaf nodes in the gin-vue-admin response */
+  children?: Menu[] | null;
   /** buttons bound to this menu (gin-vue-admin SysAuthorityBtn) */
-  menuBtn?: MenuBtn[];
+  menuBtn?: MenuBtn[] | null;
+  /** route parameters for this menu */
+  parameters?: { type: string; key: string; value: string }[];
 }
 
 /** A button bound to a menu (gin-vue-admin SysAuthorityBtn). */
@@ -39,23 +44,4 @@ export interface MenuForm {
   sort: number;
   hidden: boolean;
   meta: MenuMeta;
-}
-
-/** Query params for getMenuList */
-export interface MenuListQuery {
-  page?: number;
-  pageSize?: number;
-}
-
-/** Response of getMenuList */
-export interface MenuListResponse {
-  list: Menu[];
-  total: number;
-}
-
-/** Frontend search form model for menu list */
-export interface MenuSearchParams {
-  title: string;
-  name: string;
-  component: string;
 }
