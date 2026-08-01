@@ -28,6 +28,7 @@ export interface SystemMenuLang {
   hidden: string;
   confirmDelete: string;
   confirmBatchDelete: string;
+  deleteDisabledHasChildren: string;
   namePlaceholder: string;
   titlePlaceholder: string;
   pathPlaceholder: string;
@@ -86,4 +87,35 @@ export interface SystemMenuLang {
   addBtnBtn: string;
   btnEmptyTip: string;
   btnRequiredTip: string;
+  /* detail panel */
+  panelMenuList: string;
+  panelMenuDetail: string;
+  panelBtnPermission: string;
+  panelAddChild: string;
+  panelEdit: string;
+  panelDelete: string;
+  fieldMenuType: string;
+  fieldMenuStatus: string;
+  fieldMenuName: string;
+  fieldRoutePath: string;
+  fieldIsExternal: string;
+  fieldDisplayStatus: string;
+  fieldBtnPerm: string;
+  fieldCreateTime: string;
+  fieldSort: string;
+  typeDirectory: string;
+  typeMenu: string;
+  statusNormal: string;
+  statusDisabled: string;
+  externalYes: string;
+  externalNo: string;
+  btnEmpty: string;
+  btnAdd: string;
+  noSelectHint: string;
+  fieldLayout: string;
+  layoutBase: string;
+  layoutBlank: string;
+  layoutBaseLabel: string;
+  layoutBlankLabel: string;
+  layoutPlaceholder: string;
 }

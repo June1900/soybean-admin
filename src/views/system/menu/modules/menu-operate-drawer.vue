@@ -11,14 +11,17 @@ import {
   NForm,
   NFormItemGi,
   NGrid,
+  NIcon,
   NInput,
   NInputNumber,
   NRadioButton,
   NRadioGroup,
   NSelect,
   NSpace,
+  NTooltip,
   NTreeSelect,
-  type FormInst
+  type FormInst,
+  type TreeSelectOption
 } from 'naive-ui';
 import { $t } from '@/locales';
 import { layouts, views } from '@/router/elegant/imports';
@@ -55,9 +58,7 @@ const formRef = ref<FormInst | null>(null);
 const model = ref<MenuForm>(createDefaultModel());
 const saving = ref(false);
 /** 父节点树形选项 */
-const parentTreeOptions = ref<NaiveUI.TreeSelectOption[]>([]);
-/** 组件录入模式：directory 目录型 | file 最终文件型 | manual 手动输入 */
-const componentMode = ref<'directory' | 'file' | 'manual'>('file');
+const parentTreeOptions = ref<TreeSelectOption[]>([]);
 const addParam = ref(false);
 
 /** 目录型可选项（来源于 elegant-router 自动生成的 layouts 映射） */
@@ -66,7 +67,10 @@ const directoryOptions = computed(() =>
 );
 
 /** 递归收集 generatedRoutes 中标记为 hideInMenu 的路由 name，这些不参与选择 */
-function collectHiddenRouteNames(routes: { name?: string; meta?: { hideInMenu?: boolean }; children?: unknown[] }[] = [], acc: Set<string> = new Set()): Set<string> {
+function collectHiddenRouteNames(
+  routes: { name?: string; meta?: { hideInMenu?: boolean }; children?: unknown[] }[] = [],
+  acc: Set<string> = new Set()
+): Set<string> {
   for (const r of routes) {
     if (r.meta?.hideInMenu && r.name) acc.add(r.name);
     if (r.children?.length) collectHiddenRouteNames(r.children as typeof routes, acc);
@@ -74,7 +78,9 @@ function collectHiddenRouteNames(routes: { name?: string; meta?: { hideInMenu?: 
   return acc;
 }
 
-const hiddenRouteNames = computed(() => collectHiddenRouteNames(generatedRoutes as Parameters<typeof collectHiddenRouteNames>[0]));
+const hiddenRouteNames = computed(() =>
+  collectHiddenRouteNames(generatedRoutes as Parameters<typeof collectHiddenRouteNames>[0])
+);
 
 /** 最终文件型可选项，显示为"组件名（菜单名称）（路由路径）"，便于直观选择；hideInMenu 的路由不参与选择 */
 const fileOptions = computed(() =>
@@ -82,8 +88,8 @@ const fileOptions = computed(() =>
     .filter(k => !hiddenRouteNames.value.has(k))
     .map(k => {
       const routePath = getRoutePath(k as Parameters<typeof getRoutePath>[0]);
-      const routeTitleKey = `route.${k}`;
-      const routeTitle = $t(routeTitleKey);
+      const routeTitleKey = `route.${k}` as const;
+      const routeTitle = $t(routeTitleKey as any);
       // 未配置翻译时 $t 返回 key 本身，此时不展示菜单名称括号
       const hasTitle = routeTitle && routeTitle !== routeTitleKey;
       const suffix = [hasTitle ? routeTitle : '', routePath].filter(Boolean).join('）（');
@@ -94,12 +100,31 @@ const fileOptions = computed(() =>
     })
 );
 
-/** 组件类型可选项 */
-const componentTypeOptions = computed(() => [
-  { label: $t('page.system.menu.componentTypeDirectory'), value: 'directory' },
-  { label: $t('page.system.menu.componentTypeFile'), value: 'file' },
-  { label: $t('page.system.menu.componentTypeManual'), value: 'manual' }
+/** 组件录入模式：由菜单类型决定，目录选 layouts，菜单选 views */
+const componentMode = computed<'directory' | 'file'>(() =>
+  model.value.menuType === 'directory' ? 'directory' : 'file'
+);
+
+/** 菜单类型可选项：directory 目录 | menu 菜单 */
+const menuTypeOptions = computed(() => [
+  { label: $t('page.system.menu.typeDirectory'), value: 'directory' },
+  { label: $t('page.system.menu.typeMenu'), value: 'menu' }
 ]);
+
+/** 布局方式可选项：label 为简短文案（单选按钮显示），完整描述见 tooltip */
+const layoutOptions = computed(() => [
+  { label: $t('page.system.menu.layoutBaseLabel'), value: 'layout.base' },
+  { label: $t('page.system.menu.layoutBlankLabel'), value: 'layout.blank' }
+]);
+
+/** 切换菜单类型：选择目录时锁定布局为 layout.base，并清空已选组件 */
+function handleMenuTypeChange(val: 'directory' | 'menu') {
+  model.value.menuType = val;
+  model.value.component = '';
+  if (val === 'directory') {
+    model.value.layout = 'layout.base';
+  }
+}
 
 /** 表单校验规则：核心字段必填 */
 const formRules = computed(() => ({
@@ -131,22 +156,6 @@ const formRules = computed(() => ({
   }
 }));
 
-/** 根据已有 component 字符串推断录入模式 */
-function detectComponentMode(component: string): 'directory' | 'file' | 'manual' {
-  if (!component) return 'file';
-  // 含 $ 的单级路由组合（如 layout.base$view.home）归为手动输入
-  if (component.includes('$')) return 'manual';
-  if (component.startsWith('layout.')) return 'directory';
-  if (component.startsWith('view.')) return 'file';
-  return 'manual';
-}
-
-/** 切换组件类型时清空已选值，避免类型与值不匹配 */
-function handleComponentModeChange(val: 'directory' | 'file' | 'manual') {
-  componentMode.value = val;
-  model.value.component = '';
-}
-
 /** 选择组件文件后，自动回显对应的路由路径到 path 字段，并回显 i18n key 到 meta.title */
 function handleComponentChange(val: string) {
   model.value.component = val;
@@ -157,8 +166,8 @@ function handleComponentChange(val: string) {
       model.value.path = routePath;
     }
     // meta.title 保存 i18n 的 key（如 route.system_menu），运行时由路由模块解析为多语言文案
-    const routeTitleKey = `route.${routeName}`;
-    const routeTitle = $t(routeTitleKey);
+    const routeTitleKey = `route.${routeName}` as const;
+    const routeTitle = $t(routeTitleKey as any);
     if (routeTitle && routeTitle !== routeTitleKey) {
       model.value.meta.title = routeTitleKey;
     }
@@ -182,6 +191,8 @@ function createDefaultModel(): MenuForm {
     parentId: 0,
     sort: 0,
     hidden: false,
+    menuType: 'menu',
+    layout: 'layout.base',
     meta: {
       title: '',
       icon: '',
@@ -195,13 +206,13 @@ function createDefaultModel(): MenuForm {
 }
 
 /** 将后端菜单树构造为 NTreeSelect 选项，编辑时排除自身（同时排除其整个子树，避免形成环），隐藏菜单不参与选择 */
-function buildMenuTree(list: Menu[] = [], excludeId?: number): NaiveUI.TreeSelectOption[] {
+function buildMenuTree(list: Menu[] = [], excludeId?: number): TreeSelectOption[] {
   return list
     .filter(m => m.ID !== excludeId && !m.hidden)
     .map(m => {
-      const node: NaiveUI.TreeSelectOption = {
+      const node: TreeSelectOption = {
         key: m.ID,
-        label: m.meta?.title || m.name
+        label: m.meta?.title ? $t(m.meta.title as any) : m.name
       };
       if (m.children?.length) {
         const children = buildMenuTree(m.children, excludeId);
@@ -236,11 +247,11 @@ watch(
             parentId: props.editingData!.parentId,
             sort: props.editingData!.sort,
             hidden: props.editingData!.hidden,
+            menuType: props.editingData!.menuType ?? 'menu',
+            layout: props.editingData!.layout ?? 'layout.base',
             meta: { ...props.editingData!.meta }
           }
         : createDefaultModel();
-      // 根据现有 component 推断录入模式
-      componentMode.value = detectComponentMode(model.value.component);
       // 新增子菜单时预置父级
       if (!editing && props.defaultParentId) {
         model.value.parentId = props.defaultParentId;
@@ -409,7 +420,7 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <NDrawer :show="props.visible" display-directive="show" width="50%" @update:show="val => !val && emit('close')">
+  <NDrawer :show="props.visible" display-directive="show" :width="640" @update:show="val => !val && emit('close')">
     <NDrawerContent :title="title" :native-scrollbar="false">
       <!-- 顶部警告 -->
       <NAlert type="warning" :bordered="false" class="mb-16px">
@@ -419,60 +430,6 @@ async function handleSubmit() {
       <NForm ref="formRef" :model="model" :rules="formRules" label-placement="top">
         <!-- 基础信息 -->
         <NDivider title-placement="left">{{ $t('page.system.menu.sectionBasic') }}</NDivider>
-
-        <NGrid :cols="24" :x-gap="16" :y-gap="8">
-          <NFormItemGi :span="12" :label="$t('page.system.menu.titleField')" path="meta.title">
-            <NInput v-model:value="model.meta.title" :placeholder="$t('page.system.menu.titlePlaceholder')" />
-          </NFormItemGi>
-          <NFormItemGi :span="12" :label="$t('page.system.menu.name')" path="name">
-            <NInput v-model:value="model.name" :placeholder="$t('page.system.menu.namePlaceholder')" />
-          </NFormItemGi>
-          <NFormItemGi :span="24" :label="$t('page.system.menu.componentType')" path="componentMode">
-            <NRadioGroup v-model:value="componentMode" @update:value="handleComponentModeChange">
-              <NRadioButton
-                v-for="opt in componentTypeOptions"
-                :key="opt.value"
-                :value="opt.value"
-                :label="opt.label"
-              />
-            </NRadioGroup>
-          </NFormItemGi>
-          <NFormItemGi :span="24" :label="$t('page.system.menu.component')" path="component">
-            <!-- 目录型：从 layouts 中选择 -->
-            <NSelect
-              v-if="componentMode === 'directory'"
-              v-model:value="model.component"
-              :placeholder="$t('page.system.menu.componentDirPlaceholder')"
-              :options="directoryOptions"
-              clearable
-            />
-            <!-- 最终文件型：从 views 中选择，选中后自动回显路由路径 -->
-            <NSelect
-              v-else-if="componentMode === 'file'"
-              :value="model.component"
-              :placeholder="$t('page.system.menu.componentFilePlaceholder')"
-              :options="fileOptions"
-              filterable
-              clearable
-              @update:value="handleComponentChange"
-            />
-            <!-- 手动输入：支持单级路由组合等自定义格式 -->
-            <NInput
-              v-else
-              v-model:value="model.component"
-              :placeholder="$t('page.system.menu.componentPlaceholder')"
-            />
-            <template #feedback>
-              <NAlert type="info" :bordered="false" class="mt-4px">
-                {{ $t('page.system.menu.componentTip') }}
-                <NButton text type="primary" size="tiny">{{ $t('page.system.menu.clickToSet') }}</NButton>
-              </NAlert>
-            </template>
-          </NFormItemGi>
-        </NGrid>
-
-        <!-- 路由配置 -->
-        <NDivider title-placement="left">{{ $t('page.system.menu.sectionRoute') }}</NDivider>
 
         <NGrid :cols="24" :x-gap="16" :y-gap="8">
           <NFormItemGi :span="8" :label="$t('page.system.menu.parentId')" path="parentId">
@@ -485,7 +442,11 @@ async function handleSubmit() {
               children-field="children"
               default-expand-all
               clearable
-              @update:value="(val: number | null) => { model.parentId = val ?? 0; }"
+              @update:value="
+                (val: number | null) => {
+                  model.parentId = val ?? 0;
+                }
+              "
             />
           </NFormItemGi>
           <NFormItemGi :span="16" path="path">
@@ -496,6 +457,68 @@ async function handleSubmit() {
               </NSpace>
             </template>
             <NInput v-model:value="model.path" :placeholder="$t('page.system.menu.pathPlaceholder')" />
+          </NFormItemGi>
+        </NGrid>
+
+        <NGrid :cols="24" :x-gap="16" :y-gap="8">
+          <NFormItemGi :span="12" :label="$t('page.system.menu.fieldMenuType')" path="menuType">
+            <NRadioGroup v-model:value="model.menuType" @update:value="handleMenuTypeChange">
+              <NRadioButton v-for="opt in menuTypeOptions" :key="opt.value" :value="opt.value" :label="opt.label" />
+            </NRadioGroup>
+          </NFormItemGi>
+          <NFormItemGi :span="12" path="layout">
+            <template #label>
+              <div class="flex items-center gap-4px">
+                <span>{{ $t('page.system.menu.fieldLayout') }}</span>
+                <NTooltip trigger="hover" placement="top">
+                  <template #trigger>
+                    <NIcon class="text-14px text-gray-400 cursor-pointer">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
+                        />
+                      </svg>
+                    </NIcon>
+                  </template>
+                  {{ $t('page.system.menu.layoutBase') }}
+                  <br />
+                  {{ $t('page.system.menu.layoutBlank') }}
+                </NTooltip>
+              </div>
+            </template>
+            <NRadioGroup v-model:value="model.layout" :disabled="model.menuType === 'directory'">
+              <NRadioButton v-for="opt in layoutOptions" :key="opt.value" :value="opt.value" :label="opt.label" />
+            </NRadioGroup>
+          </NFormItemGi>
+          <NFormItemGi :span="24" :label="$t('page.system.menu.component')" path="component">
+            <!-- 目录型：从 layouts 中选择 -->
+            <NSelect
+              v-if="componentMode === 'directory'"
+              v-model:value="model.component"
+              :placeholder="$t('page.system.menu.componentDirPlaceholder')"
+              :options="directoryOptions"
+              clearable
+            />
+            <!-- 菜单型：从 views 中选择，选中后自动回显路由路径 -->
+            <NSelect
+              v-else
+              :value="model.component"
+              :placeholder="$t('page.system.menu.componentFilePlaceholder')"
+              :options="fileOptions"
+              filterable
+              clearable
+              @update:value="handleComponentChange"
+            />
+          </NFormItemGi>
+          <NFormItemGi :span="12" :label="$t('page.system.menu.titleField')" path="meta.title">
+            <NInput
+              :value="$t(model.meta.title as any)"
+              :placeholder="$t('page.system.menu.titlePlaceholder')"
+              @update:value="val => (model.meta.title = val)"
+            />
+          </NFormItemGi>
+          <NFormItemGi :span="12" :label="$t('page.system.menu.name')" path="name">
+            <NInput v-model:value="model.name" :placeholder="$t('page.system.menu.namePlaceholder')" />
           </NFormItemGi>
         </NGrid>
 
@@ -600,7 +623,11 @@ async function handleSubmit() {
         <NDivider title-placement="left">
           <NSpace align="center" :wrap="false">
             <span>{{ $t('page.system.menu.sectionParams') }}</span>
-            <NButton type="primary" size="small" @click="paramList.push({ _id: nextRowId(), type: 'query', key: '', value: '' })">
+            <NButton
+              type="primary"
+              size="small"
+              @click="paramList.push({ _id: nextRowId(), type: 'query', key: '', value: '' })"
+            >
               {{ $t('page.system.menu.addParamBtn') }}
             </NButton>
           </NSpace>

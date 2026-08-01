@@ -83,9 +83,6 @@ onBeforeUnmount(() => {
   document.body.style.userSelect = '';
 });
 
-// 左侧面板：岗位列表（已对接接口）
-
-// 从接口加载的岗位列表
 const positionList = ref<Position[]>([]);
 const positionLoading = ref(false);
 const positionKeyword = ref('');
@@ -96,7 +93,7 @@ const filteredPositions = computed(() => {
   return positionList.value.filter(p => p.name.toLowerCase().includes(kw) || p.code.toLowerCase().includes(kw));
 });
 
-/** 加载岗位列表（全量拉取，pageSize 1000） */
+// 加载岗位列表,全量拉取
 async function loadPositions() {
   positionLoading.value = true;
   try {
@@ -112,39 +109,39 @@ async function loadPositions() {
 // 当前选中的岗位（右侧面板标题来源）
 const selectedPosition = ref<Position | null>(null);
 
-/** 选中岗位并加载其成员列表 */
+// 选中岗位并加载其成员列表
 function selectPosition(pos: Position) {
   selectedPosition.value = pos;
   // 切换岗位时重置右侧搜索与勾选状态
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   memberSearch.userName = '';
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   memberSearch.nickName = '';
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   checkedMemberKeys.value = [];
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   memberPagination.page = 1;
   // 加载新选中岗位的成员列表
   loadMembers(pos.ID);
 }
 
-// 抽屉：新增 / 编辑岗位
 type DrawerOperateType = 'add' | 'edit';
 const drawerVisible = ref(false);
 const drawerOperateType = ref<DrawerOperateType>('add');
 const editingPosition = ref<Position | null>(null);
 
-/** 打开新增岗位抽屉 */
 function openAddDrawer() {
   drawerOperateType.value = 'add';
   editingPosition.value = null;
   drawerVisible.value = true;
 }
 
-/** 打开编辑岗位抽屉 */
 function openEditDrawer(pos: Position) {
   drawerOperateType.value = 'edit';
   editingPosition.value = pos;
   drawerVisible.value = true;
 }
 
-/** 关闭抽屉 */
 function closeDrawer() {
   drawerVisible.value = false;
 }
@@ -161,7 +158,7 @@ async function handleDrawerSubmitted() {
   }
 }
 
-/** 删除岗位并刷新列表 */
+// 删除岗位
 async function handleDeletePosition(id: number) {
   const { error } = await fetchDeletePosition(id);
   if (!error) {
@@ -171,13 +168,11 @@ async function handleDeletePosition(id: number) {
   }
 }
 
-// 右侧面板：成员（已对接用户列表与岗位成员接口）
-
-// 右侧表格渲染的用户列表（来自用户管理列表接口）
+// 右侧用户列表
 const members = ref<User[]>([]);
-// 用户列表总数（服务端分页用）
+// 用户列表总
 const memberTotal = ref(0);
-// 当前岗位已分配的用户 ID（来自 getPositionUsers）
+// 当前岗位已分配的用户 ID
 const selectedUserIds = ref<number[]>([]);
 const memberLoading = ref(false);
 // 保存成员操作的加载状态
@@ -190,7 +185,6 @@ const memberSearch = reactive({
 
 const checkedMemberKeys = ref<Array<string | number>>([]);
 
-// 右侧用户表格的分页状态（服务端分页）
 const memberPagination = reactive({
   page: 1,
   pageSize: 10,
@@ -199,7 +193,7 @@ const memberPagination = reactive({
   pageSizes: [10, 20, 50]
 });
 
-/** 加载当前页用户列表（带搜索条件） */
+// 加载当前页用户列表
 async function loadUserList() {
   memberLoading.value = true;
   try {
@@ -241,7 +235,7 @@ async function loadMembers(positionId?: number) {
       selectedUserIds.value = posRes.data;
       checkedMemberKeys.value = posRes.data.map(String);
     }
-    // 渲染用户列表
+
     if (!userRes.error && userRes.data) {
       members.value = userRes.data.list;
       memberTotal.value = userRes.data.total;
@@ -252,13 +246,11 @@ async function loadMembers(positionId?: number) {
   }
 }
 
-/** 点击查询：重置到第 1 页并重新加载用户列表 */
 function handleMemberQuery() {
   memberPagination.page = 1;
   loadUserList();
 }
 
-/** 重置搜索条件并重新加载用户列表 */
 function handleMemberReset() {
   memberSearch.userName = '';
   memberSearch.nickName = '';
@@ -266,14 +258,13 @@ function handleMemberReset() {
   loadUserList();
 }
 
-/** 修改每页条数：重置到第 1 页并重新加载 */
 function onMemberPageSizeChange(size: number) {
   memberPagination.pageSize = size;
   memberPagination.page = 1;
   loadUserList();
 }
 
-/** 保存当前岗位的成员关系（调用 setPositionUsers） */
+// 保存当前岗位的成员关系
 async function handleSaveMembers() {
   if (!selectedPosition.value) {
     window.$message?.warning($t('page.system.position.selectPositionFirst'));
@@ -523,7 +514,7 @@ onMounted(async () => {
 
   &:hover::after,
   &.is-dragging::after {
-    background-color: var(--theme-primary, #18a058);
+    background-color: var(--theme-primary);
     height: 64px;
   }
 }
@@ -632,11 +623,6 @@ onMounted(async () => {
   }
 
   &.is-active {
-    // 1px 主色描边，跟随主题
-    border-color: var(--theme-primary);
-    // 轻微浮起，提升精致度
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-
     // 主色淡底：opacity 叠加，兼容所有浏览器且不依赖 color-mix
     &::after {
       content: '';
@@ -658,21 +644,19 @@ onMounted(async () => {
       width: 4px;
       height: 56%;
       border-radius: 0 4px 4px 0;
-      background-color: var(--theme-primary, #18a058);
+      background-color: var(--theme-primary);
       z-index: 1;
     }
 
     .position-item__name {
-      color: var(--theme-primary, #18a058);
+      color: var(--theme-primary);
       font-weight: 600;
     }
 
-    // 选中态常驻显示操作按钮，便于快速编辑/删除
     .position-item__actions {
       display: inline-flex;
     }
 
-    // 文字、编码、操作按钮浮于淡底之上
     & > * {
       position: relative;
       z-index: 1;

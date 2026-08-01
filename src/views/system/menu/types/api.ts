@@ -18,6 +18,10 @@ export interface Menu {
   parentId: number;
   sort: number;
   hidden: boolean;
+  /** 菜单类型：directory 目录 | menu 菜单 */
+  menuType?: 'directory' | 'menu';
+  /** 布局方式：layout.base 默认布局 | layout.blank 空白布局 */
+  layout?: string;
   meta: MenuMeta;
   /** nested children; `null` on leaf nodes in the gin-vue-admin response */
   children?: Menu[] | null;
@@ -43,5 +47,9 @@ export interface MenuForm {
   parentId: number;
   sort: number;
   hidden: boolean;
+  /** 菜单类型：directory 目录 | menu 菜单 */
+  menuType?: 'directory' | 'menu';
+  /** 布局方式：layout.base 默认布局 | layout.blank 空白布局 */
+  layout?: string;
   meta: MenuMeta;
 }
