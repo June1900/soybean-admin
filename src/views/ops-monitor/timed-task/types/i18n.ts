@@ -74,7 +74,8 @@ export interface OpsMonitorTimedTaskLang {
       manual: string;
       auto: string;
       success: string;
-      failed: string;
+      fail: string;
+      timeout: string;
     };
     columns: {
       triggerType: string;

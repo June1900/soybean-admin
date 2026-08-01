@@ -10,6 +10,7 @@ import {
   fetchToggleTimedTask,
   fetchTriggerTimedTask,
   type TimedTask,
+  type TimedTaskListQuery,
   type TimedTaskSearchParams
 } from './api';
 import TimedTaskOperateDrawer from './modules/timed-task-operate-drawer.vue';
@@ -36,7 +37,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
   TimedTaskListApiResponse,
   TimedTask
 >({
-  api: () => fetchGetTimedTaskList(getQueryParams() as any),
+  api: () => fetchGetTimedTaskList(getQueryParams()),
   transform: res => {
     const body = res.data || { list: [], total: 0, page: 1, pageSize: 10 };
     return {
@@ -50,24 +51,20 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
 });
 
 const scrollX = computed(() =>
-  columns.value.reduce(
-    (acc, col) =>
-      acc +
-      ((col as { width?: number; minWidth?: number }).width ??
-        (col as { width?: number; minWidth?: number }).minWidth ??
-        120),
-    0
-  )
+  columns.value.reduce((acc, col) => {
+    const c = col as { width?: number; minWidth?: number };
+    return acc + (c.width ?? c.minWidth ?? 120);
+  }, 0)
 );
 
-function getQueryParams() {
-  const params: Record<string, unknown> = {
+function getQueryParams(): TimedTaskListQuery {
+  const params: TimedTaskListQuery = {
     page: mobilePagination.value.page,
     pageSize: mobilePagination.value.pageSize
   };
   if (searchParams.name) params.name = searchParams.name;
   if (searchParams.executorType) params.executorType = searchParams.executorType;
-  // NSelect 不支持布尔值，这里把字符串 '1'/'0' 转成布尔传给后端
+  // NSelect 用 '1'/'0' 表示启用/停用，转成布尔传后端
   if (searchParams.enabled === '1') params.enabled = true;
   else if (searchParams.enabled === '0') params.enabled = false;
   return params;
@@ -134,7 +131,7 @@ function createAllColumns(): NaiveUI.TableColumn<TimedTask>[] {
       type: 'selection',
       align: 'center',
       width: 48,
-      // 启用状态的任务不允许删除，故禁用其复选框
+      // 启用中的任务禁止删除，故禁用其复选框
       disabled: (row: TimedTask) => row.enabled
     },
     {

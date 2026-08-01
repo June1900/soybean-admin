@@ -65,19 +65,20 @@ const timedTaskEnUS = {
   log: {
     title: 'Execution Logs',
     search: {
-      triggerType: 'Trigger',
-      status: 'Status',
+      triggerType: 'Trigger Type',
+      status: 'Result',
       timeRange: 'Execution Time',
       search: 'Search',
       reset: 'Reset',
       manual: 'Manual',
       auto: 'Schedule',
       success: 'Success',
-      failed: 'Failed'
+      fail: 'Failed',
+      timeout: 'Timeout'
     },
     columns: {
-      triggerType: 'Trigger',
-      status: 'Status',
+      triggerType: 'Trigger Type',
+      status: 'Result',
       startedAt: 'Started At',
       finishedAt: 'Finished At',
       duration: 'Duration (ms)',
@@ -86,8 +87,8 @@ const timedTaskEnUS = {
     },
     detail: {
       title: 'Execution Detail',
-      triggerType: 'Trigger',
-      status: 'Status',
+      triggerType: 'Trigger Type',
+      status: 'Result',
       startedAt: 'Started At',
       finishedAt: 'Finished At',
       duration: 'Duration (ms)',

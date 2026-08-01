@@ -23,7 +23,7 @@ export type {
   TimedTaskSearchParams
 } from './types';
 
-/** 获取定时任务分页列表（GET） */
+/** 获取定时任务分页列表 */
 export function fetchGetTimedTaskList(params?: TimedTaskListQuery) {
   return request<TimedTaskListResponse>({
     url: '/timedTask/getTimedTaskList',
@@ -59,7 +59,7 @@ export function fetchDeleteTimedTask(id: number) {
   });
 }
 
-/** 启用 / 停用定时任务 */
+/** 启用 / 停用 */
 export function fetchToggleTimedTask(id: number, enabled: boolean) {
   return request<void>({
     url: '/timedTask/toggleTimedTask',
@@ -68,7 +68,7 @@ export function fetchToggleTimedTask(id: number, enabled: boolean) {
   });
 }
 
-/** 立即触发任务（执行一次） */
+/** 立即触发（执行一次） */
 export function fetchTriggerTimedTask(id: number) {
   return request<void>({
     url: '/timedTask/triggerTimedTask',
@@ -77,7 +77,7 @@ export function fetchTriggerTimedTask(id: number) {
   });
 }
 
-/** 获取任务执行日志（GET） */
+/** 获取任务执行日志 */
 export function fetchGetTimedTaskLogList(params?: TimedTaskLogListQuery) {
   return request<TimedTaskLogListResponse>({
     url: '/timedTask/getTimedTaskLogList',

@@ -73,11 +73,12 @@ const timedTaskZhCN = {
       manual: '手动',
       auto: '调度',
       success: '成功',
-      failed: '失败'
+      fail: '失败',
+      timeout: '超时'
     },
     columns: {
-      triggerType: '触发',
-      status: '状态',
+      triggerType: '触发方式',
+      status: '执行结果',
       startedAt: '开始时间',
       finishedAt: '结束时间',
       duration: '耗时(ms)',

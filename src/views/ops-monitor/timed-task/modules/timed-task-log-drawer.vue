@@ -4,32 +4,33 @@ import dayjs from 'dayjs';
 import {
   NButton,
   NDataTable,
+  NDatePicker,
   NDescriptions,
   NDescriptionsItem,
   NDrawer,
   NDrawerContent,
+  NForm,
+  NFormItemGi,
+  NGrid,
   NPagination,
+  NSelect,
+  NSpace,
   NTag
 } from 'naive-ui';
 import { $t } from '@/locales';
 import { fetchGetTimedTaskLogList, type TimedTaskLog, type TimedTaskLogSearchParams } from '../api';
-import TimedTaskLogSearch from './timed-task-log-search.vue';
 
 defineOptions({
   name: 'OpsMonitorTimedTaskLogDrawer'
 });
 
+const show = defineModel<boolean>('show', { required: true });
+
 const props = defineProps<{
-  /** 抽屉是否可见（由父级用 v-model:show 控制） */
-  show: boolean;
   /** 当前定时任务 ID */
   taskId: number;
   /** 当前定时任务名称（仅用于标题展示） */
   taskName: string;
-}>();
-
-const emit = defineEmits<{
-  (e: 'update:show', value: boolean): void;
 }>();
 
 const logData = ref<TimedTaskLog[]>([]);
@@ -81,6 +82,44 @@ function handleLogSearch() {
   loadLogs();
 }
 
+const triggerOptions = computed(() => [
+  { label: $t('page.opsMonitor.timedTask.log.search.manual'), value: 'manual' },
+  { label: $t('page.opsMonitor.timedTask.log.search.auto'), value: 'auto' }
+]);
+
+const statusOptions = computed(() => [
+  { label: $t('page.opsMonitor.timedTask.log.search.success'), value: 'success' },
+  { label: $t('page.opsMonitor.timedTask.log.search.fail'), value: 'fail' },
+  { label: $t('page.opsMonitor.timedTask.log.search.timeout'), value: 'timeout' }
+]);
+
+const timeRange = computed<[number, number] | null>({
+  get() {
+    const { startCreatedAt, endCreatedAt } = logSearchParams;
+    if (startCreatedAt && endCreatedAt) {
+      return [dayjs(startCreatedAt).valueOf(), dayjs(endCreatedAt).valueOf()] as [number, number];
+    }
+    return null;
+  },
+  set(val: [number, number] | null) {
+    if (val && val.length === 2) {
+      logSearchParams.startCreatedAt = dayjs(val[0]).format('YYYY-MM-DD HH:mm:ss');
+      logSearchParams.endCreatedAt = dayjs(val[1]).format('YYYY-MM-DD HH:mm:ss');
+    } else {
+      logSearchParams.startCreatedAt = '';
+      logSearchParams.endCreatedAt = '';
+    }
+  }
+});
+
+function resetLogSearch() {
+  logSearchParams.triggerType = '';
+  logSearchParams.status = '';
+  logSearchParams.startCreatedAt = '';
+  logSearchParams.endCreatedAt = '';
+  handleLogSearch();
+}
+
 function triggerTypeLabel(v: string) {
   return v === 'auto'
     ? $t('page.opsMonitor.timedTask.log.search.auto')
@@ -88,9 +127,15 @@ function triggerTypeLabel(v: string) {
 }
 
 function statusLabel(v: string) {
-  return v === 'success'
-    ? $t('page.opsMonitor.timedTask.log.search.success')
-    : $t('page.opsMonitor.timedTask.log.search.failed');
+  if (v === 'success') return $t('page.opsMonitor.timedTask.log.search.success');
+  if (v === 'timeout') return $t('page.opsMonitor.timedTask.log.search.timeout');
+  return $t('page.opsMonitor.timedTask.log.search.fail');
+}
+
+function statusTagType(v: string): 'success' | 'error' | 'warning' {
+  if (v === 'success') return 'success';
+  if (v === 'timeout') return 'warning';
+  return 'error';
 }
 
 function formatTime(v?: string) {
@@ -126,7 +171,7 @@ const logColumns: NaiveUI.TableColumn<TimedTaskLog>[] = [
     render: (row: TimedTaskLog) =>
       h(
         NTag,
-        { type: row.status === 'success' ? 'success' : 'error', size: 'small', bordered: false },
+        { type: statusTagType(row.status), size: 'small', bordered: false },
         { default: () => statusLabel(row.status) }
       )
   },
@@ -177,32 +222,69 @@ const logScrollX = computed(() =>
   }, 0)
 );
 
-const logMaxHeight = computed(() => Math.max(360, (typeof window !== 'undefined' ? window.innerHeight : 800) - 280));
+const logMaxHeight = computed(() => Math.max(360, window.innerHeight - 280));
 
 watch(
-  () => [props.show, props.taskId] as const,
+  () => [show.value, props.taskId] as const,
   ([val]) => {
     if (val) {
-      Object.assign(logSearchParams, { triggerType: '', status: '', startCreatedAt: '', endCreatedAt: '' });
-      logPagination.page = 1;
-      loadLogs();
+      resetLogSearch();
     } else {
-      // 关闭时一并收起详情抽屉，避免下次打开残留
+      // 关闭时收起详情抽屉，避免下次打开残留
       detailVisible.value = false;
       detailData.value = null;
     }
   }
 );
-
-function handleUpdateShow(value: boolean) {
-  emit('update:show', value);
-}
 </script>
 
 <template>
-  <NDrawer :show="show" :width="900" placement="right" @update:show="handleUpdateShow">
+  <NDrawer v-model:show="show" :width="940" placement="right">
     <NDrawerContent :title="`${$t('page.opsMonitor.timedTask.log.title')}：${taskName}`" :native-scrollbar="false">
-      <TimedTaskLogSearch v-model:model="logSearchParams" @search="handleLogSearch" @reset="handleLogSearch" />
+      <NForm :model="logSearchParams" label-placement="left" :label-width="80">
+        <NGrid responsive="screen" item-responsive>
+          <NFormItemGi
+            span="24 m:8"
+            :label="$t('page.opsMonitor.timedTask.log.search.triggerType')"
+            path="triggerType"
+            class="pr-24px"
+          >
+            <NSelect v-model:value="logSearchParams.triggerType" clearable :options="triggerOptions" />
+          </NFormItemGi>
+          <NFormItemGi
+            span="24 m:8"
+            :label="$t('page.opsMonitor.timedTask.log.search.status')"
+            path="status"
+            class="pr-24px"
+          >
+            <NSelect v-model:value="logSearchParams.status" clearable :options="statusOptions" />
+          </NFormItemGi>
+          <NFormItemGi
+            span="24 m:8"
+            :label="$t('page.opsMonitor.timedTask.log.search.timeRange')"
+            path="timeRange"
+            class="pr-24px"
+          >
+            <NDatePicker v-model:value="timeRange" type="datetimerange" clearable class="w-full" />
+          </NFormItemGi>
+          <NFormItemGi span="24" class="pr-24px">
+            <NSpace class="w-full" justify="end">
+              <NButton @click="resetLogSearch">
+                <template #icon>
+                  <icon-ri-refresh-line class="text-16px" />
+                </template>
+                {{ $t('common.reset') }}
+              </NButton>
+              <NButton type="primary" ghost @click="handleLogSearch">
+                <template #icon>
+                  <icon-ri-search-line class="text-16px" />
+                </template>
+                {{ $t('common.search') }}
+              </NButton>
+            </NSpace>
+          </NFormItemGi>
+        </NGrid>
+      </NForm>
 
       <NDataTable
         :columns="logColumns"
@@ -230,7 +312,7 @@ function handleUpdateShow(value: boolean) {
                 </NTag>
               </NDescriptionsItem>
               <NDescriptionsItem :label="$t('page.opsMonitor.timedTask.log.detail.status')">
-                <NTag :type="detailData.status === 'success' ? 'success' : 'error'" size="small" :bordered="false">
+                <NTag :type="statusTagType(detailData.status)" size="small" :bordered="false">
                   {{ statusLabel(detailData.status) }}
                 </NTag>
               </NDescriptionsItem>
