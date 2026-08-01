@@ -19,6 +19,7 @@ const zhCN: import('../types/i18n').SystemMenuLang = {
   parentId: '父节点ID',
   sort: '排序',
   icon: '图标',
+  iconCountTip: '显示 {shown} 个，共 {total} 个图标',
   keepAlive: '缓存',
   closeTab: '关闭标签',
   defaultMenu: '是否为基础页面',
@@ -63,8 +64,6 @@ const zhCN: import('../types/i18n').SystemMenuLang = {
   /* drawer fields */
   addParam: '添加参数',
   sortLabel: '排序标记',
-  activeName: '高亮菜单',
-  activeNamePlaceholder: '请输入高亮菜单名称',
   transitionType: '路由切换动画',
   followGlobal: '跟随全局',
   /* form validation */
@@ -89,6 +88,8 @@ const zhCN: import('../types/i18n').SystemMenuLang = {
   /* detail panel */
   panelMenuList: '菜单列表',
   panelMenuDetail: '菜单详情',
+  expandAll: '展开全部',
+  collapseAll: '折叠全部',
   panelBtnPermission: '按钮权限列表',
   panelAddChild: '新增子菜单',
   panelEdit: '编辑',

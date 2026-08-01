@@ -328,6 +328,7 @@ declare namespace App {
         close: string;
         check: string;
         selectAll: string;
+        select: string;
         expandColumn: string;
         columnSetting: string;
         config: string;

@@ -28,7 +28,7 @@ export interface Menu {
   /** buttons bound to this menu (gin-vue-admin SysAuthorityBtn) */
   menuBtn?: MenuBtn[] | null;
   /** route parameters for this menu */
-  parameters?: { type: string; key: string; value: string }[];
+  parameters?: { ID?: number; type: string; key: string; value: string }[];
 }
 
 /** A button bound to a menu (gin-vue-admin SysAuthorityBtn). */

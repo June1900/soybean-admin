@@ -3,7 +3,6 @@ import { computed, h, ref, watch } from 'vue';
 import {
   NAlert,
   NButton,
-  NCheckbox,
   NDataTable,
   NDrawer,
   NDrawerContent,
@@ -28,6 +27,15 @@ import { views } from '@/router/elegant/imports';
 import { generatedRoutes } from '@/router/elegant/routes';
 import { getRoutePath } from '@/router/elegant/transform';
 import { fetchCreateMenu, fetchGetMenuList, fetchUpdateMenu, type Menu, type MenuForm } from '../api';
+import {
+  translateTitle,
+  resolveMenuType,
+  yesOrNoOptions,
+  showHiddenOptions,
+  menuTypeOptions,
+  layoutOptions
+} from '../shared';
+import IconPickerModal from './icon-picker-modal.vue';
 
 defineOptions({
   name: 'MenuOperateDrawer'
@@ -57,11 +65,12 @@ const title = computed(() =>
 const formRef = ref<FormInst | null>(null);
 const model = ref<MenuForm>(createDefaultModel());
 const saving = ref(false);
+/** 图标选择弹窗显隐 */
+const iconPickerVisible = ref(false);
 /** 父节点树形选项 */
 const parentTreeOptions = ref<TreeSelectOption[]>([]);
 /** 当前已加载的菜单原始数据，用于按上级过滤菜单型组件 */
 const loadedMenuList = ref<Menu[]>([]);
-const addParam = ref(false);
 
 /** 目录型可选项：按父级约束层级
  * - 父级为根节点（parentId=0）：仅显示 generatedRoutes 第一层中含 children 的路由
@@ -73,6 +82,7 @@ const directoryOptions = computed(() => {
 
   const buildLabel = (name: string) => {
     const titleKey = `route.${name}` as const;
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     const title = $t(titleKey as any);
     const hasTitle = title && title !== titleKey;
     return hasTitle ? `${name}（${title}）` : name;
@@ -165,15 +175,16 @@ const componentMode = computed<'directory' | 'file'>(() =>
 );
 
 /** 菜单类型可选项：directory 目录 | menu 菜单 */
-const menuTypeOptions = computed(() => [
-  { label: $t('page.system.menu.typeDirectory'), value: 'directory' },
-  { label: $t('page.system.menu.typeMenu'), value: 'menu' }
-]);
+const menuTypeOpts = computed(() => menuTypeOptions());
 
 /** 布局方式可选项：label 为简短文案（单选按钮显示），完整描述见 tooltip */
-const layoutOptions = computed(() => [
-  { label: $t('page.system.menu.layoutBaseLabel'), value: 'layout.base' },
-  { label: $t('page.system.menu.layoutBlankLabel'), value: 'layout.blank' }
+const layoutOpts = computed(() => layoutOptions());
+
+/** 路由切换动画可选项：空字符串表示跟随全局 */
+const transitionTypeOptions = computed(() => [
+  { label: $t('page.system.menu.followGlobal'), value: '' },
+  { label: 'fade', value: 'fade' },
+  { label: 'slide', value: 'slide' }
 ]);
 
 /** 切换菜单类型：选择目录时锁定布局为 layout.base，并清空已选组件 */
@@ -246,6 +257,58 @@ function handleComponentChange(val: string) {
   }
 }
 
+/** 抽屉显隐变化：关闭时触发 close 事件 */
+function handleDrawerUpdateShow(val: boolean) {
+  if (!val) emit('close');
+}
+
+/** 父级菜单变更 */
+function handleParentIdChange(val: number | null) {
+  model.value.parentId = val ?? 0;
+}
+
+/** 是否隐藏变更（下拉 value 为 0/1，转换为 boolean） */
+function handleHiddenChange(val: number) {
+  model.value.hidden = val === 1;
+}
+
+/** keepAlive 变更 */
+function handleKeepAliveChange(val: number) {
+  model.value.meta.keepAlive = val === 1;
+}
+
+/** closeTab 变更 */
+function handleCloseTabChange(val: number) {
+  model.value.meta.closeTab = val === 1;
+}
+
+/** 选择图标 */
+function handleIconSelect(icon: string) {
+  model.value.meta.icon = icon;
+}
+
+/** 新增一行菜单参数 */
+function handleAddParam() {
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  paramList.value.push({ _id: nextRowId(), type: 'query', key: '', value: '' });
+}
+
+/** 新增一行可控按钮 */
+function handleAddBtn() {
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  btnList.value.push({ _id: nextRowId(), name: '', desc: '' });
+}
+
+/** 参数行 row-key（使用前端内部 id 稳定渲染） */
+function paramRowKey(row: { _id: number }) {
+  return row._id;
+}
+
+/** 按钮行 row-key */
+function btnRowKey(row: { _id: number }) {
+  return row._id;
+}
+
 /** 行唯一 id 生成器（前端内部使用，提交时剥离），用于稳定 NDataTable 行渲染，避免输入框失焦 */
 let _rowUid = 0;
 const nextRowId = () => ++_rowUid;
@@ -277,14 +340,15 @@ function createDefaultModel(): MenuForm {
   };
 }
 
-/** 将后端菜单树构造为 NTreeSelect 选项，编辑时排除自身（同时排除其整个子树，避免形成环），隐藏菜单不参与选择 */
+/** 将后端菜单树构造为 NTreeSelect 选项，仅保留目录类型节点作为父级候选；
+ *  编辑时排除自身（同时排除其整个子树，避免形成环），隐藏菜单不参与选择 */
 function buildMenuTree(list: Menu[] = [], excludeId?: number): TreeSelectOption[] {
   return list
-    .filter(m => m.ID !== excludeId && !m.hidden)
+    .filter(m => m.ID !== excludeId && !m.hidden && resolveMenuType(m) === 'directory')
     .map(m => {
       const node: TreeSelectOption = {
         key: m.ID,
-        label: m.meta?.title ? $t(m.meta.title as any) : m.name
+        label: m.meta?.title ? translateTitle(m.meta.title) : m.name
       };
       if (m.children?.length) {
         const children = buildMenuTree(m.children, excludeId);
@@ -323,40 +387,49 @@ function findParentMenuName(parentId: number): string | null {
   return found?.name ?? null;
 }
 
+/** 根据编辑数据构造表单模型；新增时使用默认模型，并预置父级 */
+function buildModelFromProps(): MenuForm {
+  const editing = props.operateType === 'edit' && props.editingData;
+  if (!editing) {
+    const fresh = createDefaultModel();
+    if (props.defaultParentId) fresh.parentId = props.defaultParentId;
+    return fresh;
+  }
+  return {
+    ID: props.editingData!.ID,
+    path: props.editingData!.path,
+    name: props.editingData!.name,
+    component: props.editingData!.component,
+    parentId: props.editingData!.parentId,
+    sort: props.editingData!.sort,
+    hidden: props.editingData!.hidden,
+    menuType: props.editingData!.menuType ?? 'menu',
+    layout: props.editingData!.layout ?? 'layout.base',
+    meta: { ...props.editingData!.meta }
+  };
+}
+
+/** 初始化参数与按钮列表（编辑时回填，补前端行 id 以稳定渲染） */
+function initParamAndBtnList() {
+  const editing = props.operateType === 'edit' && props.editingData;
+  paramList.value = editing ? (props.editingData!.parameters ?? []).map(p => ({ _id: nextRowId(), ...p })) : [];
+  btnList.value = editing
+    ? (props.editingData!.menuBtn ?? []).map(b => ({ _id: nextRowId(), name: b.name, desc: b.desc }))
+    : [];
+}
+
+/** 抽屉打开时初始化表单：构造模型、加载父级选项、回填参数与按钮 */
+function initFormOnOpen() {
+  model.value = buildModelFromProps();
+  const editingId = props.operateType === 'edit' ? props.editingData?.ID : undefined;
+  loadParentTreeOptions(editingId);
+  initParamAndBtnList();
+}
+
 watch(
   () => props.visible,
   val => {
-    if (val) {
-      const editing = props.operateType === 'edit' && props.editingData;
-      model.value = editing
-        ? {
-            ID: props.editingData!.ID,
-            path: props.editingData!.path,
-            name: props.editingData!.name,
-            component: props.editingData!.component,
-            parentId: props.editingData!.parentId,
-            sort: props.editingData!.sort,
-            hidden: props.editingData!.hidden,
-            menuType: props.editingData!.menuType ?? 'menu',
-            layout: props.editingData!.layout ?? 'layout.base',
-            meta: { ...props.editingData!.meta }
-          }
-        : createDefaultModel();
-      // 新增子菜单时预置父级
-      if (!editing && props.defaultParentId) {
-        model.value.parentId = props.defaultParentId;
-      }
-      loadParentTreeOptions(editing ? props.editingData!.ID : undefined);
-      // 加载已有参数和按钮（补前端行 id 以稳定渲染）
-      paramList.value =
-        editing && props.editingData!.parameters
-          ? props.editingData!.parameters.map(p => ({ _id: nextRowId(), ...p }))
-          : [];
-      btnList.value =
-        editing && props.editingData!.menuBtn
-          ? props.editingData!.menuBtn.map(b => ({ _id: nextRowId(), name: b.name, desc: b.desc }))
-          : [];
-    }
+    if (val) initFormOnOpen();
   }
 );
 
@@ -489,6 +562,8 @@ async function handleSubmit() {
   }
   saving.value = true;
   const payload: Record<string, unknown> = { ...model.value };
+  // 高亮菜单字段已移除 UI，提交/编辑统一使用空字符串
+  payload.meta = { ...model.value.meta, activeName: '' };
   // 提交时剥离前端行 id
   payload.parameters = paramList.value.map(({ _id, ...rest }) => rest);
   payload.menuBtn = btnList.value.map(({ _id, ...rest }) => rest);
@@ -510,7 +585,7 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <NDrawer :show="props.visible" display-directive="show" :width="640" @update:show="val => !val && emit('close')">
+  <NDrawer :show="props.visible" display-directive="show" :width="640" @update:show="handleDrawerUpdateShow">
     <NDrawerContent :title="title" :native-scrollbar="false">
       <!-- 顶部警告 -->
       <NAlert type="warning" :bordered="false" class="mb-16px">
@@ -532,28 +607,18 @@ async function handleSubmit() {
               children-field="children"
               default-expand-all
               clearable
-              @update:value="
-                (val: number | null) => {
-                  model.parentId = val ?? 0;
-                }
-              "
+              @update:value="handleParentIdChange"
             />
           </NFormItemGi>
-          <NFormItemGi :span="16" path="path">
-            <template #label>
-              <NSpace align="center" :wrap="false" :size="4">
-                <span>{{ $t('page.system.menu.path') }}</span>
-                <NCheckbox v-model:checked="addParam">{{ $t('page.system.menu.addParam') }}</NCheckbox>
-              </NSpace>
-            </template>
-            <NInput v-model:value="model.path" :placeholder="$t('page.system.menu.pathPlaceholder')" />
+          <NFormItemGi :span="16" :label="$t('page.system.menu.path')" path="path">
+            <NInput v-model:value="model.path" :placeholder="$t('page.system.menu.pathPlaceholder')" readonly />
           </NFormItemGi>
         </NGrid>
 
         <NGrid :cols="24" :x-gap="16" :y-gap="8">
           <NFormItemGi :span="12" :label="$t('page.system.menu.fieldMenuType')" path="menuType">
             <NRadioGroup v-model:value="model.menuType" @update:value="handleMenuTypeChange">
-              <NRadioButton v-for="opt in menuTypeOptions" :key="opt.value" :value="opt.value" :label="opt.label" />
+              <NRadioButton v-for="opt in menuTypeOpts" :key="opt.value" :value="opt.value" :label="opt.label" />
             </NRadioGroup>
           </NFormItemGi>
           <NFormItemGi :span="12" path="layout">
@@ -562,7 +627,7 @@ async function handleSubmit() {
                 <span>{{ $t('page.system.menu.fieldLayout') }}</span>
                 <NTooltip trigger="hover" placement="top">
                   <template #trigger>
-                    <NIcon class="text-14px text-gray-400 cursor-pointer">
+                    <NIcon class="text-14px cursor-pointer text-[var(--n-text-color-3)]">
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                         <path
                           d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
@@ -577,7 +642,7 @@ async function handleSubmit() {
               </div>
             </template>
             <NRadioGroup v-model:value="model.layout" :disabled="model.menuType === 'directory'">
-              <NRadioButton v-for="opt in layoutOptions" :key="opt.value" :value="opt.value" :label="opt.label" />
+              <NRadioButton v-for="opt in layoutOpts" :key="opt.value" :value="opt.value" :label="opt.label" />
             </NRadioGroup>
           </NFormItemGi>
           <NFormItemGi :span="24" :label="$t('page.system.menu.component')" path="component">
@@ -603,13 +668,13 @@ async function handleSubmit() {
           </NFormItemGi>
           <NFormItemGi :span="12" :label="$t('page.system.menu.titleField')" path="meta.title">
             <NInput
-              :value="$t(model.meta.title as any)"
+              :value="translateTitle(model.meta.title)"
               :placeholder="$t('page.system.menu.titlePlaceholder')"
-              @update:value="val => (model.meta.title = val)"
+              readonly
             />
           </NFormItemGi>
           <NFormItemGi :span="12" :label="$t('page.system.menu.name')" path="name">
-            <NInput v-model:value="model.name" :placeholder="$t('page.system.menu.namePlaceholder')" />
+            <NInput v-model:value="model.name" :placeholder="$t('page.system.menu.namePlaceholder')" readonly />
           </NFormItemGi>
         </NGrid>
 
@@ -617,96 +682,45 @@ async function handleSubmit() {
         <NDivider title-placement="left">{{ $t('page.system.menu.sectionDisplay') }}</NDivider>
 
         <NGrid :cols="24" :x-gap="16" :y-gap="8">
-          <NFormItemGi :span="8" :label="$t('page.system.menu.icon')" path="meta.icon">
-            <NSelect
-              v-model:value="model.meta.icon"
-              :placeholder="$t('page.system.menu.iconPlaceholder')"
-              :options="[]"
-              clearable
-            />
+          <NFormItemGi :span="12" :label="$t('page.system.menu.icon')" path="meta.icon">
+            <div class="flex items-center gap-4px">
+              <NInput
+                v-model:value="model.meta.icon"
+                :placeholder="$t('page.system.menu.iconPlaceholder')"
+                readonly
+                class="flex-1"
+              />
+              <NButton size="small" type="primary" @click="iconPickerVisible = true">
+                {{ $t('common.select') }}
+              </NButton>
+            </div>
           </NFormItemGi>
-          <NFormItemGi :span="8" :label="$t('page.system.menu.sortLabel')" path="sort">
+          <NFormItemGi :span="12" :label="$t('page.system.menu.sortLabel')" path="sort">
             <NInputNumber
               v-model:value="model.sort"
               :placeholder="$t('page.system.menu.sortPlaceholder')"
               style="width: 100%"
             />
           </NFormItemGi>
-          <NFormItemGi :span="8" :label="$t('page.system.menu.visibility')" path="hidden">
-            <NSelect
-              :value="model.hidden ? 1 : 0"
-              :options="[
-                { label: $t('page.system.menu.show'), value: 0 },
-                { label: $t('page.system.menu.hidden'), value: 1 }
-              ]"
-              @update:value="
-                val => {
-                  model.hidden = val === 1;
-                }
-              "
-            />
+          <NFormItemGi :span="12" :label="$t('page.system.menu.visibility')" path="hidden">
+            <NSelect :value="model.hidden ? 1 : 0" :options="showHiddenOptions()" @update:value="handleHiddenChange" />
           </NFormItemGi>
-        </NGrid>
-
-        <!-- 高级配置 -->
-        <NDivider title-placement="left">{{ $t('page.system.menu.sectionAdvanced') }}</NDivider>
-
-        <NGrid :cols="24" :x-gap="16" :y-gap="8">
-          <NFormItemGi :span="8" :label="$t('page.system.menu.activeName')" path="meta.activeName">
-            <NInput v-model:value="model.meta.activeName" :placeholder="$t('page.system.menu.activeNamePlaceholder')" />
-          </NFormItemGi>
-          <NFormItemGi :span="8" label="KeepAlive" path="meta.keepAlive">
+          <NFormItemGi :span="12" label="KeepAlive" path="meta.keepAlive">
             <NSelect
               :value="model.meta.keepAlive ? 1 : 0"
-              :options="[
-                { label: $t('common.yesOrNo.yes'), value: 1 },
-                { label: $t('common.yesOrNo.no'), value: 0 }
-              ]"
-              @update:value="
-                val => {
-                  model.meta.keepAlive = val === 1;
-                }
-              "
+              :options="yesOrNoOptions()"
+              @update:value="handleKeepAliveChange"
             />
           </NFormItemGi>
-          <NFormItemGi :span="8" label="CloseTab" path="meta.closeTab">
+          <NFormItemGi :span="12" label="CloseTab" path="meta.closeTab">
             <NSelect
               :value="model.meta.closeTab ? 1 : 0"
-              :options="[
-                { label: $t('common.yesOrNo.yes'), value: 1 },
-                { label: $t('common.yesOrNo.no'), value: 0 }
-              ]"
-              @update:value="
-                val => {
-                  model.meta.closeTab = val === 1;
-                }
-              "
+              :options="yesOrNoOptions()"
+              @update:value="handleCloseTabChange"
             />
           </NFormItemGi>
-          <NFormItemGi :span="8" :label="$t('page.system.menu.defaultMenu')" path="meta.defaultMenu">
-            <NSelect
-              :value="model.meta.defaultMenu ? 1 : 0"
-              :options="[
-                { label: $t('common.yesOrNo.yes'), value: 1 },
-                { label: $t('common.yesOrNo.no'), value: 0 }
-              ]"
-              @update:value="
-                val => {
-                  model.meta.defaultMenu = val === 1;
-                }
-              "
-            />
-          </NFormItemGi>
-          <NFormItemGi :span="8" :label="$t('page.system.menu.transitionType')" path="meta.transitionType">
-            <NSelect
-              v-model:value="model.meta.transitionType"
-              :options="[
-                { label: $t('page.system.menu.followGlobal'), value: '' },
-                { label: 'fade', value: 'fade' },
-                { label: 'slide', value: 'slide' }
-              ]"
-              clearable
-            />
+          <NFormItemGi :span="12" :label="$t('page.system.menu.transitionType')" path="meta.transitionType">
+            <NSelect v-model:value="model.meta.transitionType" :options="transitionTypeOptions" clearable />
           </NFormItemGi>
         </NGrid>
 
@@ -714,11 +728,7 @@ async function handleSubmit() {
         <NDivider title-placement="left">
           <NSpace align="center" :wrap="false">
             <span>{{ $t('page.system.menu.sectionParams') }}</span>
-            <NButton
-              type="primary"
-              size="small"
-              @click="paramList.push({ _id: nextRowId(), type: 'query', key: '', value: '' })"
-            >
+            <NButton type="primary" size="tiny" @click="handleAddParam">
               {{ $t('page.system.menu.addParamBtn') }}
             </NButton>
           </NSpace>
@@ -730,7 +740,7 @@ async function handleSubmit() {
           size="small"
           :bordered="false"
           :single-line="false"
-          :row-key="(row: { _id: number }) => row._id"
+          :row-key="paramRowKey"
         >
           <template #empty>
             <span class="text-12px op-50">{{ $t('page.system.menu.paramEmptyTip') }}</span>
@@ -741,7 +751,7 @@ async function handleSubmit() {
         <NDivider title-placement="left">
           <NSpace align="center" :wrap="false">
             <span>{{ $t('page.system.menu.sectionButtons') }}</span>
-            <NButton type="primary" size="small" @click="btnList.push({ _id: nextRowId(), name: '', desc: '' })">
+            <NButton type="primary" size="tiny" @click="handleAddBtn">
               {{ $t('page.system.menu.addBtnBtn') }}
             </NButton>
           </NSpace>
@@ -753,7 +763,7 @@ async function handleSubmit() {
           size="small"
           :bordered="false"
           :single-line="false"
-          :row-key="(row: { _id: number }) => row._id"
+          :row-key="btnRowKey"
         >
           <template #empty>
             <span class="text-12px op-50">{{ $t('page.system.menu.btnEmptyTip') }}</span>
@@ -770,5 +780,7 @@ async function handleSubmit() {
         </NSpace>
       </template>
     </NDrawerContent>
+
+    <IconPickerModal :visible="iconPickerVisible" @close="iconPickerVisible = false" @select="handleIconSelect" />
   </NDrawer>
 </template>

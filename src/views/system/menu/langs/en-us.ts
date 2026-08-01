@@ -19,6 +19,7 @@ const enUS: import('../types/i18n').SystemMenuLang = {
   parentId: 'Parent ID',
   sort: 'Sort',
   icon: 'Icon',
+  iconCountTip: 'Showing {shown} of {total} icons',
   keepAlive: 'KeepAlive',
   closeTab: 'Close Tab',
   defaultMenu: 'Default Menu',
@@ -63,8 +64,6 @@ const enUS: import('../types/i18n').SystemMenuLang = {
   /* drawer fields */
   addParam: 'Add Param',
   sortLabel: 'Sort Order',
-  activeName: 'Active Menu',
-  activeNamePlaceholder: 'Please enter the active menu name',
   transitionType: 'Transition Type',
   followGlobal: 'Follow Global',
   /* form validation */
@@ -89,6 +88,8 @@ const enUS: import('../types/i18n').SystemMenuLang = {
   /* detail panel */
   panelMenuList: 'Menu List',
   panelMenuDetail: 'Menu Detail',
+  expandAll: 'Expand All',
+  collapseAll: 'Collapse All',
   panelBtnPermission: 'Button Permission List',
   panelAddChild: 'Add Sub Menu',
   panelEdit: 'Edit',

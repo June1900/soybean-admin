@@ -20,6 +20,7 @@ export interface SystemMenuLang {
   parentId: string;
   sort: string;
   icon: string;
+  iconCountTip: string;
   keepAlive: string;
   closeTab: string;
   defaultMenu: string;
@@ -64,8 +65,6 @@ export interface SystemMenuLang {
   /* drawer fields */
   addParam: string;
   sortLabel: string;
-  activeName: string;
-  activeNamePlaceholder: string;
   transitionType: string;
   followGlobal: string;
   /* form validation */
@@ -90,6 +89,8 @@ export interface SystemMenuLang {
   /* detail panel */
   panelMenuList: string;
   panelMenuDetail: string;
+  expandAll: string;
+  collapseAll: string;
   panelBtnPermission: string;
   panelAddChild: string;
   panelEdit: string;

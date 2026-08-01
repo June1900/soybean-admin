@@ -35,6 +35,7 @@ const local: App.I18n.Schema = {
     close: 'Close',
     check: 'Check',
     selectAll: 'Select All',
+    select: 'Select',
     expandColumn: 'Expand Column',
     columnSetting: 'Column Setting',
     config: 'Config',

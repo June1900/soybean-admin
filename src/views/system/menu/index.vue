@@ -16,7 +16,9 @@ import {
 } from 'naive-ui';
 import { $t } from '@/locales';
 import { fetchDeleteMenu, fetchGetMenuList, type Menu } from './api';
+import { translateTitle, resolveMenuType, layoutOptions } from './shared';
 import MenuOperateDrawer from './modules/menu-operate-drawer.vue';
+import MenuTreeNode from './modules/menu-tree-node.vue';
 
 import SvgIcon from '@/components/custom/svg-icon.vue';
 
@@ -25,13 +27,6 @@ defineOptions({
 });
 
 const themeVars = useThemeVars();
-
-/* ---------- helpers ---------- */
-/** 将 meta.title 中存储的 i18n key（如 route.home）转换为实际文案 */
-function translateTitle(title: string | undefined): string {
-  if (!title) return '';
-  return $t(title as any);
-}
 
 /* ---------- data ---------- */
 const data = ref<Menu[]>([]);
@@ -48,29 +43,36 @@ async function getData() {
   }
 }
 
-/** 构建树结构：兼容扁平（children=null）与嵌套（children 含子节点）两种返回格式
- *  先递归扁平化收集所有节点，再根据 parentId 重建父子关系 */
+/** 构建树结构：兼容扁平（children=null）与嵌套（children 含子节点）两种返回格式 */
 function buildTreeFromFlat(list: Menu[]): Menu[] {
-  // 递归扁平化，收集所有节点（含嵌套 children 中的子节点）
-  const flatList: Menu[] = [];
-  const collect = (items: Menu[]) => {
-    for (const item of items) {
-      flatList.push(item);
-      if (item.children?.length) {
-        collect(item.children);
+  // 检测是否已经是嵌套树结构（任意节点有非空 children 数组）
+  const isNested = list.some(item => Array.isArray(item.children) && item.children.length > 0);
+
+  // 清理空 children 数组为 null
+  const cleanup = (nodes: Menu[]) => {
+    for (const n of nodes) {
+      if (Array.isArray(n.children) && n.children.length === 0) {
+        n.children = null;
+      } else if (n.children) {
+        cleanup(n.children);
       }
     }
   };
-  collect(list);
 
+  if (isNested) {
+    // 已是嵌套树，直接深拷贝并清理
+    const result = list.map(item => ({ ...item }));
+    cleanup(result);
+    return result;
+  }
+
+  // 扁平结构，根据 parentId 重建父子关系
   const map = new Map<number, Menu>();
   const roots: Menu[] = [];
-  // 先收集所有节点
-  for (const item of flatList) {
+  for (const item of list) {
     map.set(item.ID, { ...item, children: [] });
   }
-  // 根据 parentId 组装父子关系
-  for (const item of flatList) {
+  for (const item of list) {
     const node = map.get(item.ID)!;
     if (item.parentId && map.has(item.parentId)) {
       map.get(item.parentId)!.children!.push(node);
@@ -78,29 +80,11 @@ function buildTreeFromFlat(list: Menu[]): Menu[] {
       roots.push(node);
     }
   }
-  // 清理空 children 为 null，与原数据结构一致
-  const cleanup = (nodes: Menu[]) => {
-    for (const n of nodes) {
-      if (n.children && n.children.length === 0) {
-        n.children = null;
-      } else if (n.children) {
-        cleanup(n.children);
-      }
-    }
-  };
   cleanup(roots);
   return roots;
 }
 
 /* ---------- helpers ---------- */
-function flatten(list: Menu[] = [], acc: Menu[] = []): Menu[] {
-  for (const item of list) {
-    acc.push(item);
-    if (item.children?.length) flatten(item.children, acc);
-  }
-  return acc;
-}
-
 function findMenu(list: Menu[] = [], id: number): Menu | null {
   for (const item of list) {
     if (item.ID === id) return item;
@@ -110,6 +94,22 @@ function findMenu(list: Menu[] = [], id: number): Menu | null {
     }
   }
   return null;
+}
+
+/** 将布局方式 value（如 layout.base）翻译为简短文案，未匹配时回退到原始值 */
+function layoutLabel(value?: string): string {
+  const fallback = value || 'layout.base';
+  return layoutOptions().find(o => o.value === fallback)?.label ?? fallback;
+}
+
+/** 参数行 row-key（优先用 ID，回退到 key 字段） */
+function paramRowKey(row: { ID?: number; key: string }) {
+  return String(row.ID ?? row.key);
+}
+
+/** 按钮行 row-key */
+function btnRowKey(row: { ID: number }) {
+  return String(row.ID);
 }
 
 function filterTree(list: Menu[], kw: string): Menu[] {
@@ -138,7 +138,46 @@ const displayData = computed(() =>
 const expandedKeys = ref<string[]>([]);
 const selectedId = ref<number | null>(null);
 
-/* ---------- splitter: 左右拖拽，宽度百分比 20%-50%，默认 25% ---------- */
+/** 收集树中所有含子节点的 key（用于展开全部） */
+function collectAllKeys(list: Menu[] = []): string[] {
+  const keys: string[] = [];
+  const walk = (items: Menu[]) => {
+    for (const item of items) {
+      if (item.children?.length) {
+        keys.push(String(item.ID));
+        walk(item.children);
+      }
+    }
+  };
+  walk(list);
+  return keys;
+}
+
+function expandAll() {
+  expandedKeys.value = collectAllKeys(displayData.value);
+}
+
+function collapseAll() {
+  expandedKeys.value = [];
+}
+
+/** 当前树是否已全部展开（无子节点的空树也视为已展开） */
+const isAllExpanded = computed(() => {
+  const all = collectAllKeys(displayData.value);
+  if (all.length === 0) return true;
+  return all.every(k => expandedKeys.value.includes(k));
+});
+
+/** 展开/折叠全部切换 */
+function toggleExpandAll() {
+  if (isAllExpanded.value) {
+    collapseAll();
+  } else {
+    expandAll();
+  }
+}
+
+/* 左右拖拽，宽度百分比 20%-50%，默认 25% */
 const splitContainerRef = ref<HTMLElement | null>(null);
 const leftPercent = ref(25);
 const isDragging = ref(false);
@@ -175,7 +214,6 @@ const selectedKeys = computed<string[]>(() => (selectedId.value === null ? [] : 
 
 const activeMenu = computed<Menu | null>(() => (selectedId.value ? findMenu(data.value, selectedId.value) : null));
 
-/* ---------- tree options ---------- */
 function buildTreeOptions(list: Menu[]): TreeOption[] {
   return list.map(item => {
     const hasChildren = !!item.children?.length;
@@ -203,120 +241,40 @@ const menuById = computed(() => {
   return map;
 });
 
-/** 菜单类型：优先使用 menuType 字段，回退到根据 children 判断 */
-function resolveMenuType(menu: Menu): 'directory' | 'menu' {
-  if (menu.menuType) return menu.menuType;
-  return menu.children && menu.children.length > 0 ? 'directory' : 'menu';
-}
-
-/** 渲染树节点：图标 + 标题 + 路径 + 右侧「+」「删除」按钮 */
 function renderLabel(info: { option: TreeOption }) {
   const key = Number(info.option.key);
   const item = menuById.value.get(key);
   if (!item) return info.option.label as string;
 
-  const icon = item.meta?.icon;
-  const iconName = icon
-    ? `material-symbols:${icon.startsWith('icon-') ? '' : icon}`
-    : resolveMenuType(item) === 'directory'
-      ? 'material-symbols:folder'
-      : 'material-symbols:circle';
-
-  const searchActive = !!searchKw.value.trim();
-  const isDirectory = resolveMenuType(item) === 'directory';
-  const hasChildren = !!(item.children && item.children.length > 0);
-
-  const actions: ReturnType<typeof h>[] = [];
-
-  // 仅目录类型显示新增按钮
-  if (isDirectory) {
-    actions.push(
-      h(
-        NTooltip,
-        { trigger: 'hover', placement: 'top' },
-        {
-          trigger: () =>
-            h(
-              NButton,
-              {
-                size: 'tiny',
-                type: 'primary',
-                text: true,
-                onClick: (e: MouseEvent) => {
-                  e.stopPropagation();
-                  defaultParentId.value = item.ID;
-                  handleAdd();
-                }
-              },
-              {
-                icon: () => h(SvgIcon, { icon: 'material-symbols:add', class: 'text-14px' })
-              }
-            ),
-          default: () => $t('page.system.menu.addChild')
-        }
-      )
-    );
-  }
-
-  // 存在子节点不允许删除
-  actions.push(
-    h(
-      NTooltip,
-      { trigger: 'hover', placement: 'top' },
-      {
-        trigger: () =>
-          h(
-            NButton,
-            {
-              size: 'tiny',
-              type: 'error',
-              text: true,
-              disabled: hasChildren,
-              onClick: (e: MouseEvent) => {
-                e.stopPropagation();
-                if (!hasChildren) confirmDeleteMenu(item.ID);
-              }
-            },
-            {
-              icon: () => h(SvgIcon, { icon: 'material-symbols:delete', class: 'text-14px' })
-            }
-          ),
-        default: () =>
-          hasChildren ? $t('page.system.menu.deleteDisabledHasChildren') : $t('page.system.menu.panelDelete')
-      }
-    )
-  );
-
-  return h('div', { class: 'flex w-full h-40px items-center justify-between gap-8px' }, [
-    h('div', { class: 'flex min-w-0 flex-1 items-center gap-6px overflow-hidden' }, [
-      h(SvgIcon, { icon: iconName, class: 'shrink-0 text-16px' }),
-      h(
-        'span',
-        {
-          class: 'truncate',
-          title: translateTitle(item.meta?.title) || item.name
-        },
-        translateTitle(item.meta?.title) || item.name
-      ),
-      searchActive ? h('span', { class: 'text-12px text-gray-400' }, `(${item.path})`) : null
-    ]),
-    h('div', { class: 'menu-row-actions flex shrink-0 items-center gap-2px transition-opacity' }, actions)
-  ]);
+  return h(MenuTreeNode, {
+    item,
+    searchActive: !!searchKw.value.trim(),
+    onAdd: (parentId: number) => {
+      handleAdd(parentId);
+    },
+    onDelete: (id: number, hasChildren: boolean) => {
+      if (!hasChildren) confirmDeleteMenu(id);
+    }
+  });
 }
 
 const treeOptions = computed<TreeOption[]>(() => buildTreeOptions(displayData.value));
 
-/* ---------- operate (add / edit / delete) ---------- */
 const drawerVisible = ref(false);
 const operateType = ref<'add' | 'edit'>('add');
 const editingData = ref<Menu | null>(null);
 const defaultParentId = ref<number>(0);
 
-function handleAdd() {
+function handleAdd(parentId?: number) {
   operateType.value = 'add';
   editingData.value = null;
-  defaultParentId.value = 0;
+  defaultParentId.value = parentId ?? 0;
   drawerVisible.value = true;
+}
+
+/** 顶部"新增根菜单"按钮（无 parentId） */
+function handleAddRoot() {
+  handleAdd();
 }
 
 function handleEdit(id: number) {
@@ -340,44 +298,74 @@ async function handleDelete(id: number) {
   }
 }
 
-/* ---------- btn permission table columns ---------- */
+const paramColumns: NaiveUI.TableColumn<{ ID?: number; type: string; key: string; value: string }>[] = [
+  {
+    key: 'idx',
+    title: '#',
+    width: 48,
+    align: 'center',
+    render: (_row, index) => String(index + 1)
+  },
+  {
+    key: 'type',
+    title: $t('page.system.menu.paramType'),
+    width: 96,
+    align: 'center',
+    render: row =>
+      h(
+        NTag,
+        { size: 'small', type: row.type === 'params' ? 'success' : 'info', bordered: false, round: true },
+        { default: () => row.type || '-' }
+      )
+  },
+  {
+    key: 'key',
+    title: $t('page.system.menu.paramKey'),
+    minWidth: 140,
+    ellipsis: { tooltip: true },
+    render: row => row.key || '-'
+  },
+  {
+    key: 'value',
+    title: $t('page.system.menu.paramValue'),
+    minWidth: 140,
+    ellipsis: { tooltip: true },
+    render: row => row.value || '-'
+  }
+];
+
+const paramScrollX = computed(() =>
+  paramColumns.reduce(
+    (acc, c) =>
+      acc +
+      ((c as { width?: number; minWidth?: number }).width ??
+        (c as { width?: number; minWidth?: number }).minWidth ??
+        120),
+    0
+  )
+);
+
 const btnColumns: NaiveUI.TableColumn<{ ID: number; name: string; desc: string }>[] = [
   {
     key: 'idx',
     title: '#',
-    width: 60,
+    width: 48,
     align: 'center',
     render: (_row, index) => String(index + 1)
   },
   {
     key: 'desc',
-    title: $t('page.system.menu.fieldMenuName'),
+    title: $t('page.system.menu.btnDesc'),
     minWidth: 160,
+    ellipsis: { tooltip: true },
     render: row => row.desc || '-'
   },
   {
     key: 'name',
     title: $t('page.system.menu.fieldBtnPerm'),
     minWidth: 200,
-    render: row => row.name
-  },
-  {
-    key: 'status',
-    title: $t('page.system.menu.fieldMenuStatus'),
-    width: 100,
-    align: 'center',
-    render: () =>
-      h(
-        NTag,
-        { size: 'small', type: 'success', bordered: false },
-        { default: () => $t('page.system.menu.statusNormal') }
-      )
-  },
-  {
-    key: 'createdAt',
-    title: $t('page.system.menu.fieldCreateTime'),
-    minWidth: 160,
-    render: () => '-'
+    ellipsis: { tooltip: true },
+    render: row => row.name || '-'
   }
 ];
 
@@ -392,23 +380,20 @@ const btnScrollX = computed(() =>
   )
 );
 
-/* ---------- lifecycle ---------- */
 onMounted(async () => {
   await getData();
-  // 默认选中第一个根节点
+  // 默认选中第一个根节点（树保持折叠状态）
   if (data.value.length && selectedId.value === null) {
     selectedId.value = data.value[0].ID;
-    expandedKeys.value = [String(data.value[0].ID)];
   }
 });
 
-/* ---------- actions ---------- */
 function handleRefresh() {
   selectedId.value = null;
+  expandedKeys.value = [];
   getData();
 }
 
-/** 提交后刷新：展开父节点，使新增子菜单可见 */
 async function handleSubmitted() {
   const parentId = defaultParentId.value;
   await getData();
@@ -431,24 +416,68 @@ function confirmDeleteMenu(id: number) {
     onPositiveClick: () => handleDelete(id)
   });
 }
+
+const activeMenuTypeLabel = computed(() => {
+  if (!activeMenu.value) return '';
+  const type = resolveMenuType(activeMenu.value);
+  return type === 'directory' ? $t('page.system.menu.typeDirectory') : $t('page.system.menu.typeMenu');
+});
+
+/** 当前选中菜单是否存在子节点（存在时禁止删除） */
+const activeMenuHasChildren = computed(() => !!(activeMenu.value?.children && activeMenu.value.children.length > 0));
+
+const activeMenuTitle = computed(() => {
+  if (!activeMenu.value) return '';
+  return translateTitle(activeMenu.value.meta?.title) || activeMenu.value.name;
+});
+
+function handleAddChild() {
+  if (selectedId.value !== null) handleAdd(selectedId.value);
+}
+
+function handleEditClick() {
+  if (selectedId.value !== null) handleEdit(selectedId.value);
+}
+
+function handleDeleteClick() {
+  if (selectedId.value !== null) confirmDeleteMenu(selectedId.value);
+}
 </script>
 
 <template>
   <div class="flex min-h-500px flex-col gap-16px overflow-hidden lt-sm:overflow-auto p-16px">
-    <div class="flex min-h-0 flex-1 flex-col gap-12px overflow-hidden rounded-8px bg-white p-16px shadow-sm">
-      <div
-        ref="splitContainerRef"
-        class="flex min-h-0 flex-1"
-        :style="{ '--theme-primary': themeVars.primaryColor, '--theme-border': themeVars.borderColor }"
-      >
+    <div
+      class="flex min-h-0 flex-1 flex-col gap-12px overflow-hidden rounded-8px p-16px shadow-sm"
+      :style="{
+        backgroundColor: themeVars.cardColor,
+        '--theme-primary': themeVars.primaryColor,
+        '--theme-border': themeVars.borderColor,
+        '--theme-text-2': themeVars.textColor2,
+        '--theme-text-3': themeVars.textColor3,
+        '--theme-border-color': themeVars.borderColor
+      }"
+    >
+      <div ref="splitContainerRef" class="flex min-h-0 flex-1">
         <!-- 左侧：菜单列表 -->
         <div class="flex shrink-0 flex-col gap-12px overflow-hidden pr-12px" :style="{ width: `${leftPercent}%` }">
           <div class="flex items-center justify-between">
             <h3 class="m-0 text-16px font-500">{{ $t('page.system.menu.panelMenuList') }}</h3>
             <NSpace :size="6" align="center" :wrap="false">
-              <NButton size="small" type="primary" quaternary @click="handleAdd">
+              <NButton size="small" type="primary" quaternary @click="handleAddRoot">
                 <template #icon><SvgIcon icon="material-symbols:add" /></template>
               </NButton>
+              <NTooltip trigger="hover" placement="bottom">
+                <template #trigger>
+                  <NButton size="small" quaternary @click="toggleExpandAll">
+                    <template #icon>
+                      <SvgIcon
+                        :icon="isAllExpanded ? 'material-symbols:unfold-less' : 'material-symbols:unfold-more'"
+                      />
+                    </template>
+                  </NButton>
+                </template>
+                {{ isAllExpanded ? $t('page.system.menu.collapseAll') : $t('page.system.menu.expandAll') }}
+              </NTooltip>
               <NButton size="small" quaternary @click="handleRefresh">
                 <template #icon><SvgIcon icon="material-symbols:refresh" /></template>
               </NButton>
@@ -488,38 +517,37 @@ function confirmDeleteMenu(id: number) {
                 type="primary"
                 size="small"
                 ghost
-                @click="selectedId !== null && ((defaultParentId = selectedId), handleAdd())"
+                @click="handleAddChild"
               >
                 <template #icon><SvgIcon icon="material-symbols:add" /></template>
                 {{ $t('page.system.menu.panelAddChild') }}
               </NButton>
-              <NButton
-                type="info"
-                size="small"
-                ghost
-                :disabled="!selectedId"
-                @click="selectedId !== null && handleEdit(selectedId)"
-              >
+              <NButton type="info" size="small" ghost :disabled="!selectedId" @click="handleEditClick">
                 <template #icon><SvgIcon icon="material-symbols:edit" /></template>
                 {{ $t('page.system.menu.panelEdit') }}
               </NButton>
-              <NButton
-                type="error"
-                size="small"
-                ghost
-                :disabled="!selectedId"
-                @click="selectedId !== null && confirmDeleteMenu(selectedId)"
-              >
-                <template #icon><SvgIcon icon="material-symbols:delete" /></template>
-                {{ $t('page.system.menu.panelDelete') }}
-              </NButton>
+              <NTooltip trigger="hover" placement="bottom" :disabled="!activeMenuHasChildren">
+                <template #trigger>
+                  <NButton
+                    type="error"
+                    size="small"
+                    ghost
+                    :disabled="!selectedId || activeMenuHasChildren"
+                    @click="handleDeleteClick"
+                  >
+                    <template #icon><SvgIcon icon="material-symbols:delete" /></template>
+                    {{ $t('page.system.menu.panelDelete') }}
+                  </NButton>
+                </template>
+                {{ $t('page.system.menu.deleteDisabledHasChildren') }}
+              </NTooltip>
             </NSpace>
           </div>
 
           <!-- 未选中提示 -->
           <div
             v-if="!activeMenu"
-            class="flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden rounded-8px border border-dashed border-gray-200 text-gray-400"
+            class="flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden rounded-8px border border-dashed border-[var(--theme-border-color)] text-[var(--theme-text-3)]"
           >
             <SvgIcon icon="material-symbols:info-outline" class="mb-8px text-36px opacity-50" />
             <span>{{ $t('page.system.menu.noSelectHint') }}</span>
@@ -527,29 +555,26 @@ function confirmDeleteMenu(id: number) {
 
           <template v-else>
             <!-- 详情网格 -->
-            <div class="rounded-8px border border-gray-100 p-16px">
+            <div class="rounded-8px border border-[var(--theme-border-color)] p-16px">
               <NGrid :cols="3" :x-gap="24" :y-gap="16" responsive="screen" item-responsive>
                 <NGridItem span="3 s:3 m:1 l:1 xl:1">
                   <div class="flex items-center justify-between">
-                    <span class="text-13px text-gray-500">{{ $t('page.system.menu.fieldMenuType') }}</span>
+                    <span class="text-13px text-[var(--theme-text-2)]">{{ $t('page.system.menu.fieldMenuType') }}</span>
                     <NTag
                       size="small"
                       :type="resolveMenuType(activeMenu) === 'directory' ? 'info' : 'success'"
                       :bordered="false"
                       round
                     >
-                      {{
-                        (activeMenu.menuType ??
-                          (resolveMenuType(activeMenu) === 'directory' ? 'directory' : 'menu')) === 'directory'
-                          ? $t('page.system.menu.typeDirectory')
-                          : $t('page.system.menu.typeMenu')
-                      }}
+                      {{ activeMenuTypeLabel }}
                     </NTag>
                   </div>
                 </NGridItem>
                 <NGridItem span="3 s:3 m:1 l:1 xl:1">
                   <div class="flex items-center justify-between">
-                    <span class="text-13px text-gray-500">{{ $t('page.system.menu.fieldMenuStatus') }}</span>
+                    <span class="text-13px text-[var(--theme-text-2)]">
+                      {{ $t('page.system.menu.fieldMenuStatus') }}
+                    </span>
                     <NTag size="small" type="success" :bordered="false" round>
                       {{ $t('page.system.menu.statusNormal') }}
                     </NTag>
@@ -557,28 +582,32 @@ function confirmDeleteMenu(id: number) {
                 </NGridItem>
                 <NGridItem span="3 s:3 m:1 l:1 xl:1">
                   <div class="flex items-center justify-between">
-                    <span class="text-13px text-gray-500">{{ $t('page.system.menu.fieldSort') }}</span>
+                    <span class="text-13px text-[var(--theme-text-2)]">{{ $t('page.system.menu.fieldSort') }}</span>
                     <span class="text-14px">{{ activeMenu.sort }}</span>
                   </div>
                 </NGridItem>
 
                 <NGridItem span="3 s:3 m:1 l:1 xl:1">
                   <div class="flex items-center justify-between gap-8px">
-                    <span class="text-13px text-gray-500 shrink-0">{{ $t('page.system.menu.fieldMenuName') }}</span>
-                    <span class="truncate text-14px" :title="translateTitle(activeMenu.meta?.title) || activeMenu.name">
-                      {{ translateTitle(activeMenu.meta?.title) || activeMenu.name }}
+                    <span class="text-13px text-[var(--theme-text-2)] shrink-0">
+                      {{ $t('page.system.menu.fieldMenuName') }}
                     </span>
+                    <span class="truncate text-14px" :title="activeMenuTitle">{{ activeMenuTitle }}</span>
                   </div>
                 </NGridItem>
                 <NGridItem span="3 s:3 m:1 l:1 xl:1">
                   <div class="flex items-center justify-between gap-8px">
-                    <span class="text-13px text-gray-500 shrink-0">{{ $t('page.system.menu.fieldRoutePath') }}</span>
+                    <span class="text-13px text-[var(--theme-text-2)] shrink-0">
+                      {{ $t('page.system.menu.fieldRoutePath') }}
+                    </span>
                     <span class="truncate text-14px" :title="activeMenu.path">{{ activeMenu.path }}</span>
                   </div>
                 </NGridItem>
                 <NGridItem span="3 s:3 m:1 l:1 xl:1">
                   <div class="flex items-center justify-between">
-                    <span class="text-13px text-gray-500">{{ $t('page.system.menu.fieldDisplayStatus') }}</span>
+                    <span class="text-13px text-[var(--theme-text-2)]">
+                      {{ $t('page.system.menu.fieldDisplayStatus') }}
+                    </span>
                     <NTag size="small" :type="activeMenu.hidden ? 'warning' : 'success'" :bordered="false" round>
                       {{ activeMenu.hidden ? $t('page.system.menu.hidden') : $t('page.system.menu.show') }}
                     </NTag>
@@ -587,7 +616,9 @@ function confirmDeleteMenu(id: number) {
 
                 <NGridItem span="3 s:3 m:1 l:1 xl:1">
                   <div class="flex items-center justify-between">
-                    <span class="text-13px text-gray-500">{{ $t('page.system.menu.fieldIsExternal') }}</span>
+                    <span class="text-13px text-[var(--theme-text-2)]">
+                      {{ $t('page.system.menu.fieldIsExternal') }}
+                    </span>
                     <NTag size="small" type="warning" :bordered="false" round>
                       {{ $t('page.system.menu.externalNo') }}
                     </NTag>
@@ -595,45 +626,62 @@ function confirmDeleteMenu(id: number) {
                 </NGridItem>
                 <NGridItem span="3 s:3 m:1 l:1 xl:1">
                   <div class="flex items-center justify-between gap-8px">
-                    <span class="text-13px text-gray-500 shrink-0">{{ $t('page.system.menu.fieldBtnPerm') }}</span>
+                    <span class="text-13px text-[var(--theme-text-2)] shrink-0">
+                      {{ $t('page.system.menu.fieldBtnPerm') }}
+                    </span>
                     <span class="truncate text-14px" :title="activeMenu.name">{{ activeMenu.name }}</span>
                   </div>
                 </NGridItem>
                 <NGridItem span="3 s:3 m:1 l:1 xl:1">
                   <div class="flex items-center justify-between gap-8px">
-                    <span class="text-13px text-gray-500 shrink-0">{{ $t('page.system.menu.fieldLayout') }}</span>
-                    <span class="truncate text-14px" :title="activeMenu.layout || 'layout.base'">
-                      {{ activeMenu.layout || 'layout.base' }}
+                    <span class="text-13px text-[var(--theme-text-2)] shrink-0">
+                      {{ $t('page.system.menu.fieldLayout') }}
+                    </span>
+                    <span class="truncate text-14px" :title="layoutLabel(activeMenu.layout)">
+                      {{ layoutLabel(activeMenu.layout) }}
                     </span>
                   </div>
                 </NGridItem>
               </NGrid>
             </div>
 
-            <!-- 按钮权限列表 -->
-            <div class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-8px border border-gray-100 p-16px">
-              <div class="flex items-center justify-between">
-                <h4 class="m-0 text-14px font-500">{{ $t('page.system.menu.panelBtnPermission') }}</h4>
-                <NButton size="small" quaternary @click="handleRefresh">
-                  <template #icon><SvgIcon icon="material-symbols:refresh" /></template>
-                </NButton>
+            <!-- 菜单参数 + 按钮权限：可滚动区域 -->
+            <div class="flex min-h-0 flex-1 flex-col gap-12px overflow-auto">
+              <!-- 菜单参数 -->
+              <div class="rounded-8px border border-[var(--theme-border-color)] p-16px">
+                <h4 class="m-0 mb-12px text-14px font-500">{{ $t('page.system.menu.sectionParams') }}</h4>
+                <NDataTable
+                  :columns="paramColumns"
+                  :data="activeMenu?.parameters ?? []"
+                  size="small"
+                  :bordered="false"
+                  single-line
+                  :scroll-x="paramScrollX"
+                  :row-key="paramRowKey"
+                >
+                  <template #empty>
+                    <NEmpty :description="$t('page.system.menu.paramEmptyTip')" size="small" />
+                  </template>
+                </NDataTable>
               </div>
 
-              <NDataTable
-                :columns="btnColumns"
-                :data="activeMenu?.menuBtn ?? []"
-                size="small"
-                :bordered="false"
-                single-line
-                :scroll-x="btnScrollX"
-                :row-key="row => String(row.ID)"
-                :loading="loading"
-                class="mt-12px flex-1"
-              >
-                <template #empty>
-                  <NEmpty :description="$t('page.system.menu.btnEmpty')" size="small" />
-                </template>
-              </NDataTable>
+              <!-- 按钮权限 -->
+              <div class="rounded-8px border border-[var(--theme-border-color)] p-16px">
+                <h4 class="m-0 mb-12px text-14px font-500">{{ $t('page.system.menu.panelBtnPermission') }}</h4>
+                <NDataTable
+                  :columns="btnColumns"
+                  :data="activeMenu?.menuBtn ?? []"
+                  size="small"
+                  :bordered="false"
+                  single-line
+                  :scroll-x="btnScrollX"
+                  :row-key="btnRowKey"
+                >
+                  <template #empty>
+                    <NEmpty :description="$t('page.system.menu.btnEmpty')" size="small" />
+                  </template>
+                </NDataTable>
+              </div>
             </div>
           </template>
         </div>
@@ -660,7 +708,13 @@ function confirmDeleteMenu(id: number) {
   height: 40px;
 }
 :deep(.n-tree .n-tree-node) {
-  padding: 2px 0;
+  padding: 0;
+  align-items: center;
+}
+:deep(.n-tree .n-tree-node-switcher) {
+  height: 40px;
+  display: flex;
+  align-items: center;
 }
 :deep(.menu-row-actions) {
   opacity: 0;
