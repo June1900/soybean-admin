@@ -277,11 +277,6 @@ function handleKeepAliveChange(val: number) {
   model.value.meta.keepAlive = val === 1;
 }
 
-/** closeTab 变更 */
-function handleCloseTabChange(val: number) {
-  model.value.meta.closeTab = val === 1;
-}
-
 /** 选择图标 */
 function handleIconSelect(icon: string) {
   model.value.meta.icon = icon;
@@ -332,7 +327,7 @@ function createDefaultModel(): MenuForm {
       title: '',
       icon: '',
       keepAlive: false,
-      closeTab: false,
+      closeTab: true,
       defaultMenu: false,
       activeName: '',
       transitionType: ''
@@ -405,7 +400,7 @@ function buildModelFromProps(): MenuForm {
     hidden: props.editingData!.hidden,
     menuType: props.editingData!.menuType ?? 'menu',
     layout: props.editingData!.layout ?? 'layout.base',
-    meta: { ...props.editingData!.meta }
+    meta: { ...props.editingData!.meta, closeTab: true }
   };
 }
 
@@ -597,7 +592,7 @@ async function handleSubmit() {
         <NDivider title-placement="left">{{ $t('page.system.menu.sectionBasic') }}</NDivider>
 
         <NGrid :cols="24" :x-gap="16" :y-gap="8">
-          <NFormItemGi :span="8" :label="$t('page.system.menu.parentId')" path="parentId">
+          <NFormItemGi :span="24" :label="$t('page.system.menu.parentId')" path="parentId">
             <NTreeSelect
               :value="model.parentId"
               :options="parentTreeOptions"
@@ -609,9 +604,6 @@ async function handleSubmit() {
               clearable
               @update:value="handleParentIdChange"
             />
-          </NFormItemGi>
-          <NFormItemGi :span="16" :label="$t('page.system.menu.path')" path="path">
-            <NInput v-model:value="model.path" :placeholder="$t('page.system.menu.pathPlaceholder')" readonly />
           </NFormItemGi>
         </NGrid>
 
@@ -673,8 +665,8 @@ async function handleSubmit() {
               readonly
             />
           </NFormItemGi>
-          <NFormItemGi :span="12" :label="$t('page.system.menu.name')" path="name">
-            <NInput v-model:value="model.name" :placeholder="$t('page.system.menu.namePlaceholder')" readonly />
+          <NFormItemGi :span="12" :label="$t('page.system.menu.path')" path="path">
+            <NInput v-model:value="model.path" :placeholder="$t('page.system.menu.pathPlaceholder')" readonly />
           </NFormItemGi>
         </NGrid>
 
@@ -688,8 +680,22 @@ async function handleSubmit() {
                 v-model:value="model.meta.icon"
                 :placeholder="$t('page.system.menu.iconPlaceholder')"
                 readonly
+                clearable
                 class="flex-1"
-              />
+              >
+                <template #prefix>
+                  <SvgIcon
+                    v-if="model.meta.icon"
+                    :icon="model.meta.icon"
+                    class="text-16px text-[var(--n-text-color-2)]"
+                  />
+                  <SvgIcon
+                    v-else
+                    icon="material-symbols:image-outline-rounded"
+                    class="text-16px text-[var(--n-text-color-3)] op-50"
+                  />
+                </template>
+              </NInput>
               <NButton size="small" type="primary" @click="iconPickerVisible = true">
                 {{ $t('common.select') }}
               </NButton>
@@ -710,13 +716,6 @@ async function handleSubmit() {
               :value="model.meta.keepAlive ? 1 : 0"
               :options="yesOrNoOptions()"
               @update:value="handleKeepAliveChange"
-            />
-          </NFormItemGi>
-          <NFormItemGi :span="12" label="CloseTab" path="meta.closeTab">
-            <NSelect
-              :value="model.meta.closeTab ? 1 : 0"
-              :options="yesOrNoOptions()"
-              @update:value="handleCloseTabChange"
             />
           </NFormItemGi>
           <NFormItemGi :span="12" :label="$t('page.system.menu.transitionType')" path="meta.transitionType">

@@ -17,7 +17,7 @@ const themeStore = useThemeStore();
 const loading = ref(false);
 const serverInfo = ref<ServerInfo | null>(null);
 const lastUpdateTime = ref('');
-const refreshInterval = 30; // seconds
+const refreshIntervalSeconds = 30;
 
 /** 计算平均 CPU 使用率 */
 function calcCpuAvg(info: ServerInfo): number {
@@ -45,7 +45,7 @@ let timer: ReturnType<typeof setInterval> | null = null;
 function startAutoRefresh() {
   timer = setInterval(() => {
     void loadData();
-  }, refreshInterval * 1000);
+  }, refreshIntervalSeconds * 1000);
 }
 
 onMounted(() => {
@@ -246,7 +246,7 @@ const cardData = computed<StatCard[]>(() => {
 
     <!--  刷新提示  -->
     <div v-if="lastUpdateTime" class="text-right text-12px c-gray-350">
-      {{ refreshInterval }} {{ $t('page.opsMonitor.serverStatus.footer.autoRefresh') }} ·
+      {{ refreshIntervalSeconds }} {{ $t('page.opsMonitor.serverStatus.footer.autoRefresh') }} ·
       {{ $t('page.opsMonitor.serverStatus.footer.lastUpdate') }} {{ lastUpdateTime }}
     </div>
   </div>

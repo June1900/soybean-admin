@@ -63,7 +63,7 @@ const enUS: import('../types/i18n').SystemMenuLang = {
   sectionButtons: 'Menu Buttons',
   /* drawer fields */
   addParam: 'Add Param',
-  sortLabel: 'Sort Order',
+  sortLabel: 'Sort',
   transitionType: 'Transition Type',
   followGlobal: 'Follow Global',
   /* form validation */

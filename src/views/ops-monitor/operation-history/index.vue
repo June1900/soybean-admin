@@ -95,14 +95,12 @@ async function handleBatchDelete() {
   if (!error) await onBatchDeleted();
 }
 
-/** 操作人显示：userName(nickName) */
 function operatorLabel(row: OperationRecord): string {
   if (!row.user) return '-';
   const { userName, nickName } = row.user;
   return nickName ? `${userName}(${nickName})` : userName;
 }
 
-/** 设备ID / 请求体 / 响应体的空值占位 */
 function displayField(val: string): string {
   if (!val || val === '') return $t('page.opsMonitor.operationHistory.placeholder.none');
   return val;

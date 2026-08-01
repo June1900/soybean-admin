@@ -1,24 +1,12 @@
 <script setup lang="ts">
-import { computed, h, onMounted, ref, onBeforeUnmount } from 'vue';
-import {
-  NButton,
-  NDataTable,
-  NEmpty,
-  NGrid,
-  NGridItem,
-  NInput,
-  NSpace,
-  NTag,
-  NTooltip,
-  NTree,
-  useThemeVars,
-  type TreeOption
-} from 'naive-ui';
+import { computed, h, onMounted, ref, watch, onBeforeUnmount } from 'vue';
+import { NButton, NInput, NSpace, NTooltip, NTree, useThemeVars, type TreeOption } from 'naive-ui';
 import { $t } from '@/locales';
 import { fetchDeleteMenu, fetchGetMenuList, type Menu } from './api';
-import { translateTitle, resolveMenuType, layoutOptions } from './shared';
+import { translateTitle, resolveMenuType } from './shared';
 import MenuOperateDrawer from './modules/menu-operate-drawer.vue';
 import MenuTreeNode from './modules/menu-tree-node.vue';
+import MenuDetailPanel from './modules/menu-detail-panel.vue';
 
 import SvgIcon from '@/components/custom/svg-icon.vue';
 
@@ -96,22 +84,6 @@ function findMenu(list: Menu[] = [], id: number): Menu | null {
   return null;
 }
 
-/** 将布局方式 value（如 layout.base）翻译为简短文案，未匹配时回退到原始值 */
-function layoutLabel(value?: string): string {
-  const fallback = value || 'layout.base';
-  return layoutOptions().find(o => o.value === fallback)?.label ?? fallback;
-}
-
-/** 参数行 row-key（优先用 ID，回退到 key 字段） */
-function paramRowKey(row: { ID?: number; key: string }) {
-  return String(row.ID ?? row.key);
-}
-
-/** 按钮行 row-key */
-function btnRowKey(row: { ID: number }) {
-  return String(row.ID);
-}
-
 function filterTree(list: Menu[], kw: string): Menu[] {
   const res: Menu[] = [];
   for (const item of list) {
@@ -137,6 +109,19 @@ const displayData = computed(() =>
 
 const expandedKeys = ref<string[]>([]);
 const selectedId = ref<number | null>(null);
+
+/** 右侧详情加载态：切换菜单时短暂显示加载动画，增强切换反馈 */
+const detailLoading = ref(false);
+let detailLoadingTimer: ReturnType<typeof setTimeout> | null = null;
+watch(selectedId, id => {
+  if (id === null) return;
+  if (detailLoadingTimer) clearTimeout(detailLoadingTimer);
+  detailLoading.value = true;
+  detailLoadingTimer = setTimeout(() => {
+    detailLoading.value = false;
+    detailLoadingTimer = null;
+  }, 300);
+});
 
 /** 收集树中所有含子节点的 key（用于展开全部） */
 function collectAllKeys(list: Menu[] = []): string[] {
@@ -208,7 +193,10 @@ function onSplitterMouseUp() {
   window.removeEventListener('mouseup', onSplitterMouseUp);
 }
 
-onBeforeUnmount(onSplitterMouseUp);
+onBeforeUnmount(() => {
+  onSplitterMouseUp();
+  if (detailLoadingTimer) clearTimeout(detailLoadingTimer);
+});
 
 const selectedKeys = computed<string[]>(() => (selectedId.value === null ? [] : [String(selectedId.value)]));
 
@@ -298,94 +286,13 @@ async function handleDelete(id: number) {
   }
 }
 
-const paramColumns: NaiveUI.TableColumn<{ ID?: number; type: string; key: string; value: string }>[] = [
-  {
-    key: 'idx',
-    title: '#',
-    width: 48,
-    align: 'center',
-    render: (_row, index) => String(index + 1)
-  },
-  {
-    key: 'type',
-    title: $t('page.system.menu.paramType'),
-    width: 96,
-    align: 'center',
-    render: row =>
-      h(
-        NTag,
-        { size: 'small', type: row.type === 'params' ? 'success' : 'info', bordered: false, round: true },
-        { default: () => row.type || '-' }
-      )
-  },
-  {
-    key: 'key',
-    title: $t('page.system.menu.paramKey'),
-    minWidth: 140,
-    ellipsis: { tooltip: true },
-    render: row => row.key || '-'
-  },
-  {
-    key: 'value',
-    title: $t('page.system.menu.paramValue'),
-    minWidth: 140,
-    ellipsis: { tooltip: true },
-    render: row => row.value || '-'
-  }
-];
-
-const paramScrollX = computed(() =>
-  paramColumns.reduce(
-    (acc, c) =>
-      acc +
-      ((c as { width?: number; minWidth?: number }).width ??
-        (c as { width?: number; minWidth?: number }).minWidth ??
-        120),
-    0
-  )
-);
-
-const btnColumns: NaiveUI.TableColumn<{ ID: number; name: string; desc: string }>[] = [
-  {
-    key: 'idx',
-    title: '#',
-    width: 48,
-    align: 'center',
-    render: (_row, index) => String(index + 1)
-  },
-  {
-    key: 'desc',
-    title: $t('page.system.menu.btnDesc'),
-    minWidth: 160,
-    ellipsis: { tooltip: true },
-    render: row => row.desc || '-'
-  },
-  {
-    key: 'name',
-    title: $t('page.system.menu.fieldBtnPerm'),
-    minWidth: 200,
-    ellipsis: { tooltip: true },
-    render: row => row.name || '-'
-  }
-];
-
-const btnScrollX = computed(() =>
-  btnColumns.reduce(
-    (acc, c) =>
-      acc +
-      ((c as { width?: number; minWidth?: number }).width ??
-        (c as { width?: number; minWidth?: number }).minWidth ??
-        120),
-    0
-  )
-);
-
 onMounted(async () => {
   await getData();
+  selectedId.value = null;
   // 默认选中第一个根节点（树保持折叠状态）
-  if (data.value.length && selectedId.value === null) {
-    selectedId.value = data.value[0].ID;
-  }
+  // if (data.value.length && selectedId.value === null) {
+  //   selectedId.value = data.value[0].ID;
+  // }
 });
 
 function handleRefresh() {
@@ -417,19 +324,8 @@ function confirmDeleteMenu(id: number) {
   });
 }
 
-const activeMenuTypeLabel = computed(() => {
-  if (!activeMenu.value) return '';
-  const type = resolveMenuType(activeMenu.value);
-  return type === 'directory' ? $t('page.system.menu.typeDirectory') : $t('page.system.menu.typeMenu');
-});
-
 /** 当前选中菜单是否存在子节点（存在时禁止删除） */
 const activeMenuHasChildren = computed(() => !!(activeMenu.value?.children && activeMenu.value.children.length > 0));
-
-const activeMenuTitle = computed(() => {
-  if (!activeMenu.value) return '';
-  return translateTitle(activeMenu.value.meta?.title) || activeMenu.value.name;
-});
 
 function handleAddChild() {
   if (selectedId.value !== null) handleAdd(selectedId.value);
@@ -454,7 +350,9 @@ function handleDeleteClick() {
         '--theme-border': themeVars.borderColor,
         '--theme-text-2': themeVars.textColor2,
         '--theme-text-3': themeVars.textColor3,
-        '--theme-border-color': themeVars.borderColor
+        '--theme-border-color': themeVars.borderColor,
+        '--theme-table-header-color': themeVars.tableHeaderColor,
+        '--theme-card-color': themeVars.cardColor
       }"
     >
       <div ref="splitContainerRef" class="flex min-h-0 flex-1">
@@ -544,146 +442,7 @@ function handleDeleteClick() {
             </NSpace>
           </div>
 
-          <!-- 未选中提示 -->
-          <div
-            v-if="!activeMenu"
-            class="flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden rounded-8px border border-dashed border-[var(--theme-border-color)] text-[var(--theme-text-3)]"
-          >
-            <SvgIcon icon="material-symbols:info-outline" class="mb-8px text-36px opacity-50" />
-            <span>{{ $t('page.system.menu.noSelectHint') }}</span>
-          </div>
-
-          <template v-else>
-            <!-- 详情网格 -->
-            <div class="rounded-8px border border-[var(--theme-border-color)] p-16px">
-              <NGrid :cols="3" :x-gap="24" :y-gap="16" responsive="screen" item-responsive>
-                <NGridItem span="3 s:3 m:1 l:1 xl:1">
-                  <div class="flex items-center justify-between">
-                    <span class="text-13px text-[var(--theme-text-2)]">{{ $t('page.system.menu.fieldMenuType') }}</span>
-                    <NTag
-                      size="small"
-                      :type="resolveMenuType(activeMenu) === 'directory' ? 'info' : 'success'"
-                      :bordered="false"
-                      round
-                    >
-                      {{ activeMenuTypeLabel }}
-                    </NTag>
-                  </div>
-                </NGridItem>
-                <NGridItem span="3 s:3 m:1 l:1 xl:1">
-                  <div class="flex items-center justify-between">
-                    <span class="text-13px text-[var(--theme-text-2)]">
-                      {{ $t('page.system.menu.fieldMenuStatus') }}
-                    </span>
-                    <NTag size="small" type="success" :bordered="false" round>
-                      {{ $t('page.system.menu.statusNormal') }}
-                    </NTag>
-                  </div>
-                </NGridItem>
-                <NGridItem span="3 s:3 m:1 l:1 xl:1">
-                  <div class="flex items-center justify-between">
-                    <span class="text-13px text-[var(--theme-text-2)]">{{ $t('page.system.menu.fieldSort') }}</span>
-                    <span class="text-14px">{{ activeMenu.sort }}</span>
-                  </div>
-                </NGridItem>
-
-                <NGridItem span="3 s:3 m:1 l:1 xl:1">
-                  <div class="flex items-center justify-between gap-8px">
-                    <span class="text-13px text-[var(--theme-text-2)] shrink-0">
-                      {{ $t('page.system.menu.fieldMenuName') }}
-                    </span>
-                    <span class="truncate text-14px" :title="activeMenuTitle">{{ activeMenuTitle }}</span>
-                  </div>
-                </NGridItem>
-                <NGridItem span="3 s:3 m:1 l:1 xl:1">
-                  <div class="flex items-center justify-between gap-8px">
-                    <span class="text-13px text-[var(--theme-text-2)] shrink-0">
-                      {{ $t('page.system.menu.fieldRoutePath') }}
-                    </span>
-                    <span class="truncate text-14px" :title="activeMenu.path">{{ activeMenu.path }}</span>
-                  </div>
-                </NGridItem>
-                <NGridItem span="3 s:3 m:1 l:1 xl:1">
-                  <div class="flex items-center justify-between">
-                    <span class="text-13px text-[var(--theme-text-2)]">
-                      {{ $t('page.system.menu.fieldDisplayStatus') }}
-                    </span>
-                    <NTag size="small" :type="activeMenu.hidden ? 'warning' : 'success'" :bordered="false" round>
-                      {{ activeMenu.hidden ? $t('page.system.menu.hidden') : $t('page.system.menu.show') }}
-                    </NTag>
-                  </div>
-                </NGridItem>
-
-                <NGridItem span="3 s:3 m:1 l:1 xl:1">
-                  <div class="flex items-center justify-between">
-                    <span class="text-13px text-[var(--theme-text-2)]">
-                      {{ $t('page.system.menu.fieldIsExternal') }}
-                    </span>
-                    <NTag size="small" type="warning" :bordered="false" round>
-                      {{ $t('page.system.menu.externalNo') }}
-                    </NTag>
-                  </div>
-                </NGridItem>
-                <NGridItem span="3 s:3 m:1 l:1 xl:1">
-                  <div class="flex items-center justify-between gap-8px">
-                    <span class="text-13px text-[var(--theme-text-2)] shrink-0">
-                      {{ $t('page.system.menu.fieldBtnPerm') }}
-                    </span>
-                    <span class="truncate text-14px" :title="activeMenu.name">{{ activeMenu.name }}</span>
-                  </div>
-                </NGridItem>
-                <NGridItem span="3 s:3 m:1 l:1 xl:1">
-                  <div class="flex items-center justify-between gap-8px">
-                    <span class="text-13px text-[var(--theme-text-2)] shrink-0">
-                      {{ $t('page.system.menu.fieldLayout') }}
-                    </span>
-                    <span class="truncate text-14px" :title="layoutLabel(activeMenu.layout)">
-                      {{ layoutLabel(activeMenu.layout) }}
-                    </span>
-                  </div>
-                </NGridItem>
-              </NGrid>
-            </div>
-
-            <!-- 菜单参数 + 按钮权限：可滚动区域 -->
-            <div class="flex min-h-0 flex-1 flex-col gap-12px overflow-auto">
-              <!-- 菜单参数 -->
-              <div class="rounded-8px border border-[var(--theme-border-color)] p-16px">
-                <h4 class="m-0 mb-12px text-14px font-500">{{ $t('page.system.menu.sectionParams') }}</h4>
-                <NDataTable
-                  :columns="paramColumns"
-                  :data="activeMenu?.parameters ?? []"
-                  size="small"
-                  :bordered="false"
-                  single-line
-                  :scroll-x="paramScrollX"
-                  :row-key="paramRowKey"
-                >
-                  <template #empty>
-                    <NEmpty :description="$t('page.system.menu.paramEmptyTip')" size="small" />
-                  </template>
-                </NDataTable>
-              </div>
-
-              <!-- 按钮权限 -->
-              <div class="rounded-8px border border-[var(--theme-border-color)] p-16px">
-                <h4 class="m-0 mb-12px text-14px font-500">{{ $t('page.system.menu.panelBtnPermission') }}</h4>
-                <NDataTable
-                  :columns="btnColumns"
-                  :data="activeMenu?.menuBtn ?? []"
-                  size="small"
-                  :bordered="false"
-                  single-line
-                  :scroll-x="btnScrollX"
-                  :row-key="btnRowKey"
-                >
-                  <template #empty>
-                    <NEmpty :description="$t('page.system.menu.btnEmpty')" size="small" />
-                  </template>
-                </NDataTable>
-              </div>
-            </div>
-          </template>
+          <MenuDetailPanel :menu="activeMenu" :loading="detailLoading" />
         </div>
       </div>
 
@@ -700,10 +459,15 @@ function handleDeleteClick() {
 </template>
 
 <style scoped lang="scss">
+:deep(.n-tree .n-tree-node-wrapper) {
+  box-sizing: border-box;
+  padding: 0;
+}
 :deep(.n-tree .n-tree-node-content-wrapper) {
   padding: 0 8px;
   min-height: 40px;
 }
+
 :deep(.n-tree .n-tree-node-content-wrapper::before) {
   height: 40px;
 }
@@ -722,6 +486,12 @@ function handleDeleteClick() {
 :deep(.n-tree-node-content-wrapper:hover .menu-row-actions),
 :deep(.n-tree-node--selected .menu-row-actions) {
   opacity: 1;
+}
+
+:deep(.n-tree .n-tree-node-switcher .n-tree-node-switcher__icon) {
+  height: 20px;
+  width: 20px;
+  font-size: 20px;
 }
 
 /* 左右面板之间的拖拽分隔条 */

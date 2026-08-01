@@ -588,8 +588,8 @@ declare namespace App {
           system: import('../../views/system-tools/system/types').SystemToolsSystemLang;
         };
         opsMonitor: {
-          sysError: import('../../views/ops-monitor/sys-error/types').SystemToolsSysErrorLang;
-          loginLog: import('../../views/ops-monitor/login-log/types').SystemToolsLoginLogLang;
+          sysError: import('../../views/ops-monitor/sys-error/types').OpsMonitorSysErrorLang;
+          loginLog: import('../../views/ops-monitor/login-log/types').OpsMonitorLoginLogLang;
           operationHistory: import('../../views/ops-monitor/operation-history/types').OpsMonitorOperationHistoryLang;
           serverStatus: import('../../views/ops-monitor/server-status/types').OpsMonitorServerStatusLang;
           timedTask: import('../../views/ops-monitor/timed-task/types').OpsMonitorTimedTaskLang;

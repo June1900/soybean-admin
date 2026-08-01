@@ -21,7 +21,7 @@ import TableActionButtons from '@/components/common/table-action-buttons';
 import { formatDateTime } from '@/utils/date';
 
 defineOptions({
-  name: 'SystemToolsLoginLog'
+  name: 'OpsMonitorLoginLog'
 });
 
 const appStore = useAppStore();

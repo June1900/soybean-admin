@@ -24,7 +24,7 @@ import TableActionButtons from '@/components/common/table-action-buttons';
 import { formatDateTime } from '@/utils/date';
 
 defineOptions({
-  name: 'SystemToolsSysError'
+  name: 'OpsMonitorSysError'
 });
 
 const appStore = useAppStore();

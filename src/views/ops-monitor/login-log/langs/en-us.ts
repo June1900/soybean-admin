@@ -1,6 +1,6 @@
-import type { SystemToolsLoginLogLang } from '../types';
+import type { OpsMonitorLoginLogLang } from '../types';
 
-const lang: SystemToolsLoginLogLang = {
+const lang: OpsMonitorLoginLogLang = {
   title: 'Login Logs',
   search: {
     username: 'Username',

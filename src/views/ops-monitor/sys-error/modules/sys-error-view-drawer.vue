@@ -4,6 +4,7 @@ import { NButton, NDescriptions, NDescriptionsItem, NDrawer, NDrawerContent, NSc
 import { $t } from '@/locales';
 import type { SysError, SysErrorLevel, SysErrorStatus } from '../api';
 import { formatDateTime } from '@/utils/date';
+import { useClipboard } from '@vueuse/core';
 
 defineOptions({ name: 'SysErrorViewDrawer' });
 
@@ -29,10 +30,30 @@ const statusTagType: Record<SysErrorStatus, 'warning' | 'info' | 'success' | 'er
 const levelLabel = computed(() => (props.data ? $t(`page.opsMonitor.sysError.level.${props.data.level}`) : ''));
 const statusLabel = computed(() => (props.data ? $t(`page.opsMonitor.sysError.status.${props.data.status}`) : ''));
 
+const { copy, isSupported } = useClipboard();
+
+async function checkClipboardPermission(): Promise<boolean> {
+  try {
+    if (!navigator.permissions?.query) return true;
+    const status = await navigator.permissions.query({ name: 'clipboard-write' } as unknown as PermissionDescriptor);
+    return status.state !== 'denied';
+  } catch {
+    return true;
+  }
+}
+
 async function copyText(text: string) {
   if (!text) return;
+  if (!isSupported.value) {
+    window.$message?.error($t('common.error'));
+    return;
+  }
+  if (!(await checkClipboardPermission())) {
+    window.$message?.error($t('common.error'));
+    return;
+  }
   try {
-    await navigator.clipboard.writeText(text);
+    await copy(text);
     window.$message?.success($t('page.opsMonitor.sysError.detail.copied'));
   } catch {
     window.$message?.error($t('common.error'));

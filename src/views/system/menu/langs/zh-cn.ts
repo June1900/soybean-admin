@@ -63,7 +63,7 @@ const zhCN: import('../types/i18n').SystemMenuLang = {
   sectionButtons: '可控按钮配置',
   /* drawer fields */
   addParam: '添加参数',
-  sortLabel: '排序标记',
+  sortLabel: '排序',
   transitionType: '路由切换动画',
   followGlobal: '跟随全局',
   /* form validation */

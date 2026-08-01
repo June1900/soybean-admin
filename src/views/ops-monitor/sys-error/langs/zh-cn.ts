@@ -1,6 +1,6 @@
-import type { SystemToolsSysErrorLang } from '../types';
+import type { OpsMonitorSysErrorLang } from '../types';
 
-const lang: SystemToolsSysErrorLang = {
+const lang: OpsMonitorSysErrorLang = {
   title: '系统错误日志',
   search: {
     form: '错误来源',

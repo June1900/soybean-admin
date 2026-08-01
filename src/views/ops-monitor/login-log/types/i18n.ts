@@ -1,4 +1,4 @@
-export interface SystemToolsLoginLogLang {
+export interface OpsMonitorLoginLogLang {
   title: string;
   search: {
     username: string;

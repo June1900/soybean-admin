@@ -1,4 +1,4 @@
-export interface SystemToolsSysErrorLang {
+export interface OpsMonitorSysErrorLang {
   title: string;
   search: {
     form: string;

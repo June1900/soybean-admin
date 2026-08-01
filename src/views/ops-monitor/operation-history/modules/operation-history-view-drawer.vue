@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { NButton, NDescriptions, NDescriptionsItem, NDrawer, NDrawerContent, NScrollbar, NSpace, NTag } from 'naive-ui';
 import { $t } from '@/locales';
 import { formatDateTime } from '@/utils/date';
+import { useClipboard } from '@vueuse/core';
 import type { OperationRecord } from '../api';
 import { statusTagType } from '../share';
 
@@ -26,10 +27,30 @@ function displayField(val: string): string {
   return val;
 }
 
+const { copy, isSupported } = useClipboard();
+
+async function checkClipboardPermission(): Promise<boolean> {
+  try {
+    if (!navigator.permissions?.query) return true;
+    const status = await navigator.permissions.query({ name: 'clipboard-write' } as unknown as PermissionDescriptor);
+    return status.state !== 'denied';
+  } catch {
+    return true;
+  }
+}
+
 async function copyText(text: string) {
   if (!text) return;
+  if (!isSupported.value) {
+    window.$message?.error($t('common.error'));
+    return;
+  }
+  if (!(await checkClipboardPermission())) {
+    window.$message?.error($t('common.error'));
+    return;
+  }
   try {
-    await navigator.clipboard.writeText(text);
+    await copy(text);
     window.$message?.success($t('page.opsMonitor.operationHistory.detail.copied'));
   } catch {
     window.$message?.error($t('common.error'));

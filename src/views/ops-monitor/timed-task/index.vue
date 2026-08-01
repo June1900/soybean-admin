@@ -59,8 +59,8 @@ const scrollX = computed(() =>
 
 function getQueryParams(): TimedTaskListQuery {
   const params: TimedTaskListQuery = {
-    page: mobilePagination.value.page,
-    pageSize: mobilePagination.value.pageSize
+    page: mobilePagination.value.page ?? 1,
+    pageSize: mobilePagination.value.pageSize ?? 10
   };
   if (searchParams.name) params.name = searchParams.name;
   if (searchParams.executorType) params.executorType = searchParams.executorType;
@@ -107,11 +107,9 @@ async function handleDelete(id: number) {
 }
 
 async function handleBatchDelete() {
-  const ids = checkedRowKeys.value.map(id => Number(id)) as number[];
-  for (const id of ids) {
-    const { error } = await fetchDeleteTimedTask(id);
-    if (error) return;
-  }
+  const ids = checkedRowKeys.value.map(id => Number(id));
+  const results = await Promise.all(ids.map(id => fetchDeleteTimedTask(id)));
+  if (results.some(r => r.error)) return;
   await onBatchDeleted();
 }
 

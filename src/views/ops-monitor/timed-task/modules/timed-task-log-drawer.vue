@@ -19,6 +19,7 @@ import {
 } from 'naive-ui';
 import { $t } from '@/locales';
 import { fetchGetTimedTaskLogList, type TimedTaskLog, type TimedTaskLogSearchParams } from '../api';
+import { formatDateTime } from '@/utils/date';
 
 defineOptions({
   name: 'OpsMonitorTimedTaskLogDrawer'
@@ -103,8 +104,8 @@ const timeRange = computed<[number, number] | null>({
   },
   set(val: [number, number] | null) {
     if (val && val.length === 2) {
-      logSearchParams.startCreatedAt = dayjs(val[0]).format('YYYY-MM-DD HH:mm:ss');
-      logSearchParams.endCreatedAt = dayjs(val[1]).format('YYYY-MM-DD HH:mm:ss');
+      logSearchParams.startCreatedAt = formatDateTime(val[0]);
+      logSearchParams.endCreatedAt = formatDateTime(val[1]);
     } else {
       logSearchParams.startCreatedAt = '';
       logSearchParams.endCreatedAt = '';
@@ -136,10 +137,6 @@ function statusTagType(v: string): 'success' | 'error' | 'warning' {
   if (v === 'success') return 'success';
   if (v === 'timeout') return 'warning';
   return 'error';
-}
-
-function formatTime(v?: string) {
-  return v ? dayjs(v).format('YYYY-MM-DD HH:mm:ss') : '-';
 }
 
 const detailVisible = ref(false);
@@ -179,13 +176,13 @@ const logColumns: NaiveUI.TableColumn<TimedTaskLog>[] = [
     key: 'startedAt',
     title: $t('page.opsMonitor.timedTask.log.columns.startedAt'),
     width: 180,
-    render: (row: TimedTaskLog) => formatTime(row.startedAt)
+    render: (row: TimedTaskLog) => formatDateTime(row.startedAt)
   },
   {
     key: 'finishedAt',
     title: $t('page.opsMonitor.timedTask.log.columns.finishedAt'),
     width: 180,
-    render: (row: TimedTaskLog) => formatTime(row.finishedAt)
+    render: (row: TimedTaskLog) => formatDateTime(row.finishedAt)
   },
   {
     key: 'durationMs',
@@ -198,7 +195,7 @@ const logColumns: NaiveUI.TableColumn<TimedTaskLog>[] = [
     key: 'CreatedAt',
     title: $t('page.opsMonitor.timedTask.log.columns.createdAt'),
     width: 180,
-    render: (row: TimedTaskLog) => formatTime(row.CreatedAt)
+    render: (row: TimedTaskLog) => formatDateTime(row.CreatedAt)
   },
   {
     key: 'operation',
@@ -317,16 +314,16 @@ watch(
                 </NTag>
               </NDescriptionsItem>
               <NDescriptionsItem :label="$t('page.opsMonitor.timedTask.log.detail.startedAt')">
-                {{ formatTime(detailData.startedAt) }}
+                {{ formatDateTime(detailData.startedAt) }}
               </NDescriptionsItem>
               <NDescriptionsItem :label="$t('page.opsMonitor.timedTask.log.detail.finishedAt')">
-                {{ formatTime(detailData.finishedAt) }}
+                {{ formatDateTime(detailData.finishedAt) }}
               </NDescriptionsItem>
               <NDescriptionsItem :label="$t('page.opsMonitor.timedTask.log.detail.duration')">
                 {{ detailData.durationMs ?? '-' }}
               </NDescriptionsItem>
               <NDescriptionsItem :label="$t('page.opsMonitor.timedTask.log.detail.createdAt')">
-                {{ formatTime(detailData.CreatedAt) }}
+                {{ formatDateTime(detailData.CreatedAt) }}
               </NDescriptionsItem>
             </NDescriptions>
 

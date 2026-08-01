@@ -35,7 +35,6 @@ export interface SysErrorListResponse {
   pageSize: number;
 }
 
-/** Frontend search form model for sys error list */
 export interface SysErrorSearchParams {
   form: string;
   info: string;
