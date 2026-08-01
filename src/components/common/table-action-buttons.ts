@@ -14,7 +14,7 @@ export interface TableActionItem {
    * define its own edit/delete text.
    */
   kind?: 'edit' | 'delete';
-  /** Iconify icon name, e.g. 'material-symbols:edit'. */
+  /** Iconify icon name, e.g. 'ri:edit-line'. */
   icon: string;
   /** naive-ui button type. Controls the ghost color. Defaults to 'default'. */
   type?: TableActionButtonType;

@@ -115,19 +115,19 @@ function createAllColumns(): NaiveUI.TableColumn<SysVersion>[] {
           actions: [
             {
               label: $t('page.systemTools.version.columns.view'),
-              icon: 'material-symbols:visibility',
+              icon: 'ri:eye-line',
               type: 'default',
               onClick: () => openView(row)
             },
             {
               label: $t('page.systemTools.version.columns.download'),
-              icon: 'material-symbols:download',
+              icon: 'ri:download-line',
               type: 'info',
               onClick: () => handleDownload(row)
             },
             {
               kind: 'delete',
-              icon: 'material-symbols:delete',
+              icon: 'ri:delete-bin-line',
               type: 'error',
               popconfirm: {
                 content: $t('common.confirmDelete'),

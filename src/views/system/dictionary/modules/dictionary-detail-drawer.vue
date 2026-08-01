@@ -120,19 +120,19 @@ function createDetailColumns(): NaiveUI.TableColumn<DictionaryDetail>[] {
           actions: [
             {
               label: $t('page.system.dictionary.addChildDetail'),
-              icon: 'material-symbols:add',
+              icon: 'ri:add-line',
               type: 'primary',
               onClick: () => handleAddChild(row)
             },
             {
               label: $t('page.system.dictionary.modifyDetail'),
-              icon: 'material-symbols:edit',
+              icon: 'ri:edit-line',
               type: 'info',
               onClick: () => handleEditDetail(row.ID)
             },
             {
               kind: 'delete',
-              icon: 'material-symbols:delete',
+              icon: 'ri:delete-bin-line',
               type: 'error',
               popconfirm: {
                 content: $t('page.system.dictionary.confirmDeleteDetail'),

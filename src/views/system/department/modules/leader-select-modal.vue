@@ -67,7 +67,7 @@ const columns: DataTableColumns<User> = [
         },
         [
           h(SvgIcon, {
-            icon: checked ? 'material-symbols:check-circle' : 'material-symbols:radio-button-unchecked',
+            icon: checked ? 'ri:checkbox-circle-line' : 'ri:checkbox-blank-circle-line',
             style: {
               fontSize: '18px',
               color: checked ? themeVars.value.primaryColor : 'var(--text-color-3, #c2c8d1)'
@@ -195,18 +195,18 @@ watch(
             @keyup.enter="onKeywordInput"
           >
             <template #prefix>
-              <span class="i-material-symbols-search text-16px text-[var(--text-color-placeholder)]"></span>
+              <span class="i-ri-search-line text-16px text-[var(--text-color-placeholder)]"></span>
             </template>
           </NInput>
           <NButton size="small" type="primary" @click="onKeywordInput">
             <template #icon>
-              <SvgIcon icon="material-symbols:search" />
+              <SvgIcon icon="ri:search-line" />
             </template>
             {{ $t('common.search') }}
           </NButton>
           <NButton size="small" @click="handleReset">
             <template #icon>
-              <SvgIcon icon="material-symbols:restart-alt" />
+              <SvgIcon icon="ri:restart-line" />
             </template>
             {{ $t('common.reset') }}
           </NButton>

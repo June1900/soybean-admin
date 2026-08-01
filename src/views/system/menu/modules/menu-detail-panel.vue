@@ -150,7 +150,7 @@ const btnScrollX = computed(() =>
       class="detail-empty flex h-full min-h-300px flex-col items-center justify-center overflow-hidden rounded-8px"
     >
       <div class="detail-empty__icon">
-        <SvgIcon icon="material-symbols:menu-book-rounded" />
+        <SvgIcon icon="ri:book-open-line" />
       </div>
       <p class="detail-empty__title">{{ $t('page.system.menu.noSelectHint') }}</p>
     </div>
@@ -226,10 +226,7 @@ const btnScrollX = computed(() =>
       <!-- 菜单参数 -->
       <div class="detail-card rounded-8px p-16px">
         <h4 class="m-0 mb-12px flex items-center gap-6px text-14px font-500">
-          <SvgIcon
-            icon="material-symbols:settings-input-component-outline-rounded"
-            class="text-16px text-[var(--theme-primary)]"
-          />
+          <SvgIcon icon="ri:settings-3-line" class="text-16px text-[var(--theme-primary)]" />
           {{ $t('page.system.menu.sectionParams') }}
         </h4>
         <NDataTable
@@ -250,7 +247,7 @@ const btnScrollX = computed(() =>
       <!-- 按钮权限 -->
       <div class="detail-card rounded-8px p-16px">
         <h4 class="m-0 mb-12px flex items-center gap-6px text-14px font-500">
-          <SvgIcon icon="material-symbols:vpn-key-outline-rounded" class="text-16px text-[var(--theme-primary)]" />
+          <SvgIcon icon="ri:key-line" class="text-16px text-[var(--theme-primary)]" />
           {{ $t('page.system.menu.sectionButtons') }}
         </h4>
         <NDataTable

@@ -44,7 +44,7 @@ const title = computed(() => translateTitle(props.item.meta?.title) || props.ite
         <template #trigger>
           <NButton size="medium" type="primary" text @click.stop="emit('add', item.ID)">
             <template #icon>
-              <SvgIcon icon="material-symbols:add" class="text-14px" />
+              <SvgIcon icon="ri:add-line" class="text-14px" />
             </template>
           </NButton>
         </template>
@@ -60,7 +60,7 @@ const title = computed(() => translateTitle(props.item.meta?.title) || props.ite
             @click.stop="emit('delete', item.ID, hasChildren)"
           >
             <template #icon>
-              <SvgIcon icon="material-symbols:delete" class="text-14px" />
+              <SvgIcon icon="ri:delete-bin-line" class="text-14px" />
             </template>
           </NButton>
         </template>

@@ -118,13 +118,13 @@ function createAllColumns(): NaiveUI.TableColumn<Params>[] {
           actions: [
             {
               kind: 'edit',
-              icon: 'material-symbols:edit',
+              icon: 'ri:edit-line',
               type: 'primary',
               onClick: () => handleEdit(row.ID)
             },
             {
               kind: 'delete',
-              icon: 'material-symbols:delete',
+              icon: 'ri:delete-bin-line',
               type: 'error',
               popconfirm: {
                 content: $t('page.system.params.confirmDelete'),

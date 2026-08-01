@@ -124,13 +124,13 @@ function createAllColumns(): NaiveUI.TableColumn<Customer>[] {
           actions: [
             {
               kind: 'edit',
-              icon: 'material-symbols:edit',
+              icon: 'ri:edit-line',
               type: 'info',
               onClick: () => handleEdit(row.ID)
             },
             {
               kind: 'delete',
-              icon: 'material-symbols:delete',
+              icon: 'ri:delete-bin-line',
               type: 'error',
               popconfirm: {
                 content: $t('page.example.customer.deleteConfirm'),

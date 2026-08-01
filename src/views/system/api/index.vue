@@ -163,19 +163,19 @@ function createAllColumns(): NaiveUI.TableColumn<Api>[] {
           actions: [
             {
               kind: 'edit',
-              icon: 'material-symbols:edit',
+              icon: 'ri:edit-line',
               type: 'primary',
               onClick: () => handleEdit(row.ID)
             },
             {
               label: $t('page.system.api.assignRole'),
-              icon: 'material-symbols:person-add',
+              icon: 'ri:user-add-line',
               type: 'info',
               onClick: () => openRoleAssign(row)
             },
             {
               kind: 'delete',
-              icon: 'material-symbols:delete',
+              icon: 'ri:delete-bin-line',
               type: 'error',
               popconfirm: {
                 content: $t('page.system.api.confirmDelete'),

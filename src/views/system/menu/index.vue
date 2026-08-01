@@ -362,29 +362,27 @@ function handleDeleteClick() {
             <h3 class="m-0 text-16px font-500">{{ $t('page.system.menu.panelMenuList') }}</h3>
             <NSpace :size="6" align="center" :wrap="false">
               <NButton size="small" type="primary" quaternary @click="handleAddRoot">
-                <template #icon><SvgIcon icon="material-symbols:add" /></template>
+                <template #icon><SvgIcon icon="ri:add-line" /></template>
               </NButton>
               <NTooltip trigger="hover" placement="bottom">
                 <template #trigger>
                   <NButton size="small" quaternary @click="toggleExpandAll">
                     <template #icon>
-                      <SvgIcon
-                        :icon="isAllExpanded ? 'material-symbols:unfold-less' : 'material-symbols:unfold-more'"
-                      />
+                      <SvgIcon :icon="isAllExpanded ? 'ri:contract-up-down-line' : 'ri:expand-up-down-line'" />
                     </template>
                   </NButton>
                 </template>
                 {{ isAllExpanded ? $t('page.system.menu.collapseAll') : $t('page.system.menu.expandAll') }}
               </NTooltip>
               <NButton size="small" quaternary @click="handleRefresh">
-                <template #icon><SvgIcon icon="material-symbols:refresh" /></template>
+                <template #icon><SvgIcon icon="ri:refresh-line" /></template>
               </NButton>
             </NSpace>
           </div>
 
           <NInput v-model:value="searchKw" clearable size="small" :placeholder="$t('page.system.menu.searchTitle')">
             <template #prefix>
-              <SvgIcon icon="material-symbols:search" class="text-16px" />
+              <SvgIcon icon="ri:search-line" class="text-16px" />
             </template>
           </NInput>
 
@@ -417,11 +415,11 @@ function handleDeleteClick() {
                 ghost
                 @click="handleAddChild"
               >
-                <template #icon><SvgIcon icon="material-symbols:add" /></template>
+                <template #icon><SvgIcon icon="ri:add-line" /></template>
                 {{ $t('page.system.menu.panelAddChild') }}
               </NButton>
               <NButton type="info" size="small" ghost :disabled="!selectedId" @click="handleEditClick">
-                <template #icon><SvgIcon icon="material-symbols:edit" /></template>
+                <template #icon><SvgIcon icon="ri:edit-line" /></template>
                 {{ $t('page.system.menu.panelEdit') }}
               </NButton>
               <NTooltip trigger="hover" placement="bottom" :disabled="!activeMenuHasChildren">
@@ -433,7 +431,7 @@ function handleDeleteClick() {
                     :disabled="!selectedId || activeMenuHasChildren"
                     @click="handleDeleteClick"
                   >
-                    <template #icon><SvgIcon icon="material-symbols:delete" /></template>
+                    <template #icon><SvgIcon icon="ri:delete-bin-line" /></template>
                     {{ $t('page.system.menu.panelDelete') }}
                   </NButton>
                 </template>

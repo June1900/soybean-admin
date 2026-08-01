@@ -145,19 +145,19 @@ function createAllColumns(): NaiveUI.TableColumn<Dictionary>[] {
           actions: [
             {
               label: $t('page.system.dictionary.detail'),
-              icon: 'material-symbols:visibility',
+              icon: 'ri:eye-line',
               type: 'info',
               onClick: () => openDetailDrawer(row)
             },
             {
               kind: 'edit',
-              icon: 'material-symbols:edit',
+              icon: 'ri:edit-line',
               type: 'primary',
               onClick: () => handleEdit(row.ID)
             },
             {
               kind: 'delete',
-              icon: 'material-symbols:delete',
+              icon: 'ri:delete-bin-line',
               type: 'error',
               popconfirm: {
                 content: $t('page.system.dictionary.confirmDeleteDictionary'),

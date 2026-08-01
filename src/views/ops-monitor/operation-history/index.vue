@@ -196,13 +196,13 @@ function createAllColumns(): NaiveUI.TableColumn<OperationRecord>[] {
           actions: [
             {
               label: $t('page.opsMonitor.operationHistory.columns.view'),
-              icon: 'material-symbols:visibility',
+              icon: 'ri:eye-line',
               type: 'default',
               onClick: () => openView(row)
             },
             {
               kind: 'delete',
-              icon: 'material-symbols:delete',
+              icon: 'ri:delete-bin-line',
               type: 'error',
               popconfirm: {
                 content: $t('common.confirmDelete'),

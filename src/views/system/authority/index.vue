@@ -88,31 +88,31 @@ function createAllColumns(): NaiveUI.TableColumn<Authority>[] {
           actions: [
             {
               label: $t('page.system.authority.setPermission'),
-              icon: 'material-symbols:lock-person',
+              icon: 'ri:admin-line',
               type: 'default',
               onClick: () => openPermission(row)
             },
             {
               label: $t('page.system.authority.assignUser'),
-              icon: 'material-symbols:group-add',
+              icon: 'ri:group-line',
               type: 'default',
               onClick: () => openAssignUser(row)
             },
             {
               label: $t('page.system.authority.addChildRole'),
-              icon: 'material-symbols:account-tree',
+              icon: 'ri:node-tree',
               type: 'default',
               onClick: () => handleAddChild(row)
             },
             {
               kind: 'edit',
-              icon: 'material-symbols:edit',
+              icon: 'ri:edit-line',
               type: 'primary',
               onClick: () => handleEdit(row.authorityId)
             },
             {
               kind: 'delete',
-              icon: 'material-symbols:delete',
+              icon: 'ri:delete-bin-line',
               type: 'error',
               popconfirm: {
                 content: $t('page.system.authority.confirmDelete'),

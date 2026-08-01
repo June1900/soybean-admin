@@ -173,7 +173,7 @@ async function handleSubmit() {
             </NInput>
             <NButton type="primary" ghost @click="openLeaderModal">
               <template #icon>
-                <SvgIcon icon="material-symbols:person-search" />
+                <SvgIcon icon="ri:user-search-line" />
               </template>
               {{ $t('page.system.department.selectLeaderBtn') }}
             </NButton>

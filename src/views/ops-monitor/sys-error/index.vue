@@ -175,13 +175,13 @@ function createAllColumns(): NaiveUI.TableColumn<SysError>[] {
           actions: [
             {
               label: $t('page.opsMonitor.sysError.columns.view'),
-              icon: 'material-symbols:visibility',
+              icon: 'ri:eye-line',
               type: 'default',
               onClick: () => openView(row)
             },
             {
               kind: 'delete',
-              icon: 'material-symbols:delete',
+              icon: 'ri:delete-bin-line',
               type: 'error',
               popconfirm: {
                 content: $t('common.confirmDelete'),

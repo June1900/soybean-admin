@@ -86,7 +86,7 @@ function handleClose() {
           @keyup.enter="handleSearch"
         >
           <template #prefix>
-            <SvgIcon icon="material-symbols:search" class="text-16px" />
+            <SvgIcon icon="ri:search-line" class="text-16px" />
           </template>
         </NInput>
         <NButton type="primary" size="small" @click="handleSearch">

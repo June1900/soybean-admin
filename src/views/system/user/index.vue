@@ -162,20 +162,20 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
           actions: [
             {
               kind: 'edit',
-              icon: 'material-symbols:edit',
+              icon: 'ri:edit-line',
               type: 'primary',
               // eslint-disable-next-line @typescript-eslint/no-use-before-define
               onClick: () => handleEdit(row.ID)
             },
             {
               label: $t('page.system.user.resetPwd'),
-              icon: 'material-symbols:lock-reset',
+              icon: 'ri:lock-unlock-line',
               type: 'warning',
               onClick: () => openResetPwd(row)
             },
             {
               kind: 'delete',
-              icon: 'material-symbols:delete',
+              icon: 'ri:delete-bin-line',
               type: 'error',
               popconfirm: {
                 content: $t('page.system.user.confirmDelete'),

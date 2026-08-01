@@ -356,13 +356,13 @@ onMounted(async () => {
               <span class="position-item__code">({{ pos.code }})</span>
               <span class="position-item__actions">
                 <NButton ghost type="primary" size="tiny" @click.stop="openEditDrawer(pos)">
-                  <template #icon><SvgIcon icon="material-symbols:edit" /></template>
+                  <template #icon><SvgIcon icon="ri:edit-line" /></template>
                   {{ $t('common.edit') }}
                 </NButton>
                 <NPopconfirm @positive-click="handleDeletePosition(pos.ID)">
                   <template #trigger>
                     <NButton ghost type="error" size="tiny" @click.stop>
-                      <template #icon><SvgIcon icon="material-symbols:delete" /></template>
+                      <template #icon><SvgIcon icon="ri:delete-bin-line" /></template>
                       {{ $t('common.delete') }}
                     </NButton>
                   </template>

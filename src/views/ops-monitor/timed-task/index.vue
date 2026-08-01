@@ -192,25 +192,25 @@ function createAllColumns(): NaiveUI.TableColumn<TimedTask>[] {
           actions: [
             {
               label: $t('page.opsMonitor.timedTask.columns.trigger'),
-              icon: 'material-symbols:play-arrow',
+              icon: 'ri:play-line',
               type: 'default',
               onClick: () => handleTrigger(row)
             },
             {
               label: $t('page.opsMonitor.timedTask.columns.logs'),
-              icon: 'material-symbols:article',
+              icon: 'ri:article-line',
               type: 'default',
               onClick: () => openLogs(row)
             },
             {
               kind: 'edit',
-              icon: 'material-symbols:edit',
+              icon: 'ri:edit-line',
               type: 'info',
               onClick: () => handleEdit(row.ID)
             },
             {
               kind: 'delete',
-              icon: 'material-symbols:delete',
+              icon: 'ri:delete-bin-line',
               type: 'error',
               disabled: row.enabled,
               tooltip: row.enabled ? $t('page.opsMonitor.timedTask.columns.cannotDeleteEnabled') : undefined,

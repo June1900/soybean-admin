@@ -689,11 +689,7 @@ async function handleSubmit() {
                     :icon="model.meta.icon"
                     class="text-16px text-[var(--n-text-color-2)]"
                   />
-                  <SvgIcon
-                    v-else
-                    icon="material-symbols:image-outline-rounded"
-                    class="text-16px text-[var(--n-text-color-3)] op-50"
-                  />
+                  <SvgIcon v-else icon="ri:image-line" class="text-16px text-[var(--n-text-color-3)] op-50" />
                 </template>
               </NInput>
               <NButton size="small" type="primary" @click="iconPickerVisible = true">

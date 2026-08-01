@@ -183,7 +183,7 @@ function createAllColumns(): NaiveUI.TableColumn<ApiToken>[] {
             NButton,
             { size: 'small', ghost: true, type: 'info', onClick: () => openCurl(row) },
             {
-              icon: () => h(SvgIcon, { icon: 'material-symbols:terminal' }),
+              icon: () => h(SvgIcon, { icon: 'ri:terminal-line' }),
               default: () => $t('page.systemTools.apiToken.columns.curl')
             }
           ),
@@ -193,7 +193,7 @@ function createAllColumns(): NaiveUI.TableColumn<ApiToken>[] {
                   NButton,
                   { size: 'small', ghost: true, type: 'error', onClick: () => handleInvalidate(row) },
                   {
-                    icon: () => h(SvgIcon, { icon: 'material-symbols:block' }),
+                    icon: () => h(SvgIcon, { icon: 'ri:forbid-line' }),
                     default: () => $t('page.systemTools.apiToken.columns.invalidate')
                   }
                 )

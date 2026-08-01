@@ -199,19 +199,19 @@ function createAllColumns(): NaiveUI.TableColumn<Department>[] {
           actions: [
             {
               label: $t('common.add'),
-              icon: 'material-symbols:add',
+              icon: 'ri:add-line',
               type: 'primary',
               onClick: () => handleAddChild(row.ID)
             },
             {
               kind: 'edit',
-              icon: 'material-symbols:edit',
+              icon: 'ri:edit-line',
               type: 'primary',
               onClick: () => handleEdit(row.ID)
             },
             {
               kind: 'delete',
-              icon: 'material-symbols:delete',
+              icon: 'ri:delete-bin-line',
               type: 'error',
               popconfirm: {
                 content: $t('page.system.department.confirmDelete'),
@@ -239,7 +239,7 @@ function createAllColumns(): NaiveUI.TableColumn<Department>[] {
         <NSpace :size="8" align="center" wrap>
           <NButton size="small" tertiary @click="toggleExpand">
             <template #icon>
-              <SvgIcon :icon="isAllExpanded ? 'material-symbols:unfold-less' : 'material-symbols:unfold-more'" />
+              <SvgIcon :icon="isAllExpanded ? 'ri:contract-up-down-line' : 'ri:expand-up-down-line'" />
             </template>
             {{ isAllExpanded ? $t('page.system.department.collapseAll') : $t('page.system.department.expandAll') }}
           </NButton>
@@ -252,7 +252,7 @@ function createAllColumns(): NaiveUI.TableColumn<Department>[] {
             <template #default>
               <NButton size="small" ghost type="primary" @click="handleAdd">
                 <template #icon>
-                  <SvgIcon icon="material-symbols:add" />
+                  <SvgIcon icon="ri:add-line" />
                 </template>
                 {{ $t('common.add') }}
               </NButton>

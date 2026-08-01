@@ -12,9 +12,9 @@ defineOptions({
 const themeStore = useThemeStore();
 
 const icons: Record<UnionKey.ThemeScheme, string> = {
-  light: 'material-symbols:sunny',
-  dark: 'material-symbols:nightlight-rounded',
-  auto: 'material-symbols:hdr-auto'
+  light: 'ri:sun-line',
+  dark: 'ri:moon-line',
+  auto: 'ri:contrast-line'
 };
 
 function handleSegmentChange(value: string | number) {
