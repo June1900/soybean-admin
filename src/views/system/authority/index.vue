@@ -5,6 +5,7 @@ import { useAppStore } from '@/store/modules/app';
 import { useNaiveTable, useTableOperate } from '@/hooks/common/table';
 import { $t } from '@/locales';
 import { fetchDeleteAuthority, fetchGetAuthorityList, type Authority } from './api';
+import { dataScopeOptions, dataScopeTagType } from './shared';
 import AuthorityOperateDrawer from './modules/authority-operate-drawer.vue';
 import AuthorityPermissionDrawer from './modules/authority-permission-drawer.vue';
 import AuthorityAssignUserDrawer from './modules/authority-assign-user-drawer.vue';
@@ -26,20 +27,12 @@ const { columns, columnChecks, data, getData, loading, scrollX } = useNaiveTable
   immediate: false
 });
 
-const dataScopeOptions = computed(() => [
-  { label: $t('page.system.authority.allData'), value: 1 },
-  { label: $t('page.system.authority.deptAndBelow'), value: 2 },
-  { label: $t('page.system.authority.deptOnly'), value: 3 },
-  { label: $t('page.system.authority.selfOnly'), value: 4 },
-  { label: $t('page.system.authority.customDept'), value: 5 }
-]);
-
-const dataScopeTagType = (value: number) => (value === 1 ? 'success' : value === 5 ? 'warning' : 'default');
+const dataScopeOpts = computed(() => dataScopeOptions());
 
 const { drawerVisible, closeDrawer, operateType, handleAdd, editingData, handleEdit, onDeleted } =
   useTableOperate<Authority>(data, 'authorityId', getData);
 
-/** 新增子角色时预置的父级角色 ID（顶级为 0） */
+/** 新增子角色时预置的父级 ID（顶级为 0） */
 const defaultParentId = ref<number | null>(null);
 const permissionModalVisible = ref(false);
 const assignUserModalVisible = ref(false);
@@ -75,7 +68,7 @@ function createAllColumns(): NaiveUI.TableColumn<Authority>[] {
       width: 140,
       align: 'center',
       render: row => {
-        const opt = dataScopeOptions.value.find(o => o.value === row.dataScope);
+        const opt = dataScopeOpts.value.find(o => o.value === row.dataScope);
         return h(
           NTag,
           { type: dataScopeTagType(row.dataScope), size: 'small', bordered: false },

@@ -5,6 +5,7 @@ import type { FormInst, FormRules, TreeSelectOption } from 'naive-ui';
 import { NForm, NFormItem, NInput, NInputNumber, NTreeSelect } from 'naive-ui';
 import { $t } from '@/locales';
 import { fetchCreateAuthority, fetchGetAuthorityList, fetchUpdateAuthority, type Authority } from '../api';
+import { buildParentOptions, buildRoleNameMap, collectRoleDisabledIds, dataScopeOptions } from '../shared';
 
 const props = defineProps<{
   visible: boolean;
@@ -39,7 +40,7 @@ const rules: FormRules = {
     },
     {
       validator: (_rule, value) => {
-        // 仅新增时强制校验：必须为正整数
+        // 新增时校验正整数
         if (props.operateType !== 'add') return true;
         if (typeof value === 'number' && Number.isInteger(value) && value > 0) return true;
         return new Error($t('page.system.authority.authorityIdPositiveInt'));
@@ -54,69 +55,7 @@ const title = computed(() =>
   props.operateType === 'add' ? $t('page.system.authority.addRole') : $t('page.system.authority.editRole')
 );
 
-const dataScopeOptions = computed(() => [
-  { label: $t('page.system.authority.allData'), value: 1 },
-  { label: $t('page.system.authority.deptAndBelow'), value: 2 },
-  { label: $t('page.system.authority.deptOnly'), value: 3 },
-  { label: $t('page.system.authority.selfOnly'), value: 4 },
-  { label: $t('page.system.authority.customDept'), value: 5 }
-]);
-
-/** 把角色树拍平为 { authorityId: authorityName }，用于只读展示父级角色名称 */
-function buildNameMap(list: Authority[]): Record<number, string> {
-  const map: Record<number, string> = {};
-  const walk = (items: Authority[]) => {
-    for (const it of items ?? []) {
-      map[Number(it.authorityId) || 0] = it.authorityName ?? '';
-      walk(it.children ?? []);
-    }
-  };
-  walk(list);
-  return map;
-}
-
-/** 把所有节点（含子孙）的 id 收集进 acc */
-function collectAll(items: Authority[], acc: Set<number>): void {
-  for (const it of items ?? []) {
-    acc.add(Number(it.authorityId) || 0);
-    collectAll(it.children ?? [], acc);
-  }
-}
-
-/** 收集 targetId 自身及其所有子孙的 id（用于编辑时禁用，防循环引用） */
-function collectDisabledIds(list: Authority[], targetId: number): Set<number> {
-  const result = new Set<number>();
-  const walk = (items: Authority[]): boolean => {
-    for (const it of items ?? []) {
-      const id = Number(it.authorityId) || 0;
-      if (id === targetId) {
-        result.add(id);
-        collectAll(it.children ?? [], result);
-        return true;
-      }
-      if (walk(it.children ?? [])) return true;
-    }
-    return false;
-  };
-  walk(list);
-  return result;
-}
-
-/** 构建编辑时可选择的父级角色树：disableIds 中的节点（当前节点及其子孙）禁用 */
-function buildParentOptions(list: Authority[], disableIds: Set<number>): TreeSelectOption[] {
-  return (list ?? []).map(item => {
-    const id = Number(item.authorityId) || 0;
-    const children = item.children?.length ? buildParentOptions(item.children, disableIds) : undefined;
-    return {
-      label: item.authorityName ?? '',
-      value: id,
-      disabled: disableIds.has(id),
-      children
-    };
-  });
-}
-
-/** 父级角色展示文案（只读/新增模式）：顶级=根角色，其余按 parentId 查名称 */
+/** 父级角色展示文案：顶级=根角色，其余按 parentId 查名称 */
 const parentRoleLabel = computed(() => {
   if (model.parentId === 0) return $t('page.system.authority.rootRole');
   return roleNameMap.value[model.parentId] ?? '';
@@ -128,11 +67,11 @@ watch(
     if (!visible) return;
 
     const { data } = await fetchGetAuthorityList();
-    roleNameMap.value = buildNameMap(data ?? []);
-    // 编辑时禁用"当前节点及其所有子孙"，避免循环引用；新增时无需禁用（字段只读）
+    roleNameMap.value = buildRoleNameMap(data ?? []);
+    // 编辑时禁用当前节点及子孙，防循环引用
     const disableId =
       props.operateType === 'edit' && props.editingData ? Number(props.editingData.authorityId) || 0 : null;
-    const disableIds = disableId != null ? collectDisabledIds(data ?? [], disableId) : new Set<number>();
+    const disableIds = disableId != null ? collectRoleDisabledIds(data ?? [], disableId) : new Set<number>();
     parentOptions.value = [
       { label: $t('page.system.authority.rootRole'), value: 0 },
       ...buildParentOptions(data ?? [], disableIds)
@@ -221,7 +160,7 @@ async function handleSubmit() {
           />
         </NFormItem>
         <NFormItem :label="$t('page.system.authority.dataScope')" path="dataScope">
-          <NSelect v-model:value="model.dataScope" :options="dataScopeOptions" />
+          <NSelect v-model:value="model.dataScope" :options="dataScopeOptions()" />
         </NFormItem>
       </NForm>
       <template #footer>

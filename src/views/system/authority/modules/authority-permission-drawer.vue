@@ -16,6 +16,16 @@ import {
 } from 'naive-ui';
 import { $t } from '@/locales';
 import type { Menu } from '@/views/system/menu/api';
+import { translateTitle } from '@/views/system/menu/shared';
+import {
+  collectMenuLeafIds,
+  collectTreeLeafKeys,
+  filterMenuTree,
+  findMenuNameById,
+  flattenMenuTree,
+  pruneMenuTree,
+  toMenuTreeOptions
+} from '../shared';
 import {
   fetchAddMenuAuthority,
   fetchGetAllApis,
@@ -38,7 +48,7 @@ const emit = defineEmits<{ close: [] }>();
 
 const { loading, startLoading, endLoading } = useLoading();
 
-// 两个 Tab 各自的保存 loading（菜单 / API 互相独立）
+// 两个 Tab 各自的保存 loading
 const { loading: menuSaving, startLoading: startMenuSaving, endLoading: endMenuSaving } = useLoading();
 const { loading: apiSaving, startLoading: startApiSaving, endLoading: endApiSaving } = useLoading();
 
@@ -51,29 +61,6 @@ const menuTree = ref<Menu[]>([]);
 const checkedMenuKeys = ref<number[]>([]);
 const defaultRouter = ref<string | null>(null);
 
-function toMenuTreeOptions(menus: Menu[]): TreeOption[] {
-  return (menus ?? []).map(m => ({
-    key: m.ID,
-    label: m.meta?.title || m.name,
-    children: m.children?.length ? toMenuTreeOptions(m.children) : undefined
-  }));
-}
-
-function filterMenuTree(menus: Menu[], k: string): TreeOption[] {
-  return (menus ?? []).reduce<TreeOption[]>((acc, m) => {
-    const label = (m.meta?.title || m.name).toLowerCase();
-    const children = m.children?.length ? filterMenuTree(m.children, k) : [];
-    if (label.includes(k) || children.length > 0) {
-      acc.push({
-        key: m.ID,
-        label: m.meta?.title || m.name,
-        children: children.length > 0 ? children : undefined
-      });
-    }
-    return acc;
-  }, []);
-}
-
 const filteredMenuTreeOptions = computed(() => {
   const k = menuKeywordApplied.value.trim().toLowerCase();
   if (!k) return toMenuTreeOptions(menuTree.value);
@@ -85,8 +72,8 @@ const defaultRouterOptions = computed(() => {
   const walk = (menus: Menu[]) => {
     for (const m of menus ?? []) {
       if (!m.children?.length) {
-        // gin-vue-admin 的 defaultRouter 存的是菜单 name（路由名），不是 path
-        opts.push({ label: m.meta?.title || m.name, value: m.name });
+        // defaultRouter 存菜单 name（路由名）
+        opts.push({ label: translateTitle(m.meta?.title) || m.name, value: m.name });
       }
       walk(m.children ?? []);
     }
@@ -95,7 +82,7 @@ const defaultRouterOptions = computed(() => {
   return opts;
 });
 
-/** 菜单 ID → 完整 Menu 对象，供 render-label 快速取 menuBtn */
+/** 菜单 ID → Menu 对象，供 render-label 取 menuBtn */
 const menuById = computed(() => {
   const map = new Map<number, Menu>();
   const walk = (menus: Menu[]) => {
@@ -108,7 +95,46 @@ const menuById = computed(() => {
   return map;
 });
 
-/** 菜单树节点渲染：标题 + （menuBtn 非空时）「分配按钮」入口 */
+/** 全选父节点：所有叶子后代均选中（checkedMenuKeys 只存叶子） */
+const treeCheckedKeys = computed<number[]>(() => {
+  const leafSet = new Set(checkedMenuKeys.value.map(Number));
+  const result: number[] = [...leafSet];
+  const walk = (menus: Menu[]) => {
+    for (const m of menus ?? []) {
+      if (m.children?.length) {
+        const leaves = collectMenuLeafIds(m.children);
+        if (leaves.length > 0 && leaves.every(id => leafSet.has(id))) {
+          result.push(Number(m.ID));
+        }
+        walk(m.children);
+      }
+    }
+  };
+  walk(menuTree.value);
+  return result;
+});
+
+/** 半选父节点：部分（非全部）叶子后代被选中 */
+const indeterminateMenuKeys = computed<number[]>(() => {
+  const leafSet = new Set(checkedMenuKeys.value.map(Number));
+  const result: number[] = [];
+  const walk = (menus: Menu[]) => {
+    for (const m of menus ?? []) {
+      if (m.children?.length) {
+        const leaves = collectMenuLeafIds(m.children);
+        const checkedCount = leaves.filter(id => leafSet.has(id)).length;
+        if (checkedCount > 0 && checkedCount < leaves.length) {
+          result.push(Number(m.ID));
+        }
+        walk(m.children);
+      }
+    }
+  };
+  walk(menuTree.value);
+  return result;
+});
+
+/** 菜单节点渲染：标题 + menuBtn 时的「分配按钮」入口 */
 function renderMenuLabel(info: { option: TreeOption }) {
   const label = info.option.label as string;
   const menu = menuById.value.get(Number(info.option.key));
@@ -126,7 +152,7 @@ function renderMenuLabel(info: { option: TreeOption }) {
               type: 'primary',
               tertiary: true,
               onClick: (e: MouseEvent) => {
-                // 阻止冒泡，避免触发树节点勾选
+                // 阻止冒泡触发节点勾选
                 e.stopPropagation();
                 openBtnAssign(menu);
               }
@@ -140,32 +166,27 @@ function renderMenuLabel(info: { option: TreeOption }) {
   return label;
 }
 
-function findMenuNameById(menus: Menu[], id: number): string | null {
-  for (const m of menus ?? []) {
-    if (m.ID === id) return m.name;
-    const found = findMenuNameById(m.children ?? [], id);
-    if (found) return found;
-  }
-  return null;
-}
-
 /**
- * 根据勾选集合，从完整菜单树中裁剪出「已授权菜单树」——与 gin-vue-admin 的
- * addMenuAuthority 期望的 menus 数组结构一致：每个节点携带其「仅含已勾选后代」的 children。
- * - 节点被勾选 → 保留该节点，children 递归裁剪为已勾选的后代
- * - 节点未被勾选但其后代有勾选（半选父节点）→ 不保留父节点，直接把已勾选后代上提
+ * 手动父子联动（不用 cascade 避免回显级联）。
+ * checkedMenuKeys 只存叶子：勾选父节点 → 加入所有叶子后代；取消父节点 → 移除所有叶子后代
  */
-function pruneMenuTree(menus: Menu[], checked: Set<number>): Menu[] {
-  const out: Menu[] = [];
-  for (const m of menus ?? []) {
-    const childChecked = m.children?.length ? pruneMenuTree(m.children, checked) : [];
-    if (checked.has(Number(m.ID))) {
-      out.push({ ...m, children: childChecked });
-    } else if (childChecked.length) {
-      out.push(...childChecked);
-    }
+function handleMenuCheckedKeysUpdate(
+  _keys: Array<string & number>,
+  _options: Array<TreeOption | null>,
+  meta: { node: TreeOption | null; action: 'check' | 'uncheck' }
+) {
+  const node = meta.node;
+  if (!node) {
+    return;
   }
-  return out;
+  const leafKeys = collectTreeLeafKeys(node);
+  const set = new Set(checkedMenuKeys.value.map(Number));
+  if (meta.action === 'check') {
+    leafKeys.forEach(k => set.add(k));
+  } else {
+    leafKeys.forEach(k => set.delete(k));
+  }
+  checkedMenuKeys.value = Array.from(set);
 }
 
 /* ---------- api tab ---------- */
@@ -233,7 +254,6 @@ function policiesFromCheckedKeys(keys: string[]): AuthorityApiPolicy[] {
 // 分配按钮
 const btnModalVisible = ref(false);
 const btnModalMenu = ref<Menu | null>(null);
-//  打开「分配按钮」弹窗
 function openBtnAssign(menu: Menu) {
   if (!props.role) return;
   btnModalMenu.value = menu;
@@ -242,7 +262,7 @@ function openBtnAssign(menu: Menu) {
 
 /* ---------- 加载与保存 ---------- */
 
-/** 加载角色权限数据：菜单树 / 已授权菜单 / 接口列表 / 已授权接口策略（四个接口并行） */
+/** 加载角色权限数据（四个接口并行） */
 async function loadPermissionData(authorityId: number) {
   startLoading();
   try {
@@ -256,11 +276,11 @@ async function loadPermissionData(authorityId: number) {
     );
 
     menuTree.value = baseMenuData?.menus ?? [];
-    // gin-vue-admin：只勾选叶子节点，避免父节点被勾选后级联全选
+    // 回显：只勾选叶子节点，父节点状态由 computed 推导
     const authMenus = menuAuthData?.menus ?? [];
-    const parentIdSet = new Set(authMenus.map(m => Number(m.parentId)));
+    const leafIdSet = new Set(collectMenuLeafIds(menuTree.value));
     checkedMenuKeys.value = authMenus
-      .filter(m => !parentIdSet.has(Number(m.menuId ?? m.ID)))
+      .filter(m => leafIdSet.has(Number(m.menuId ?? m.ID)))
       .map(m => Number(m.menuId ?? m.ID));
     allApis.value = apiData?.apis ?? [];
     checkedApiKeys.value = (policyData?.paths ?? [])
@@ -279,7 +299,7 @@ async function loadPermissionData(authorityId: number) {
 watch(
   () => props.visible,
   async visible => {
-    // 关闭抽屉后，Tab 回归默认值（菜单），并收起分配按钮弹窗，避免下次打开残留
+    // 关闭后重置 Tab 和按钮弹窗
     if (!visible) {
       activeTab.value = 'menu';
       btnModalVisible.value = false;
@@ -296,7 +316,8 @@ async function handleSaveMenu() {
   if (!props.role) return;
 
   const checkedSet = new Set(checkedMenuKeys.value.map(Number));
-  const menus = pruneMenuTree(menuTree.value, checkedSet);
+  const prunedTree = pruneMenuTree(menuTree.value, checkedSet);
+  const menus = flattenMenuTree(prunedTree);
 
   startMenuSaving();
   try {
@@ -380,13 +401,14 @@ function handleClose() {
           <NCard :bordered="false" class="permission-card" :loading="loading">
             <div class="permission-tree-wrap">
               <NTree
-                v-model:checked-keys="checkedMenuKeys"
+                :checked-keys="treeCheckedKeys"
+                :indeterminate-keys="indeterminateMenuKeys"
                 block-line
                 checkable
-                cascade
                 :data="filteredMenuTreeOptions"
                 :default-expand-all="true"
                 :render-label="renderMenuLabel"
+                @update:checked-keys="handleMenuCheckedKeysUpdate"
               />
             </div>
           </NCard>

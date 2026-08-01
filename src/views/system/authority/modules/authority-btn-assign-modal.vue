@@ -7,9 +7,9 @@ import type { Menu, MenuBtn } from '@/views/system/menu/api';
 import { fetchGetAuthorityBtn, fetchSetAuthorityBtn } from '../api';
 
 const props = defineProps<{
-  /** 双向绑定：控制弹窗显隐（v-model:show） */
+  /** 控制弹窗显隐（v-model:show） */
   show: boolean;
-  /** 当前要分配按钮的菜单（携带 menuBtn） */
+  /** 当前菜单（携带 menuBtn） */
   menu: Menu | null;
   /** 角色 ID */
   authorityId: number;
@@ -27,7 +27,7 @@ const { loading: saving, startLoading: startSaving, endLoading: endSaving } = us
 const btnOptions = ref<MenuBtn[]>([]);
 const checkedBtnKeys = ref<number[]>([]);
 
-/** 加载分配按钮数据：按钮全集来自菜单树 menuBtn，已选 ID 从后端拉取 */
+/** 加载按钮全集与已选 ID */
 async function loadBtnData() {
   if (!props.menu) return;
   btnOptions.value = props.menu.menuBtn ?? [];

@@ -51,7 +51,7 @@ function getQueryParams(): UserListQuery {
   };
 }
 
-/** 加载分配用户数据：重置查询条件 + 并行拉取用户列表与该角色已关联的用户 ID */
+/** 加载用户列表与已关联用户 ID */
 async function loadAssignUserData(authorityId: number) {
   checkedRowKeys.value = [];
   searchModel.username = '';
