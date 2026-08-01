@@ -60,13 +60,70 @@ export const generatedRoutes: GeneratedRoute[] = [
     ]
   },
   {
+    name: 'function',
+    path: '/function',
+    component: 'layout.base',
+    meta: {
+      title: 'function',
+      i18nKey: 'route.function'
+    },
+    children: [
+      {
+        name: 'function_hide-child',
+        path: '/function/hide-child',
+        meta: {
+          title: 'function_hide-child',
+          i18nKey: 'route.function_hide-child'
+        },
+        children: [
+          {
+            name: 'function_hide-child_one',
+            path: '/function/hide-child/one',
+            component: 'view.function_hide-child_one',
+            meta: {
+              title: 'function_hide-child_one',
+              i18nKey: 'route.function_hide-child_one'
+            }
+          },
+          {
+            name: 'function_hide-child_three',
+            path: '/function/hide-child/three',
+            component: 'view.function_hide-child_three',
+            meta: {
+              title: 'function_hide-child_three',
+              i18nKey: 'route.function_hide-child_three'
+            }
+          },
+          {
+            name: 'function_hide-child_two',
+            path: '/function/hide-child/two',
+            component: 'view.function_hide-child_two',
+            meta: {
+              title: 'function_hide-child_two',
+              i18nKey: 'route.function_hide-child_two'
+            }
+          }
+        ]
+      },
+      {
+        name: 'function_super-page',
+        path: '/function/super-page',
+        component: 'view.function_super-page',
+        meta: {
+          title: 'function_super-page',
+          i18nKey: 'route.function_super-page'
+        }
+      }
+    ]
+  },
+  {
     name: 'home',
     path: '/home',
     component: 'layout.base$view.home',
     meta: {
       title: 'home',
       i18nKey: 'route.home',
-      icon: 'mdi:monitor-dashboard',
+      icon: 'ri:dashboard-line',
       order: 1
     }
   },
@@ -96,57 +153,57 @@ export const generatedRoutes: GeneratedRoute[] = [
     }
   },
   {
-    name: 'opsmonitor',
-    path: '/opsmonitor',
+    name: 'ops-monitor',
+    path: '/ops-monitor',
     component: 'layout.base',
     meta: {
-      title: 'opsmonitor',
-      i18nKey: 'route.opsmonitor'
+      title: 'ops-monitor',
+      i18nKey: 'route.ops-monitor'
     },
     children: [
       {
-        name: 'opsmonitor_loginlog',
-        path: '/opsmonitor/loginlog',
-        component: 'view.opsmonitor_loginlog',
+        name: 'ops-monitor_login-log',
+        path: '/ops-monitor/login-log',
+        component: 'view.ops-monitor_login-log',
         meta: {
-          title: 'opsmonitor_loginlog',
-          i18nKey: 'route.opsmonitor_loginlog'
+          title: 'ops-monitor_login-log',
+          i18nKey: 'route.ops-monitor_login-log'
         }
       },
       {
-        name: 'opsmonitor_operation-history',
-        path: '/opsmonitor/operation-history',
-        component: 'view.opsmonitor_operation-history',
+        name: 'ops-monitor_operation-history',
+        path: '/ops-monitor/operation-history',
+        component: 'view.ops-monitor_operation-history',
         meta: {
-          title: 'opsmonitor_operation-history',
-          i18nKey: 'route.opsmonitor_operation-history'
+          title: 'ops-monitor_operation-history',
+          i18nKey: 'route.ops-monitor_operation-history'
         }
       },
       {
-        name: 'opsmonitor_server-status',
-        path: '/opsmonitor/server-status',
-        component: 'view.opsmonitor_server-status',
+        name: 'ops-monitor_server-status',
+        path: '/ops-monitor/server-status',
+        component: 'view.ops-monitor_server-status',
         meta: {
-          title: 'opsmonitor_server-status',
-          i18nKey: 'route.opsmonitor_server-status'
+          title: 'ops-monitor_server-status',
+          i18nKey: 'route.ops-monitor_server-status'
         }
       },
       {
-        name: 'opsmonitor_syserror',
-        path: '/opsmonitor/syserror',
-        component: 'view.opsmonitor_syserror',
+        name: 'ops-monitor_sys-error',
+        path: '/ops-monitor/sys-error',
+        component: 'view.ops-monitor_sys-error',
         meta: {
-          title: 'opsmonitor_syserror',
-          i18nKey: 'route.opsmonitor_syserror'
+          title: 'ops-monitor_sys-error',
+          i18nKey: 'route.ops-monitor_sys-error'
         }
       },
       {
-        name: 'opsmonitor_timedtask',
-        path: '/opsmonitor/timedtask',
-        component: 'view.opsmonitor_timedtask',
+        name: 'ops-monitor_timed-task',
+        path: '/ops-monitor/timed-task',
+        component: 'view.ops-monitor_timed-task',
         meta: {
-          title: 'opsmonitor_timedtask',
-          i18nKey: 'route.opsmonitor_timedtask'
+          title: 'ops-monitor_timed-task',
+          i18nKey: 'route.ops-monitor_timed-task'
         }
       }
     ]
@@ -244,39 +301,39 @@ export const generatedRoutes: GeneratedRoute[] = [
     ]
   },
   {
-    name: 'systemtools',
-    path: '/systemtools',
+    name: 'system-tools',
+    path: '/system-tools',
     component: 'layout.base',
     meta: {
-      title: 'systemtools',
-      i18nKey: 'route.systemtools'
+      title: 'system-tools',
+      i18nKey: 'route.system-tools'
     },
     children: [
       {
-        name: 'systemtools_apitoken',
-        path: '/systemtools/apitoken',
-        component: 'view.systemtools_apitoken',
+        name: 'system-tools_api-token',
+        path: '/system-tools/api-token',
+        component: 'view.system-tools_api-token',
         meta: {
-          title: 'systemtools_apitoken',
-          i18nKey: 'route.systemtools_apitoken'
+          title: 'system-tools_api-token',
+          i18nKey: 'route.system-tools_api-token'
         }
       },
       {
-        name: 'systemtools_system',
-        path: '/systemtools/system',
-        component: 'view.systemtools_system',
+        name: 'system-tools_system',
+        path: '/system-tools/system',
+        component: 'view.system-tools_system',
         meta: {
-          title: 'systemtools_system',
-          i18nKey: 'route.systemtools_system'
+          title: 'system-tools_system',
+          i18nKey: 'route.system-tools_system'
         }
       },
       {
-        name: 'systemtools_version',
-        path: '/systemtools/version',
-        component: 'view.systemtools_version',
+        name: 'system-tools_version',
+        path: '/system-tools/version',
+        component: 'view.system-tools_version',
         meta: {
-          title: 'systemtools_version',
-          i18nKey: 'route.systemtools_version'
+          title: 'system-tools_version',
+          i18nKey: 'route.system-tools_version'
         }
       }
     ]

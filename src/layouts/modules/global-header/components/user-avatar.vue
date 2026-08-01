@@ -36,7 +36,7 @@ const options = computed(() => {
     {
       label: $t('common.logout'),
       key: 'logout',
-      icon: SvgIconVNode({ icon: 'ph:sign-out', fontSize: 18 })
+      icon: SvgIconVNode({ icon: 'ri:logout-box-r-line', fontSize: 18 })
     }
   ];
 
@@ -72,7 +72,7 @@ function handleDropdown(key: DropdownKey) {
   <NDropdown v-else placement="bottom" trigger="click" :options="options" @select="handleDropdown">
     <div>
       <ButtonIcon>
-        <SvgIcon icon="ph:user-circle" class="text-icon-large" />
+        <SvgIcon icon="ri:user-6-line" class="text-icon-large" />
         <span class="text-16px font-medium">{{ authStore.userInfo.userName }}</span>
       </ButtonIcon>
     </div>

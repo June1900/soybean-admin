@@ -43,19 +43,34 @@ async function getData() {
   loading.value = false;
   if (!res.error && res.data) {
     data.value = buildTreeFromFlat(res.data);
+  } else if (res.error) {
+    window.$message?.error($t('page.system.menu.refreshFailed'));
   }
 }
 
-/** 后端返回扁平数组（children 为 null），需根据 parentId 构建树结构 */
+/** 构建树结构：兼容扁平（children=null）与嵌套（children 含子节点）两种返回格式
+ *  先递归扁平化收集所有节点，再根据 parentId 重建父子关系 */
 function buildTreeFromFlat(list: Menu[]): Menu[] {
+  // 递归扁平化，收集所有节点（含嵌套 children 中的子节点）
+  const flatList: Menu[] = [];
+  const collect = (items: Menu[]) => {
+    for (const item of items) {
+      flatList.push(item);
+      if (item.children?.length) {
+        collect(item.children);
+      }
+    }
+  };
+  collect(list);
+
   const map = new Map<number, Menu>();
   const roots: Menu[] = [];
   // 先收集所有节点
-  for (const item of list) {
+  for (const item of flatList) {
     map.set(item.ID, { ...item, children: [] });
   }
   // 根据 parentId 组装父子关系
-  for (const item of list) {
+  for (const item of flatList) {
     const node = map.get(item.ID)!;
     if (item.parentId && map.has(item.parentId)) {
       map.get(item.parentId)!.children!.push(node);
@@ -188,8 +203,9 @@ const menuById = computed(() => {
   return map;
 });
 
-/** 菜单类型：存在子节点视为「目录」，否则为「菜单」 */
+/** 菜单类型：优先使用 menuType 字段，回退到根据 children 判断 */
 function resolveMenuType(menu: Menu): 'directory' | 'menu' {
+  if (menu.menuType) return menu.menuType;
   return menu.children && menu.children.length > 0 ? 'directory' : 'menu';
 }
 
@@ -202,7 +218,7 @@ function renderLabel(info: { option: TreeOption }) {
   const icon = item.meta?.icon;
   const iconName = icon
     ? `material-symbols:${icon.startsWith('icon-') ? '' : icon}`
-    : item.children?.length
+    : resolveMenuType(item) === 'directory'
       ? 'material-symbols:folder'
       : 'material-symbols:circle';
 
@@ -299,6 +315,7 @@ const defaultParentId = ref<number>(0);
 function handleAdd() {
   operateType.value = 'add';
   editingData.value = null;
+  defaultParentId.value = 0;
   drawerVisible.value = true;
 }
 

@@ -5,17 +5,17 @@ import apiZhCN from '@/views/system/api/langs/zh-cn';
 import departmentZhCN from '@/views/system/department/langs/zh-cn';
 import positionZhCN from '@/views/system/position/langs/zh-cn';
 import paramsZhCN from '@/views/system/params/langs/zh-cn';
-import apiTokenZhCN from '@/views/systemtools/apiToken/langs/zh-cn';
-import timedTaskZhCN from '@/views/opsmonitor/timedtask/langs/zh-cn';
+import apiTokenZhCN from '@/views/system-tools/api-token/langs/zh-cn';
+import timedTaskZhCN from '@/views/ops-monitor/timed-task/langs/zh-cn';
 import dictionaryZhCN from '@/views/system/dictionary/langs/zh-cn';
 import customerZhCN from '@/views/example/customer/langs/zh-cn';
-import sysErrorZhCN from '@/views/opsmonitor/syserror/langs/zh-cn';
-import loginLogZhCN from '@/views/opsmonitor/loginlog/langs/zh-cn';
-import operationHistoryZhCN from '@/views/opsmonitor/operation-history/langs/zh-cn';
-import versionZhCN from '@/views/systemtools/version/langs/zh-cn';
+import sysErrorZhCN from '@/views/ops-monitor/sys-error/langs/zh-cn';
+import loginLogZhCN from '@/views/ops-monitor/login-log/langs/zh-cn';
+import operationHistoryZhCN from '@/views/ops-monitor/operation-history/langs/zh-cn';
+import versionZhCN from '@/views/system-tools/version/langs/zh-cn';
 import securityZhCN from '@/views/system/security/langs/zh-cn';
-import systemConfigZhCN from '@/views/systemtools/system/langs/zh-cn';
-import serverStatusZhCN from '@/views/opsmonitor/server-status/langs/zh-cn';
+import systemConfigZhCN from '@/views/system-tools/system/langs/zh-cn';
+import serverStatusZhCN from '@/views/ops-monitor/server-status/langs/zh-cn';
 
 const local: App.I18n.Schema = {
   system: {
@@ -262,16 +262,16 @@ const local: App.I18n.Schema = {
     system_security: '安全设置',
     example: '示例',
     example_customer: '客户管理',
-    systemtools: '系统工具',
-    systemtools_apitoken: '接口凭证',
-    opsmonitor_timedtask: '定时任务',
-    systemtools_version: '版本信息',
-    systemtools_system: '系统配置',
-    opsmonitor: '运维监控',
-    opsmonitor_loginlog: '登录日志',
-    'opsmonitor_server-status': '服务器状态',
-    opsmonitor_syserror: '系统错误日志',
-    'opsmonitor_operation-history': '操作历史'
+    'system-tools': '系统工具',
+    'system-tools_api-token': '接口凭证',
+    'ops-monitor_timed-task': '定时任务',
+    'system-tools_version': '版本信息',
+    'system-tools_system': '系统配置',
+    'ops-monitor': '运维监控',
+    'ops-monitor_login-log': '登录日志',
+    'ops-monitor_server-status': '服务器状态',
+    'ops-monitor_sys-error': '系统错误日志',
+    'ops-monitor_operation-history': '操作历史'
   },
   page: {
     login: {

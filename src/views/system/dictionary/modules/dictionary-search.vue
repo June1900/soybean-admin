@@ -62,13 +62,13 @@ async function search() {
               <NSpace class="w-full" justify="end">
                 <NButton @click="reset">
                   <template #icon>
-                    <icon-mdi-refresh class="text-16px" />
+                    <icon-ri-refresh-line class="text-16px" />
                   </template>
                   {{ $t('common.reset') }}
                 </NButton>
                 <NButton type="primary" ghost @click="search">
                   <template #icon>
-                    <icon-mdi-magnify class="text-16px" />
+                    <icon-ri-search-line class="text-16px" />
                   </template>
                   {{ $t('common.search') }}
                 </NButton>

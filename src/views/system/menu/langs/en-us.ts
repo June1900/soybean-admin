@@ -116,7 +116,8 @@ const enUS: import('../types/i18n').SystemMenuLang = {
   layoutBlank: 'Blank layout: no common parts, e.g. login page',
   layoutBaseLabel: 'Default',
   layoutBlankLabel: 'Blank',
-  layoutPlaceholder: 'Please select a layout'
+  layoutPlaceholder: 'Please select a layout',
+  refreshFailed: 'Failed to refresh data, please try again'
 };
 
 export default enUS;

@@ -582,16 +582,16 @@ declare namespace App {
           customer: import('../../views/example/customer/types').ExampleCustomerLang;
         };
         systemTools: {
-          apiToken: import('../../views/systemtools/apiToken/types').SystemToolsApiTokenLang;
-          version: import('../../views/systemtools/version/types').SystemToolsVersionLang;
-          system: import('../../views/systemtools/system/types').SystemToolsSystemLang;
+          apiToken: import('../../views/system-tools/api-token/types').SystemToolsApiTokenLang;
+          version: import('../../views/system-tools/version/types').SystemToolsVersionLang;
+          system: import('../../views/system-tools/system/types').SystemToolsSystemLang;
         };
         opsMonitor: {
-          sysError: import('../../views/opsmonitor/syserror/types').SystemToolsSysErrorLang;
-          loginLog: import('../../views/opsmonitor/loginlog/types').SystemToolsLoginLogLang;
-          operationHistory: import('../../views/opsmonitor/operation-history/types').OpsMonitorOperationHistoryLang;
-          serverStatus: import('../../views/opsmonitor/server-status/types').OpsMonitorServerStatusLang;
-          timedTask: import('../../views/opsmonitor/timedtask/types').OpsMonitorTimedTaskLang;
+          sysError: import('../../views/ops-monitor/sys-error/types').SystemToolsSysErrorLang;
+          loginLog: import('../../views/ops-monitor/login-log/types').SystemToolsLoginLogLang;
+          operationHistory: import('../../views/ops-monitor/operation-history/types').OpsMonitorOperationHistoryLang;
+          serverStatus: import('../../views/ops-monitor/server-status/types').OpsMonitorServerStatusLang;
+          timedTask: import('../../views/ops-monitor/timed-task/types').OpsMonitorTimedTaskLang;
         };
       };
       form: {

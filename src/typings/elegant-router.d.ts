@@ -22,15 +22,21 @@ declare module "@elegant-router/types" {
     "500": "/500";
     "example": "/example";
     "example_customer": "/example/customer";
+    "function": "/function";
+    "function_hide-child": "/function/hide-child";
+    "function_hide-child_one": "/function/hide-child/one";
+    "function_hide-child_three": "/function/hide-child/three";
+    "function_hide-child_two": "/function/hide-child/two";
+    "function_super-page": "/function/super-page";
     "home": "/home";
     "iframe-page": "/iframe-page/:url";
     "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?";
-    "opsmonitor": "/opsmonitor";
-    "opsmonitor_loginlog": "/opsmonitor/loginlog";
-    "opsmonitor_operation-history": "/opsmonitor/operation-history";
-    "opsmonitor_server-status": "/opsmonitor/server-status";
-    "opsmonitor_syserror": "/opsmonitor/syserror";
-    "opsmonitor_timedtask": "/opsmonitor/timedtask";
+    "ops-monitor": "/ops-monitor";
+    "ops-monitor_login-log": "/ops-monitor/login-log";
+    "ops-monitor_operation-history": "/ops-monitor/operation-history";
+    "ops-monitor_server-status": "/ops-monitor/server-status";
+    "ops-monitor_sys-error": "/ops-monitor/sys-error";
+    "ops-monitor_timed-task": "/ops-monitor/timed-task";
     "system": "/system";
     "system_api": "/system/api";
     "system_authority": "/system/authority";
@@ -41,10 +47,10 @@ declare module "@elegant-router/types" {
     "system_position": "/system/position";
     "system_security": "/system/security";
     "system_user": "/system/user";
-    "systemtools": "/systemtools";
-    "systemtools_apitoken": "/systemtools/apitoken";
-    "systemtools_system": "/systemtools/system";
-    "systemtools_version": "/systemtools/version";
+    "system-tools": "/system-tools";
+    "system-tools_api-token": "/system-tools/api-token";
+    "system-tools_system": "/system-tools/system";
+    "system-tools_version": "/system-tools/version";
   };
 
   /**
@@ -80,12 +86,13 @@ declare module "@elegant-router/types" {
     | "404"
     | "500"
     | "example"
+    | "function"
     | "home"
     | "iframe-page"
     | "login"
-    | "opsmonitor"
+    | "ops-monitor"
     | "system"
-    | "systemtools"
+    | "system-tools"
   >;
 
   /**
@@ -108,12 +115,19 @@ declare module "@elegant-router/types" {
     | "iframe-page"
     | "login"
     | "example_customer"
+    | "function_hide-child_one"
+    | "function_hide-child_three"
+    | "function_hide-child_two"
+    | "function_super-page"
     | "home"
-    | "opsmonitor_loginlog"
-    | "opsmonitor_operation-history"
-    | "opsmonitor_server-status"
-    | "opsmonitor_syserror"
-    | "opsmonitor_timedtask"
+    | "ops-monitor_login-log"
+    | "ops-monitor_operation-history"
+    | "ops-monitor_server-status"
+    | "ops-monitor_sys-error"
+    | "ops-monitor_timed-task"
+    | "system-tools_api-token"
+    | "system-tools_system"
+    | "system-tools_version"
     | "system_api"
     | "system_authority"
     | "system_department"
@@ -123,9 +137,6 @@ declare module "@elegant-router/types" {
     | "system_position"
     | "system_security"
     | "system_user"
-    | "systemtools_apitoken"
-    | "systemtools_system"
-    | "systemtools_version"
   >;
 
   /**

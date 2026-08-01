@@ -7,15 +7,15 @@ import positionEnUS from '@/views/system/position/langs/en-us';
 import paramsEnUS from '@/views/system/params/langs/en-us';
 import dictionaryEnUS from '@/views/system/dictionary/langs/en-us';
 import customerEnUS from '@/views/example/customer/langs/en-us';
-import sysErrorEnUS from '@/views/opsmonitor/syserror/langs/en-us';
-import loginLogEnUS from '@/views/opsmonitor/loginlog/langs/en-us';
-import operationHistoryEnUS from '@/views/opsmonitor/operation-history/langs/en-us';
-import versionEnUS from '@/views/systemtools/version/langs/en-us';
+import sysErrorEnUS from '@/views/ops-monitor/sys-error/langs/en-us';
+import loginLogEnUS from '@/views/ops-monitor/login-log/langs/en-us';
+import operationHistoryEnUS from '@/views/ops-monitor/operation-history/langs/en-us';
+import versionEnUS from '@/views/system-tools/version/langs/en-us';
 import securityEnUS from '@/views/system/security/langs/en-us';
-import systemConfigEnUS from '@/views/systemtools/system/langs/en-us';
-import apiTokenEnUS from '@/views/systemtools/apiToken/langs/en-us';
-import timedTaskEnUS from '@/views/opsmonitor/timedtask/langs/en-us';
-import serverStatusEnUS from '@/views/opsmonitor/server-status/langs/en-us';
+import systemConfigEnUS from '@/views/system-tools/system/langs/en-us';
+import apiTokenEnUS from '@/views/system-tools/api-token/langs/en-us';
+import timedTaskEnUS from '@/views/ops-monitor/timed-task/langs/en-us';
+import serverStatusEnUS from '@/views/ops-monitor/server-status/langs/en-us';
 
 const local: App.I18n.Schema = {
   system: {
@@ -266,16 +266,16 @@ const local: App.I18n.Schema = {
     system_security: 'Security',
     example: 'Example',
     example_customer: 'Customer',
-    systemtools: 'System Tools',
-    systemtools_apitoken: 'API Token',
-    opsmonitor_timedtask: 'Timed Task',
-    systemtools_version: 'Version Info',
-    systemtools_system: 'System Config',
-    opsmonitor: 'Ops Monitor',
-    opsmonitor_loginlog: 'Login Logs',
-    'opsmonitor_server-status': 'Server Status',
-    opsmonitor_syserror: 'System Error Logs',
-    'opsmonitor_operation-history': 'Operation History'
+    'system-tools': 'System Tools',
+    'system-tools_api-token': 'API Token',
+    'ops-monitor_timed-task': 'Timed Task',
+    'system-tools_version': 'Version Info',
+    'system-tools_system': 'System Config',
+    'ops-monitor': 'Ops Monitor',
+    'ops-monitor_login-log': 'Login Logs',
+    'ops-monitor_server-status': 'Server Status',
+    'ops-monitor_sys-error': 'System Error Logs',
+    'ops-monitor_operation-history': 'Operation History'
   },
   page: {
     login: {

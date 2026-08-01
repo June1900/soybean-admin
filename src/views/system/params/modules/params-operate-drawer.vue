@@ -106,7 +106,7 @@ async function handleSubmit() {
               {{ $t('page.system.params.key') }}
               <NTooltip trigger="hover">
                 <template #trigger>
-                  <icon-mdi-help-circle-outline class="text-14px text-gray-400 cursor-help" />
+                  <icon-ri-question-line class="text-14px text-gray-400 cursor-help" />
                 </template>
                 {{ $t('page.system.params.keyPatternError') }}
               </NTooltip>

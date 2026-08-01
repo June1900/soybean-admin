@@ -24,7 +24,7 @@ import {
   type TreeSelectOption
 } from 'naive-ui';
 import { $t } from '@/locales';
-import { layouts, views } from '@/router/elegant/imports';
+import { views } from '@/router/elegant/imports';
 import { generatedRoutes } from '@/router/elegant/routes';
 import { getRoutePath } from '@/router/elegant/transform';
 import { fetchCreateMenu, fetchGetMenuList, fetchUpdateMenu, type Menu, type MenuForm } from '../api';
@@ -59,12 +59,63 @@ const model = ref<MenuForm>(createDefaultModel());
 const saving = ref(false);
 /** 父节点树形选项 */
 const parentTreeOptions = ref<TreeSelectOption[]>([]);
+/** 当前已加载的菜单原始数据，用于按上级过滤菜单型组件 */
+const loadedMenuList = ref<Menu[]>([]);
 const addParam = ref(false);
 
-/** 目录型可选项（来源于 elegant-router 自动生成的 layouts 映射） */
-const directoryOptions = computed(() =>
-  Object.keys(layouts).map(k => ({ label: `layout.${k}`, value: `layout.${k}` }))
-);
+/** 目录型可选项：按父级约束层级
+ * - 父级为根节点（parentId=0）：仅显示 generatedRoutes 第一层中含 children 的路由
+ * - 父级为某目录：在 generatedRoutes 中找到同名路由，显示其 children 中含 children 的路由（下一层目录）
+ */
+const directoryOptions = computed(() => {
+  const result: { label: string; value: string }[] = [];
+  type RouteNode = { name?: string; meta?: { hideInMenu?: boolean }; children?: RouteNode[] };
+
+  const buildLabel = (name: string) => {
+    const titleKey = `route.${name}` as const;
+    const title = $t(titleKey as any);
+    const hasTitle = title && title !== titleKey;
+    return hasTitle ? `${name}（${title}）` : name;
+  };
+
+  // 收集当前层级中未隐藏且含 children 的路由
+  const collectDirRoutes = (routes: RouteNode[]) => {
+    for (const r of routes) {
+      if (!r.name || r.meta?.hideInMenu) continue;
+      if (r.children?.length) {
+        result.push({ label: buildLabel(r.name), value: r.name });
+      }
+    }
+  };
+
+  // 在 generatedRoutes 中按 name 查找路由节点
+  const findRouteByName = (routes: RouteNode[], name: string): RouteNode | null => {
+    for (const r of routes) {
+      if (r.name === name) return r;
+      if (r.children?.length) {
+        const found = findRouteByName(r.children, name);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  const parentName = findParentMenuName(model.value.parentId);
+  if (!parentName) {
+    // 父级为根节点：显示第一层目录路由
+    collectDirRoutes(generatedRoutes as RouteNode[]);
+  } else {
+    // 父级为某目录：显示该目录下下一层目录路由
+    const parentRoute = findRouteByName(generatedRoutes as RouteNode[], parentName);
+    if (parentRoute?.children?.length) {
+      collectDirRoutes(parentRoute.children);
+    } else {
+      // 父级不在 generatedRoutes 中（自定义目录），回退到第一层
+      collectDirRoutes(generatedRoutes as RouteNode[]);
+    }
+  }
+  return result;
+});
 
 /** 递归收集 generatedRoutes 中标记为 hideInMenu 的路由 name，这些不参与选择 */
 function collectHiddenRouteNames(
@@ -82,25 +133,33 @@ const hiddenRouteNames = computed(() =>
   collectHiddenRouteNames(generatedRoutes as Parameters<typeof collectHiddenRouteNames>[0])
 );
 
-/** 最终文件型可选项，显示为"组件名（菜单名称）（路由路径）"，便于直观选择；hideInMenu 的路由不参与选择 */
-const fileOptions = computed(() =>
-  Object.keys(views)
-    .filter(k => !hiddenRouteNames.value.has(k))
-    .map(k => {
-      const routePath = getRoutePath(k as Parameters<typeof getRoutePath>[0]);
-      const routeTitleKey = `route.${k}` as const;
-      const routeTitle = $t(routeTitleKey as any);
-      // 未配置翻译时 $t 返回 key 本身，此时不展示菜单名称括号
-      const hasTitle = routeTitle && routeTitle !== routeTitleKey;
-      const suffix = [hasTitle ? routeTitle : '', routePath].filter(Boolean).join('）（');
-      return {
-        label: suffix ? `view.${k}（${suffix}）` : `view.${k}`,
-        value: `view.${k}`
-      };
-    })
-);
+/** 菜单型可选项：根据选择的上级过滤；上级为根或无匹配时显示全部未隐藏视图 */
+const fileOptions = computed(() => {
+  const parentName = findParentMenuName(model.value.parentId);
+  const allViews = Object.keys(views).filter(k => !hiddenRouteNames.value.has(k));
+  let filtered = allViews;
+  if (parentName) {
+    const matching = allViews.filter(k => k.startsWith(`${parentName}_`));
+    // 仅当存在匹配项时才过滤，避免父级为自定义目录时无选项可选
+    if (matching.length > 0) {
+      filtered = matching;
+    }
+  }
+  return filtered.map(k => {
+    const routePath = getRoutePath(k as Parameters<typeof getRoutePath>[0]);
+    const routeTitleKey = `route.${k}` as const;
+    const routeTitle = $t(routeTitleKey as any);
+    // 未配置翻译时 $t 返回 key 本身，此时不展示菜单名称括号
+    const hasTitle = routeTitle && routeTitle !== routeTitleKey;
+    const suffix = [hasTitle ? routeTitle : '', routePath].filter(Boolean).join('）（');
+    return {
+      label: suffix ? `view.${k}（${suffix}）` : `view.${k}`,
+      value: `view.${k}`
+    };
+  });
+});
 
-/** 组件录入模式：由菜单类型决定，目录选 layouts，菜单选 views */
+/** 组件录入模式：由菜单类型决定，目录选 generatedRoutes 目录路由，菜单选 views */
 const componentMode = computed<'directory' | 'file'>(() =>
   model.value.menuType === 'directory' ? 'directory' : 'file'
 );
@@ -156,21 +215,34 @@ const formRules = computed(() => ({
   }
 }));
 
-/** 选择组件文件后，自动回显对应的路由路径到 path 字段，并回显 i18n key 到 meta.title */
+/** 选择组件后自动回显 path、name、meta.title
+ * - 菜单型：值为 view.xxx，xxx 即为路由名（如 view.system_menu → system_menu）
+ * - 目录型：值为路由名本身（如 system）
+ * 选中的路由名作为 name 默认值，便于用户在此基础上调整
+ */
 function handleComponentChange(val: string) {
   model.value.component = val;
+  let routeName = '';
   if (componentMode.value === 'file' && val.startsWith('view.')) {
-    const routeName = val.slice('view.'.length);
-    const routePath = getRoutePath(routeName as Parameters<typeof getRoutePath>[0]);
-    if (routePath) {
-      model.value.path = routePath;
-    }
-    // meta.title 保存 i18n 的 key（如 route.system_menu），运行时由路由模块解析为多语言文案
-    const routeTitleKey = `route.${routeName}` as const;
-    const routeTitle = $t(routeTitleKey as any);
-    if (routeTitle && routeTitle !== routeTitleKey) {
-      model.value.meta.title = routeTitleKey;
-    }
+    routeName = val.slice('view.'.length);
+  } else if (componentMode.value === 'directory') {
+    routeName = val;
+  }
+  if (!routeName) return;
+
+  // 路由名回显到 name 字段，用户仍可手动编辑
+  model.value.name = routeName;
+
+  // 路由路径回显到 path 字段
+  const routePath = getRoutePath(routeName as Parameters<typeof getRoutePath>[0]);
+  if (routePath) {
+    model.value.path = routePath;
+  }
+  // meta.title 保存 i18n 的 key（如 route.system_menu），运行时由路由模块解析为多语言文案
+  const routeTitleKey = `route.${routeName}` as const;
+  const routeTitle = $t(routeTitleKey as any);
+  if (routeTitle && routeTitle !== routeTitleKey) {
+    model.value.meta.title = routeTitleKey;
   }
 }
 
@@ -224,6 +296,7 @@ function buildMenuTree(list: Menu[] = [], excludeId?: number): TreeSelectOption[
 
 async function loadParentTreeOptions(excludeId?: number) {
   const { data } = await fetchGetMenuList();
+  loadedMenuList.value = data ?? [];
   parentTreeOptions.value = [
     {
       key: 0,
@@ -231,6 +304,23 @@ async function loadParentTreeOptions(excludeId?: number) {
       children: buildMenuTree(data ?? [], excludeId)
     }
   ];
+}
+
+/** 根据 parentId 查找父级菜单的 name，用于按上级过滤菜单型组件 */
+function findParentMenuName(parentId: number): string | null {
+  if (!parentId) return null;
+  const walk = (list: Menu[]): Menu | null => {
+    for (const m of list) {
+      if (m.ID === parentId) return m;
+      if (m.children?.length) {
+        const found = walk(m.children);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+  const found = walk(loadedMenuList.value);
+  return found?.name ?? null;
 }
 
 watch(
@@ -491,13 +581,14 @@ async function handleSubmit() {
             </NRadioGroup>
           </NFormItemGi>
           <NFormItemGi :span="24" :label="$t('page.system.menu.component')" path="component">
-            <!-- 目录型：从 layouts 中选择 -->
+            <!-- 目录型：从 generatedRoutes 目录路由中选择，选中后回显 path/name/title -->
             <NSelect
               v-if="componentMode === 'directory'"
-              v-model:value="model.component"
+              :value="model.component"
               :placeholder="$t('page.system.menu.componentDirPlaceholder')"
               :options="directoryOptions"
               clearable
+              @update:value="handleComponentChange"
             />
             <!-- 菜单型：从 views 中选择，选中后自动回显路由路径 -->
             <NSelect

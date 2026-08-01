@@ -424,13 +424,13 @@ onMounted(async () => {
           <div class="member-actions flex gap-8px">
             <NButton type="primary" size="small" @click="handleMemberQuery">
               <template #icon>
-                <icon-mdi-magnify class="text-14px" />
+                <icon-ri-search-line class="text-14px" />
               </template>
               {{ $t('page.system.position.query') }}
             </NButton>
             <NButton size="small" @click="handleMemberReset">
               <template #icon>
-                <icon-mdi-refresh class="text-14px" />
+                <icon-ri-refresh-line class="text-14px" />
               </template>
               {{ $t('page.system.position.reset') }}
             </NButton>

@@ -116,7 +116,8 @@ const zhCN: import('../types/i18n').SystemMenuLang = {
   layoutBlank: '空白布局：无公共部分的布局，如登录页',
   layoutBaseLabel: '默认布局',
   layoutBlankLabel: '空白布局',
-  layoutPlaceholder: '请选择布局方式'
+  layoutPlaceholder: '请选择布局方式',
+  refreshFailed: '刷新数据失败，请重试'
 };
 
 export default zhCN;

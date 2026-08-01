@@ -202,7 +202,7 @@ onMounted(() => {
         <NSpace align="center" wrap justify="end" class="lt-sm:w-200px">
           <NButton size="small" ghost type="primary" @click="handleAdd">
             <template #icon>
-              <icon-ic-round-plus class="text-icon" />
+              <icon-ri-add-line class="text-icon" />
             </template>
             {{ $t('common.add') }}
           </NButton>
@@ -210,7 +210,7 @@ onMounted(() => {
             <template #trigger>
               <NButton size="small" ghost type="error" :disabled="checkedRowKeys.length === 0">
                 <template #icon>
-                  <icon-ic-round-delete class="text-icon" />
+                  <icon-ri-delete-bin-line class="text-icon" />
                 </template>
                 {{ $t('page.system.api.batchDelete') }}
               </NButton>
@@ -219,7 +219,7 @@ onMounted(() => {
           </NPopconfirm>
           <NButton size="small" @click="handleRefreshCache">
             <template #icon>
-              <icon-mdi-refresh class="text-icon" :class="{ 'animate-spin': loading }" />
+              <icon-ri-refresh-line class="text-icon" :class="{ 'animate-spin': loading }" />
             </template>
             {{ $t('page.system.api.refresh') }}
           </NButton>

@@ -41,27 +41,27 @@ const options = computed(() => {
     {
       key: 'closeCurrent',
       label: $t('dropdown.closeCurrent'),
-      icon: SvgIconVNode({ icon: 'ant-design:close-outlined', fontSize: 18 })
+      icon: SvgIconVNode({ icon: 'ri:close-line', fontSize: 18 })
     },
     {
       key: 'closeOther',
       label: $t('dropdown.closeOther'),
-      icon: SvgIconVNode({ icon: 'ant-design:column-width-outlined', fontSize: 18 })
+      icon: SvgIconVNode({ icon: 'ri:layout-column-line', fontSize: 18 })
     },
     {
       key: 'closeLeft',
       label: $t('dropdown.closeLeft'),
-      icon: SvgIconVNode({ icon: 'mdi:format-horizontal-align-left', fontSize: 18 })
+      icon: SvgIconVNode({ icon: 'ri:align-left', fontSize: 18 })
     },
     {
       key: 'closeRight',
       label: $t('dropdown.closeRight'),
-      icon: SvgIconVNode({ icon: 'mdi:format-horizontal-align-right', fontSize: 18 })
+      icon: SvgIconVNode({ icon: 'ri:align-right', fontSize: 18 })
     },
     {
       key: 'closeAll',
       label: $t('dropdown.closeAll'),
-      icon: SvgIconVNode({ icon: 'ant-design:line-outlined', fontSize: 18 })
+      icon: SvgIconVNode({ icon: 'ri:bar-chart-horizontal-line', fontSize: 18 })
     }
   ];
 
@@ -70,13 +70,13 @@ const options = computed(() => {
       opts.push({
         key: 'unpin',
         label: $t('dropdown.unpin'),
-        icon: SvgIconVNode({ icon: 'mdi:pin-off-outline', fontSize: 18 })
+        icon: SvgIconVNode({ icon: 'ri:pushpin-fill', fontSize: 18 })
       });
     } else {
       opts.push({
         key: 'pin',
         label: $t('dropdown.pin'),
-        icon: SvgIconVNode({ icon: 'mdi:pin-outline', fontSize: 18 })
+        icon: SvgIconVNode({ icon: 'ri:pushpin-line', fontSize: 18 })
       });
     }
   }

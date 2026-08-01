@@ -64,7 +64,7 @@ function toggleSelectAll(checked: boolean) {
     <template #trigger>
       <NButton size="small">
         <template #icon>
-          <icon-ant-design-setting-outlined class="text-icon" />
+          <icon-ri-settings-3-line class="text-icon" />
         </template>
         {{ $t('common.columnSetting') }}
       </NButton>
@@ -93,7 +93,7 @@ function toggleSelectAll(checked: boolean) {
             class="h-full flex-y-center flex-1 rd-4px hover:(bg-primary bg-opacity-20)"
             :title="item.lock ? $t('datatable.operationLocked') : undefined"
           >
-            <icon-mdi-drag class="mr-8px h-full cursor-move text-icon" />
+            <icon-ri-drag-move-2-line class="mr-8px h-full cursor-move text-icon" />
             <NCheckbox v-model:checked="item.checked" :disabled="item.lock" class="none_draggable flex-1">
               <template v-if="typeof item.title === 'function'">
                 <component :is="item.title" />
@@ -107,10 +107,10 @@ function toggleSelectAll(checked: boolean) {
             :tooltip-content="item.lock ? $t('datatable.operationLocked') : $t(tooltipRecord[item.fixed!])"
             @click="handleFixed(item)"
           >
-            <icon-octicon-pin-16 v-if="item.lock" class="rotate-90" />
-            <icon-octicon-pin-16 v-else-if="item.fixed === 'unFixed'" />
-            <icon-octicon-pin-16 v-else-if="item.fixed === 'left'" class="rotate-270" />
-            <icon-octicon-pin-slash-16 v-else />
+            <icon-ri-pushpin-line v-if="item.lock" class="rotate-90" />
+            <icon-ri-pushpin-line v-else-if="item.fixed === 'unFixed'" />
+            <icon-ri-pushpin-line v-else-if="item.fixed === 'left'" class="rotate-270" />
+            <icon-ri-pushpin-fill v-else />
           </ButtonIcon>
         </div>
       </VueDraggable>

@@ -1,0 +1,99 @@
+<script setup lang="ts">
+import { computed, toRaw } from 'vue';
+import { jsonClone } from '@sa/utils';
+import { useNaiveForm } from '@/hooks/common/form';
+import { $t } from '@/locales';
+import type { TimedTaskSearchParams } from '../api';
+
+defineOptions({ name: 'TimedTaskSearch' });
+
+interface Emits {
+  (e: 'search'): void;
+  (e: 'reset'): void;
+}
+const emit = defineEmits<Emits>();
+
+const { formRef, validate, restoreValidation } = useNaiveForm();
+
+const model = defineModel<TimedTaskSearchParams>('model', { required: true });
+
+const executorTypeOptions = computed(() => [
+  { label: $t('page.opsMonitor.timedTask.search.method'), value: 'method' },
+  { label: $t('page.opsMonitor.timedTask.search.http'), value: 'http' }
+]);
+
+const enabledOptions = computed(() => [
+  { label: $t('page.opsMonitor.timedTask.enable'), value: '1' },
+  { label: $t('page.opsMonitor.timedTask.disable'), value: '0' }
+]);
+
+const defaultModel = jsonClone(toRaw(model.value));
+
+function resetModel() {
+  Object.assign(model.value, defaultModel);
+}
+
+async function reset() {
+  await restoreValidation();
+  resetModel();
+  emit('reset');
+}
+
+async function search() {
+  await validate();
+  emit('search');
+}
+</script>
+
+<template>
+  <NCard :bordered="false" size="small" class="card-wrapper">
+    <NCollapse>
+      <NCollapseItem :title="$t('common.search')" name="timed-task-search">
+        <NForm ref="formRef" :model="model" label-placement="left" :label-width="80">
+          <NGrid responsive="screen" item-responsive>
+            <NFormItemGi
+              span="24 s:12 m:6"
+              :label="$t('page.opsMonitor.timedTask.search.name')"
+              path="name"
+              class="pr-24px"
+            >
+              <NInput v-model:value="model.name" />
+            </NFormItemGi>
+            <NFormItemGi
+              span="24 s:12 m:6"
+              :label="$t('page.opsMonitor.timedTask.search.executorType')"
+              path="executorType"
+              class="pr-24px"
+            >
+              <NSelect v-model:value="model.executorType" clearable :options="executorTypeOptions" />
+            </NFormItemGi>
+            <NFormItemGi
+              span="24 s:12 m:6"
+              :label="$t('page.opsMonitor.timedTask.search.enabled')"
+              path="enabled"
+              class="pr-24px"
+            >
+              <NSelect v-model:value="model.enabled" clearable :options="enabledOptions" />
+            </NFormItemGi>
+            <NFormItemGi span="24 m:6" class="pr-24px">
+              <NSpace class="w-full" justify="end">
+                <NButton @click="reset">
+                  <template #icon>
+                    <icon-ri-refresh-line class="text-16px" />
+                  </template>
+                  {{ $t('common.reset') }}
+                </NButton>
+                <NButton type="primary" ghost @click="search">
+                  <template #icon>
+                    <icon-ri-search-line class="text-16px" />
+                  </template>
+                  {{ $t('common.search') }}
+                </NButton>
+              </NSpace>
+            </NFormItemGi>
+          </NGrid>
+        </NForm>
+      </NCollapseItem>
+    </NCollapse>
+  </NCard>
+</template>

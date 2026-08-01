@@ -118,4 +118,5 @@ export interface SystemMenuLang {
   layoutBaseLabel: string;
   layoutBlankLabel: string;
   layoutPlaceholder: string;
+  refreshFailed: string;
 }
