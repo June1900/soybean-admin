@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { NButton, NTooltip } from 'naive-ui';
+import { NButton, NTag, NTooltip } from 'naive-ui';
 import { $t } from '@/locales';
 import SvgIcon from '@/components/custom/svg-icon.vue';
 import type { Menu } from '../api';
-import { resolveMenuType, translateTitle } from '../shared';
+import { resolveMenuType, translateTitle, isExternalLink } from '../shared';
 
 defineOptions({
   name: 'MenuTreeNode'
@@ -22,8 +22,10 @@ const emit = defineEmits<{
 
 const isDirectory = computed(() => resolveMenuType(props.item) === 'directory');
 const hasChildren = computed(() => !!(props.item.children && props.item.children.length > 0));
+const external = computed(() => isExternalLink(props.item));
 
 const iconName = computed(() => {
+  if (external.value) return 'ri:external-link-line';
   const icon = props.item.meta?.icon;
   if (icon) return icon;
   return isDirectory.value ? 'ri:folder-line' : 'ri:menu-line';
@@ -37,6 +39,9 @@ const title = computed(() => translateTitle(props.item.meta?.title) || props.ite
     <div class="flex min-w-0 flex-1 items-center gap-6px overflow-hidden">
       <SvgIcon :icon="iconName" class="shrink-0 text-16px" />
       <span class="truncate" :title="title">{{ title }}</span>
+      <NTag v-if="external" size="tiny" type="warning" :bordered="false" round class="shrink-0">
+        {{ $t('page.system.menu.typeLink') }}
+      </NTag>
       <span v-if="searchActive" class="text-12px text-[var(--theme-text-3)]">({{ item.path }})</span>
     </div>
     <div class="menu-row-actions flex shrink-0 items-center gap-2px transition-opacity">

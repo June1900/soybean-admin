@@ -4,7 +4,7 @@ import { NDataTable, NDescriptions, NDescriptionsItem, NEmpty, NSpin, NTag, useT
 import { $t } from '@/locales';
 import SvgIcon from '@/components/custom/svg-icon.vue';
 import type { Menu } from '../api';
-import { translateTitle, resolveMenuType, layoutOptions, yesOrNoOptions } from '../shared';
+import { translateTitle, resolveMenuType, isExternalLink, layoutOptions, yesOrNoOptions } from '../shared';
 
 defineOptions({
   name: 'MenuDetailPanel'
@@ -21,8 +21,13 @@ const themeVars = useThemeVars();
 const menuTypeLabel = computed(() => {
   if (!props.menu) return '';
   const type = resolveMenuType(props.menu);
-  return type === 'directory' ? $t('page.system.menu.typeDirectory') : $t('page.system.menu.typeMenu');
+  if (type === 'directory') return $t('page.system.menu.typeDirectory');
+  if (type === 'link') return $t('page.system.menu.typeLink');
+  return $t('page.system.menu.typeMenu');
 });
+
+/** 是否外链 */
+const isExternal = computed(() => !!props.menu && isExternalLink(props.menu));
 
 /** 展示名称（翻译 meta.title i18n key） */
 const titleText = computed(() => {
@@ -172,7 +177,13 @@ const btnScrollX = computed(() =>
           <NDescriptionsItem :label="$t('page.system.menu.fieldMenuType')">
             <NTag
               size="small"
-              :type="resolveMenuType(menu) === 'directory' ? 'info' : 'success'"
+              :type="
+                resolveMenuType(menu) === 'directory'
+                  ? 'info'
+                  : resolveMenuType(menu) === 'link'
+                    ? 'warning'
+                    : 'success'
+              "
               :bordered="false"
               round
             >
@@ -210,9 +221,19 @@ const btnScrollX = computed(() =>
             </NTag>
           </NDescriptionsItem>
           <NDescriptionsItem :label="$t('page.system.menu.fieldIsExternal')">
-            <NTag size="small" type="warning" :bordered="false" round>
-              {{ $t('page.system.menu.externalNo') }}
+            <NTag size="small" :type="isExternal ? 'warning' : 'success'" :bordered="false" round>
+              {{ isExternal ? $t('page.system.menu.externalYes') : $t('page.system.menu.externalNo') }}
             </NTag>
+          </NDescriptionsItem>
+          <NDescriptionsItem v-if="isExternal" :label="$t('page.system.menu.linkAddress')">
+            <a
+              :href="menu.meta?.href"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-[var(--theme-primary)] break-all"
+            >
+              {{ menu.meta?.href }}
+            </a>
           </NDescriptionsItem>
           <NDescriptionsItem :label="$t('page.system.menu.fieldLayout')">
             {{ layoutLabel }}

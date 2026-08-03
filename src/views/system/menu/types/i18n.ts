@@ -106,6 +106,11 @@ export interface SystemMenuLang {
   fieldSort: string;
   typeDirectory: string;
   typeMenu: string;
+  typeLink: string;
+  linkAddress: string;
+  linkAddressPlaceholder: string;
+  linkPathPlaceholder: string;
+  linkRequired: string;
   statusNormal: string;
   statusDisabled: string;
   externalYes: string;
