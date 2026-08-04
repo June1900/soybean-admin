@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed, h, ref, watch } from 'vue';
 import {
+  type FormInst,
   NAlert,
   NButton,
   NDataTable,
+  NDivider,
   NDrawer,
   NDrawerContent,
-  NDivider,
   NForm,
   NFormItemGi,
   NGrid,
@@ -17,7 +18,6 @@ import {
   NSelect,
   NSpace,
   NTreeSelect,
-  type FormInst,
   type TreeSelectOption
 } from 'naive-ui';
 import { $t } from '@/locales';
@@ -25,14 +25,7 @@ import { views } from '@/router/elegant/imports';
 import { generatedRoutes } from '@/router/elegant/routes';
 import { getRoutePath } from '@/router/elegant/transform';
 import { fetchCreateMenu, fetchGetMenuList, fetchUpdateMenu, type Menu, type MenuForm } from '../api';
-import {
-  translateTitle,
-  resolveMenuType,
-  yesOrNoOptions,
-  showHiddenOptions,
-  menuTypeOptions,
-  layoutOptions
-} from '../shared';
+import { layoutOptions, menuTypeOptions, resolveMenuType, showHiddenOptions, translateTitle, yesOrNoOptions } from '../shared';
 import IconPickerModal from './icon-picker-modal.vue';
 
 defineOptions({
@@ -222,28 +215,21 @@ function handleMenuTypeChange(val: 'directory' | 'menu' | 'link') {
   }
 }
 
-/** 外链地址变更：自动回显 name / path / 展示名称（由 host 派生，展示名称默认用 host 文案，可手动覆盖） */
+/** 外链地址变更 */
 function handleHrefChange(val: string) {
-  model.value.meta.href = val;
+  model.value.path = val;
   const url = (val || '').trim();
-  if (!url) {
-    model.value.path = '';
-    model.value.name = '';
-    return;
-  }
   let host = '';
   try {
     host = new URL(url).host;
   } catch {
     host = url.replace(/^https?:\/\//i, '').split('/')[0];
   }
-  const slug = host.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() || 'external';
-  model.value.name = slug;
-  model.value.path = `/${slug}`;
-  if (!model.value.meta.title) model.value.meta.title = host || url;
+  model.value.name = host || 'external';
+  model.value.component = 'layout.base$view.iframe-page'
 }
 
-/** 表单校验规则：核心字段必填；外链类型用 meta.href 替代 component 作为必填项 */
+/** 表单校验规则：核心字段必填 */
 const formRules = computed(() => {
   const rules: Record<
     string,
@@ -272,11 +258,21 @@ const formRules = computed(() => {
     }
   };
   if (model.value.menuType === 'link') {
-    rules['meta.href'] = {
+    // rules['meta.href'] = {
+    //   required: true,
+    //   message: $t('page.system.menu.linkRequired'),
+    //   trigger: ['blur', 'input']
+    // };
+    rules.path = {
       required: true,
       message: $t('page.system.menu.linkRequired'),
-      trigger: ['blur', 'input']
+      trigger: ['blur', 'change']
     };
+    // rules.component = {
+    //   required: true,
+    //   message: $t('page.system.menu.linkRequired'),
+    //   trigger: ['blur', 'change']
+    // };
   } else if (!(model.value.menuType === 'menu' && menuManualMode.value)) {
     // 菜单型手动输入模式：component 由 name 派生，无需校验
     rules.component = {
@@ -713,7 +709,7 @@ async function handleSubmit() {
             </NRadioGroup>
           </NFormItemGi>
           <NFormItemGi
-            v-if="model.menuType === 'directory' || model.menuType === 'menu'"
+            v-if="model.menuType === 'directory'"
             :span="24"
             :label="$t('page.system.menu.componentInputMode')"
           >
@@ -763,44 +759,50 @@ async function handleSubmit() {
             v-else-if="model.menuType === 'link'"
             :span="24"
             :label="$t('page.system.menu.linkAddress')"
-            path="meta.href"
+            path="path"
           >
+            <!-- 使用 path 接收外链地址 -->
             <NInput
-              v-model:value="model.meta.href"
+              v-model:value="model.path"
               :placeholder="$t('page.system.menu.linkAddressPlaceholder')"
               @update:value="handleHrefChange"
             />
           </NFormItemGi>
-          <template v-if="manualFields">
-            <NFormItemGi :span="8" :label="$t('page.system.menu.name')" path="name">
-              <NInput v-model:value="model.name" :placeholder="$t('page.system.menu.namePlaceholder')" />
-            </NFormItemGi>
-            <NFormItemGi :span="8" :label="$t('page.system.menu.path')" path="path">
-              <NInput
-                v-model:value="model.path"
-                :placeholder="
-                  model.menuType === 'link'
-                    ? $t('page.system.menu.linkPathPlaceholder')
-                    : $t('page.system.menu.pathPlaceholder')
-                "
-              />
-            </NFormItemGi>
-            <NFormItemGi :span="8" :label="$t('page.system.menu.titleField')" path="meta.title">
+          <template v-if="model.menuType === 'link'">
+            <NFormItemGi :span="24" :label="$t('page.system.menu.titleField')" path="meta.title">
               <NInput v-model:value="model.meta.title" :placeholder="$t('page.system.menu.titlePlaceholder')" />
             </NFormItemGi>
           </template>
-          <template v-else>
-            <NFormItemGi :span="12" :label="$t('page.system.menu.titleField')" path="meta.title">
-              <NInput
-                :value="translateTitle(model.meta.title)"
-                :placeholder="$t('page.system.menu.titlePlaceholder')"
-                readonly
-              />
-            </NFormItemGi>
-            <NFormItemGi :span="12" :label="$t('page.system.menu.path')" path="path">
-              <NInput v-model:value="model.path" :placeholder="$t('page.system.menu.pathPlaceholder')" readonly />
-            </NFormItemGi>
-          </template>
+<!--          <template v-if="manualFields">-->
+<!--            <NFormItemGi :span="24" :label="$t('page.system.menu.name')" path="name">-->
+<!--              <NInput v-model:value="model.name" :placeholder="$t('page.system.menu.namePlaceholder')" />-->
+<!--            </NFormItemGi>-->
+<!--            <NFormItemGi :span="24" :label="$t('page.system.menu.path')" path="path">-->
+<!--              <NInput-->
+<!--                v-model:value="model.path"-->
+<!--                :placeholder="-->
+<!--                  model.menuType === 'link'-->
+<!--                    ? $t('page.system.menu.linkPathPlaceholder')-->
+<!--                    : $t('page.system.menu.pathPlaceholder')-->
+<!--                "-->
+<!--              />-->
+<!--            </NFormItemGi>-->
+<!--            <NFormItemGi :span="24" :label="$t('page.system.menu.titleField')" path="meta.title">-->
+<!--              <NInput v-model:value="model.meta.title" :placeholder="$t('page.system.menu.titlePlaceholder')" />-->
+<!--            </NFormItemGi>-->
+<!--          </template>-->
+<!--          <template v-else>-->
+<!--            <NFormItemGi :span="24" :label="$t('page.system.menu.titleField')" path="meta.title">-->
+<!--              <NInput-->
+<!--                :value="translateTitle(model.meta.title)"-->
+<!--                :placeholder="$t('page.system.menu.titlePlaceholder')"-->
+<!--                readonly-->
+<!--              />-->
+<!--            </NFormItemGi>-->
+<!--            <NFormItemGi :span="24" :label="$t('page.system.menu.path')" path="path">-->
+<!--              <NInput v-model:value="model.path" :placeholder="$t('page.system.menu.pathPlaceholder')" readonly />-->
+<!--            </NFormItemGi>-->
+<!--          </template>-->
         </NGrid>
 
         <!-- 显示设置 -->

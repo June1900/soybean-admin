@@ -25,9 +25,9 @@ const hasChildren = computed(() => !!(props.item.children && props.item.children
 const external = computed(() => isExternalLink(props.item));
 
 const iconName = computed(() => {
-  if (external.value) return 'ri:external-link-line';
   const icon = props.item.meta?.icon;
   if (icon) return icon;
+  if (external.value) return 'ri:external-link-line';
   return isDirectory.value ? 'ri:folder-line' : 'ri:menu-line';
 });
 
