@@ -361,9 +361,14 @@ function handleDeleteClick() {
           <div class="flex items-center justify-between">
             <h3 class="m-0 text-16px font-500">{{ $t('page.system.menu.panelMenuList') }}</h3>
             <NSpace :size="6" align="center" :wrap="false">
-              <NButton size="small" type="primary" quaternary @click="handleAddRoot">
-                <template #icon><SvgIcon icon="ri:add-line" /></template>
-              </NButton>
+              <NTooltip trigger="hover" placement="bottom">
+                <template #trigger>
+                  <NButton size="small" type="primary" quaternary @click="handleAddRoot">
+                    <template #icon><SvgIcon icon="ri:add-line" /></template>
+                  </NButton>
+                </template>
+                {{ $t('page.system.menu.addMenu') }}
+              </NTooltip>
               <NTooltip trigger="hover" placement="bottom">
                 <template #trigger>
                   <NButton size="small" quaternary @click="toggleExpandAll">
@@ -374,9 +379,14 @@ function handleDeleteClick() {
                 </template>
                 {{ isAllExpanded ? $t('page.system.menu.collapseAll') : $t('page.system.menu.expandAll') }}
               </NTooltip>
-              <NButton size="small" quaternary @click="handleRefresh">
-                <template #icon><SvgIcon icon="ri:refresh-line" /></template>
-              </NButton>
+              <NTooltip trigger="hover" placement="bottom">
+                <template #trigger>
+                  <NButton size="small" quaternary @click="handleRefresh">
+                    <template #icon><SvgIcon icon="ri:refresh-line" /></template>
+                  </NButton>
+                </template>
+                {{ $t('page.system.menu.refresh') }}
+              </NTooltip>
             </NSpace>
           </div>
 

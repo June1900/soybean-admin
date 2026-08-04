@@ -4,7 +4,7 @@ import { NDataTable, NDescriptions, NDescriptionsItem, NEmpty, NSpin, NTag, useT
 import { $t } from '@/locales';
 import SvgIcon from '@/components/custom/svg-icon.vue';
 import type { Menu } from '../api';
-import { translateTitle, resolveMenuType, isExternalLink, layoutOptions, yesOrNoOptions } from '../shared';
+import { translateTitle, resolveMenuType, isExternalLink, layoutOptions, yesOrNoOptions, menuTypeTagType } from '../shared';
 
 defineOptions({
   name: 'MenuDetailPanel'
@@ -160,12 +160,11 @@ const btnScrollX = computed(() =>
       <p class="detail-empty__title">{{ $t('page.system.menu.noSelectHint') }}</p>
     </div>
 
-    <!-- 三个卡片统一滚动 -->
-    <div v-else class="flex flex-col gap-16px overflow-auto h-full">
+    <div v-else class="flex flex-col gap-12px overflow-auto h-full">
       <!-- 详情网格 -->
       <div class="detail-card rounded-8px p-16px">
         <NDescriptions
-          :column="2"
+          :column="3"
           label-placement="left"
           bordered
           :label-style="{
@@ -175,18 +174,7 @@ const btnScrollX = computed(() =>
           }"
         >
           <NDescriptionsItem :label="$t('page.system.menu.fieldMenuType')">
-            <NTag
-              size="small"
-              :type="
-                resolveMenuType(menu) === 'directory'
-                  ? 'info'
-                  : resolveMenuType(menu) === 'link'
-                    ? 'warning'
-                    : 'success'
-              "
-              :bordered="false"
-              round
-            >
+            <NTag size="small" :type="menuTypeTagType(menu)" :bordered="false" round>
               {{ menuTypeLabel }}
             </NTag>
           </NDescriptionsItem>

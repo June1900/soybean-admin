@@ -52,6 +52,8 @@ const enUS: import('../types/i18n').SystemMenuLang = {
   rootDirectory: 'Root',
   selectPath: 'Select Path',
   manualInput: 'Manual Input',
+  selectInput: 'Select File',
+  componentInputMode: 'Input Mode',
   componentTip: 'If this menu contains child menus, please create a router-view secondary route page or',
   clickToSet: 'Click to set',
   addMenuWarning: 'New menus require permission configuration in Role Management before they can be used.',

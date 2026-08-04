@@ -53,6 +53,8 @@ export interface SystemMenuLang {
   rootDirectory: string;
   selectPath: string;
   manualInput: string;
+  selectInput: string;
+  componentInputMode: string;
   componentTip: string;
   clickToSet: string;
   addMenuWarning: string;

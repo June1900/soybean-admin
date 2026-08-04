@@ -18,6 +18,14 @@ export function isExternalLink(menu: Menu): boolean {
   return menu.menuType === 'link' || !!menu.meta?.href;
 }
 
+/** 菜单类型对应的 NTag 颜色类型（决定 tag 文字/背景颜色）：目录=info，外链=warning，菜单=success */
+export function menuTypeTagType(menu: Menu): 'info' | 'warning' | 'success' {
+  const type = resolveMenuType(menu);
+  if (type === 'directory') return 'info';
+  if (type === 'link') return 'warning';
+  return 'success';
+}
+
 /** 是/否下拉选项（value: 1 = 是, 0 = 否） */
 export const yesOrNoOptions = () => [
   { label: $t('common.yesOrNo.yes'), value: 1 },

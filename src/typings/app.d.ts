@@ -67,7 +67,7 @@ declare namespace App {
         /**
          * Whether to cache the tab
          *
-         * If cache, the tabs will get from the local storage when the page is refreshed
+         * If cached, the tabs will get from the local storage when the page is refreshed
          */
         cache: boolean;
         /** Tab height */
@@ -126,7 +126,7 @@ declare namespace App {
         /** Time format for watermark text */
         timeFormat: string;
       };
-      /** define some theme settings tokens, will transform to css variables */
+      /** define some theme settings tokens, will transform to CSS variables */
       tokens: {
         light: ThemeSettingToken;
         dark?: {

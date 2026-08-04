@@ -10,14 +10,12 @@ import {
   NForm,
   NFormItemGi,
   NGrid,
-  NIcon,
   NInput,
   NInputNumber,
-  NRadioButton,
+  NRadio,
   NRadioGroup,
   NSelect,
   NSpace,
-  NTooltip,
   NTreeSelect,
   type FormInst,
   type TreeSelectOption
@@ -171,10 +169,28 @@ const fileOptions = computed(() => {
 
 /** 目录型组件录入方式：select 从 generatedRoutes 目录路由选择 / manual 手动输入组件路径 */
 const directoryManualMode = ref(false);
+/** 菜单型组件录入方式：select 从 views 选择 / manual 手动输入组件路径 */
+const menuManualMode = ref(false);
 
-/** 需要手动编辑 name/path/title 的场景：外链，或目录型切换为手动输入组件 */
+/** 组件录入模式统一控制：select 选择 / manual 手动输入 */
+const componentMode = computed<'select' | 'manual'>({
+  get: () => {
+    if (model.value.menuType === 'directory') return directoryManualMode.value ? 'manual' : 'select';
+    if (model.value.menuType === 'menu') return menuManualMode.value ? 'manual' : 'select';
+    return 'select';
+  },
+  set: val => {
+    if (model.value.menuType === 'directory') directoryManualMode.value = val === 'manual';
+    if (model.value.menuType === 'menu') menuManualMode.value = val === 'manual';
+  }
+});
+
+/** 需要手动编辑 name/path/title 的场景：外链，或目录/菜单型切换为手动输入组件 */
 const manualFields = computed(
-  () => model.value.menuType === 'link' || (model.value.menuType === 'directory' && directoryManualMode.value)
+  () =>
+    model.value.menuType === 'link' ||
+    (model.value.menuType === 'directory' && directoryManualMode.value) ||
+    (model.value.menuType === 'menu' && menuManualMode.value)
 );
 
 /** 菜单类型可选项：directory 目录 | menu 菜单 */
@@ -195,6 +211,7 @@ function handleMenuTypeChange(val: 'directory' | 'menu' | 'link') {
   model.value.menuType = val;
   model.value.component = '';
   directoryManualMode.value = false;
+  menuManualMode.value = false;
   if (val === 'directory') {
     model.value.layout = 'layout.base';
   }
@@ -260,7 +277,8 @@ const formRules = computed(() => {
       message: $t('page.system.menu.linkRequired'),
       trigger: ['blur', 'input']
     };
-  } else {
+  } else if (!(model.value.menuType === 'menu' && menuManualMode.value)) {
+    // 菜单型手动输入模式：component 由 name 派生，无需校验
     rules.component = {
       required: true,
       message: $t('page.system.menu.componentRequired'),
@@ -470,6 +488,12 @@ function initFormOnOpen() {
   } else {
     directoryManualMode.value = false;
   }
+  // 编辑菜单且已存组件不在可选视图列表中，判定为手动输入模式
+  if (props.operateType === 'edit' && model.value.menuType === 'menu' && model.value.component) {
+    menuManualMode.value = !fileOptions.value.some(o => o.value === model.value.component);
+  } else {
+    menuManualMode.value = false;
+  }
 }
 
 watch(
@@ -595,6 +619,10 @@ const btnColumns: NaiveUI.TableColumn<{ _id: number; name: string; desc: string 
 
 async function handleSubmit() {
   await formRef.value?.validate();
+  // 菜单型手动输入模式：component 由 name 派生（view.{name}），避免后端缺字段
+  if (model.value.menuType === 'menu' && menuManualMode.value && !model.value.component && model.value.name) {
+    model.value.component = `view.${model.value.name}`;
+  }
   // 校验菜单参数与可控按钮：存在行时所有字段必填
   const invalidParam = paramList.value.findIndex(p => !p.type || !p.key || !p.value);
   if (invalidParam > -1) {
@@ -639,9 +667,6 @@ async function handleSubmit() {
       </NAlert>
 
       <NForm ref="formRef" :model="model" :rules="formRules" label-placement="top">
-        <!-- 基础信息 -->
-        <NDivider title-placement="left">{{ $t('page.system.menu.sectionBasic') }}</NDivider>
-
         <NGrid :cols="24" :x-gap="16" :y-gap="8">
           <NFormItemGi :span="24" :label="$t('page.system.menu.parentId')" path="parentId">
             <NTreeSelect
@@ -661,70 +686,65 @@ async function handleSubmit() {
         <NGrid :cols="24" :x-gap="16" :y-gap="8">
           <NFormItemGi :span="12" :label="$t('page.system.menu.fieldMenuType')" path="menuType">
             <NRadioGroup v-model:value="model.menuType" @update:value="handleMenuTypeChange">
-              <NRadioButton v-for="opt in menuTypeOpts" :key="opt.value" :value="opt.value" :label="opt.label" />
+              <NRadio v-for="opt in menuTypeOpts" :key="opt.value" :value="opt.value" :label="opt.label" />
             </NRadioGroup>
           </NFormItemGi>
           <NFormItemGi :span="12" path="layout">
             <template #label>
               <div class="flex items-center gap-4px">
                 <span>{{ $t('page.system.menu.fieldLayout') }}</span>
-                <NTooltip trigger="hover" placement="top">
+                <IconTooltip placement="top">
                   <template #trigger>
-                    <NIcon class="text-14px cursor-pointer text-[var(--n-text-color-3)]">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                        <path
-                          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
-                        />
-                      </svg>
-                    </NIcon>
+                    <span class="text-14px cursor-pointer text-[var(--n-text-color-3)] inline-flex">
+                      <SvgIcon icon="ri:information-line" />
+                    </span>
                   </template>
                   {{ $t('page.system.menu.layoutBase') }}
                   <br />
                   {{ $t('page.system.menu.layoutBlank') }}
-                </NTooltip>
+                </IconTooltip>
               </div>
             </template>
             <NRadioGroup
               v-model:value="model.layout"
               :disabled="model.menuType === 'directory' || model.menuType === 'link'"
             >
-              <NRadioButton v-for="opt in layoutOpts" :key="opt.value" :value="opt.value" :label="opt.label" />
+              <NRadio v-for="opt in layoutOpts" :key="opt.value" :value="opt.value" :label="opt.label" />
             </NRadioGroup>
           </NFormItemGi>
           <NFormItemGi
-            v-if="model.menuType === 'directory'"
+            v-if="model.menuType === 'directory' || model.menuType === 'menu'"
+            :span="24"
+            :label="$t('page.system.menu.componentInputMode')"
+          >
+            <NRadioGroup v-model:value="componentMode">
+              <NRadio value="select">
+                {{
+                  model.menuType === 'directory'
+                    ? $t('page.system.menu.selectPath')
+                    : $t('page.system.menu.selectInput')
+                }}
+              </NRadio>
+              <NRadio value="manual">{{ $t('page.system.menu.manualInput') }}</NRadio>
+            </NRadioGroup>
+          </NFormItemGi>
+          <NFormItemGi
+            v-if="model.menuType === 'directory' && !directoryManualMode"
             :span="24"
             :label="$t('page.system.menu.component')"
             path="component"
           >
-            <div class="flex w-full flex-col gap-8px">
-              <div class="flex items-center justify-end gap-8px">
-                <NButton
-                  size="tiny"
-                  :type="directoryManualMode ? 'primary' : 'default'"
-                  @click="directoryManualMode = !directoryManualMode"
-                >
-                  {{ $t('page.system.menu.manualInput') }}
-                </NButton>
-              </div>
-              <NSelect
-                v-if="!directoryManualMode"
-                :value="model.component"
-                :placeholder="$t('page.system.menu.componentDirPlaceholder')"
-                :options="directoryOptions"
-                filterable
-                clearable
-                @update:value="handleComponentChange"
-              />
-              <NInput
-                v-else
-                v-model:value="model.component"
-                :placeholder="$t('page.system.menu.componentPlaceholder')"
-              />
-            </div>
+            <NSelect
+              :value="model.component"
+              :placeholder="$t('page.system.menu.componentDirPlaceholder')"
+              :options="directoryOptions"
+              filterable
+              clearable
+              @update:value="handleComponentChange"
+            />
           </NFormItemGi>
           <NFormItemGi
-            v-else-if="model.menuType === 'menu'"
+            v-else-if="model.menuType === 'menu' && !menuManualMode"
             :span="24"
             :label="$t('page.system.menu.component')"
             path="component"
@@ -739,7 +759,12 @@ async function handleSubmit() {
               @update:value="handleComponentChange"
             />
           </NFormItemGi>
-          <NFormItemGi v-else :span="24" :label="$t('page.system.menu.linkAddress')" path="meta.href">
+          <NFormItemGi
+            v-else-if="model.menuType === 'link'"
+            :span="24"
+            :label="$t('page.system.menu.linkAddress')"
+            path="meta.href"
+          >
             <NInput
               v-model:value="model.meta.href"
               :placeholder="$t('page.system.menu.linkAddressPlaceholder')"
