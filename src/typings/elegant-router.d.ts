@@ -37,6 +37,7 @@ declare module "@elegant-router/types" {
     "ops-monitor_server-status": "/ops-monitor/server-status";
     "ops-monitor_sys-error": "/ops-monitor/sys-error";
     "ops-monitor_timed-task": "/ops-monitor/timed-task";
+    "profile": "/profile";
     "system": "/system";
     "system_api": "/system/api";
     "system_authority": "/system/authority";
@@ -91,6 +92,7 @@ declare module "@elegant-router/types" {
     | "iframe-page"
     | "login"
     | "ops-monitor"
+    | "profile"
     | "system"
     | "system-tools"
   >;
@@ -114,6 +116,7 @@ declare module "@elegant-router/types" {
     | "500"
     | "iframe-page"
     | "login"
+    | "profile"
     | "example_customer"
     | "function_hide-child_one"
     | "function_hide-child_three"

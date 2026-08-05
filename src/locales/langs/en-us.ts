@@ -255,6 +255,7 @@ const local: App.I18n.Schema = {
     500: 'Server Error',
     'iframe-page': 'Iframe',
     home: 'Home',
+    profile: 'Profile',
     system: 'System Management',
     system_user: 'User Management',
     system_authority: 'Role Management',
@@ -392,6 +393,27 @@ const local: App.I18n.Schema = {
       operationHistory: { ...operationHistoryEnUS },
       serverStatus: { ...serverStatusEnUS },
       timedTask: { ...timedTaskEnUS }
+    },
+    profile: {
+      title: 'Personal Information',
+      subtitle: 'Manage your account info, security settings & contact',
+      accountSettings: 'Account Settings',
+      accountSettingsDesc: 'Unified avatar, contact, password and account identity',
+      avatar: 'Avatar',
+      avatarTip: 'Displayed in your personal profile across the system',
+      changeAvatar: 'Change Avatar',
+      phone: 'Phone Number',
+      phoneTip: 'Used for security verification and notifications',
+      changePhone: 'Change Phone',
+      email: 'Email Address',
+      emailTip: 'Used for account notifications and login verification',
+      unbindEmail: 'Unbind',
+      password: 'Password',
+      passwordTip: 'Regularly update your password for account security',
+      passwordSet: 'Set',
+      passwordNotSet: 'Not Set',
+      changePassword: 'Change Password',
+      organization: 'Organization'
     }
   },
   form: {

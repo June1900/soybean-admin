@@ -594,6 +594,27 @@ declare namespace App {
           serverStatus: import('../../views/ops-monitor/server-status/types').OpsMonitorServerStatusLang;
           timedTask: import('../../views/ops-monitor/timed-task/types').OpsMonitorTimedTaskLang;
         };
+        profile: {
+          title: string;
+          subtitle: string;
+          accountSettings: string;
+          accountSettingsDesc: string;
+          avatar: string;
+          avatarTip: string;
+          changeAvatar: string;
+          phone: string;
+          phoneTip: string;
+          changePhone: string;
+          email: string;
+          emailTip: string;
+          unbindEmail: string;
+          password: string;
+          passwordTip: string;
+          passwordSet: string;
+          passwordNotSet: string;
+          changePassword: string;
+          organization: string;
+        };
       };
       form: {
         required: string;

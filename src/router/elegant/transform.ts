@@ -183,6 +183,7 @@ const routeMap: RouteMap = {
   "ops-monitor_server-status": "/ops-monitor/server-status",
   "ops-monitor_sys-error": "/ops-monitor/sys-error",
   "ops-monitor_timed-task": "/ops-monitor/timed-task",
+  "profile": "/profile",
   "system": "/system",
   "system_api": "/system/api",
   "system_authority": "/system/authority",

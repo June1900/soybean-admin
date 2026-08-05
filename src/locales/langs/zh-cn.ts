@@ -251,6 +251,7 @@ const local: App.I18n.Schema = {
     500: '服务器错误',
     'iframe-page': '外链页面',
     home: '首页',
+    profile: '个人信息',
     system: '系统管理',
     system_user: '用户管理',
     system_authority: '角色管理',
@@ -388,6 +389,27 @@ const local: App.I18n.Schema = {
       operationHistory: { ...operationHistoryZhCN },
       serverStatus: { ...serverStatusZhCN },
       timedTask: { ...timedTaskZhCN }
+    },
+    profile: {
+      title: '个人信息',
+      subtitle: '管理你的账号资料、安全设置&联系方式',
+      accountSettings: '账号资料设置',
+      accountSettingsDesc: '统一-邮箱头像、联系方式、密码与账号标识',
+      avatar: '头像',
+      avatarTip: '用于系统内个人资料展示',
+      changeAvatar: '更换头像',
+      phone: '手机号码',
+      phoneTip: '用于安全验证与通知接收',
+      changePhone: '修改手机',
+      email: '邮箱地址',
+      emailTip: '用于账号通知与登录验证',
+      unbindEmail: '解除绑定',
+      password: '默认密码',
+      passwordTip: '建议定期更新密码以保障账号安全',
+      passwordSet: '已设置',
+      passwordNotSet: '未设置',
+      changePassword: '修改密码',
+      organization: '所属架构'
     }
   },
   form: {
