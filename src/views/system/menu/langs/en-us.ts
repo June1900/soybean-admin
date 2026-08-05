@@ -111,6 +111,8 @@ const enUS: import('../types/i18n').SystemMenuLang = {
   linkAddress: 'External Link',
   linkAddressPlaceholder: 'Please enter the external link, e.g. https://example.com',
   linkPathPlaceholder: 'Auto-generated from the external link (editable)',
+  openInProject: 'Open Inside App',
+  openInProjectTip: 'Yes: open embedded inside the app; No: open in a new browser tab',
   linkRequired: 'Please enter the external link',
   linkFormatInvalid: 'Invalid external link format, must start with http:// or https://',
   statusNormal: 'Normal',

@@ -1,5 +1,5 @@
 import { request } from '@/service/request';
-import type { Menu, MenuBtn } from '@/views/system/menu/api';
+import type { Menu } from '@/views/system/menu/api';
 import type { Authority, AuthorityApi, AuthorityApiPolicy, AuthorityForm, AuthorityListQuery } from './types';
 
 export type { Authority, AuthorityApi, AuthorityApiPolicy, AuthorityForm, AuthorityListQuery } from './types';

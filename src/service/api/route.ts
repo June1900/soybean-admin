@@ -1,20 +1,11 @@
 import { request } from '../request';
 
-/** get constant routes */
-export function fetchGetConstantRoutes() {
-  return request<Api.Route.MenuRoute[]>({ url: '/route/getConstantRoutes' });
-}
-
-/** get user routes */
-export function fetchGetUserRoutes() {
-  return request<Api.Route.UserRoute>({ url: '/route/getUserRoutes' });
-}
-
 /**
- * whether the route is exist
+ * 获取后端菜单（GVA：`/api/v2/menu/getMenu`）
  *
- * @param routeName route name
+ * 后端按当前登录用户的权限返回菜单树，前端据此动态生成路由与侧边栏。
+ * 返回结构见 `Api.Route.GvaMenuResponse`。
  */
-export function fetchIsRouteExist(routeName: string) {
-  return request<boolean>({ url: '/route/isRouteExist', params: { routeName } });
+export function fetchGetMenu() {
+  return request<Api.Route.GvaMenuResponse>({ url: '/v2/menu/getMenu', method: 'post' });
 }

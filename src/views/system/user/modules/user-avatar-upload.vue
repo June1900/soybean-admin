@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import type { UploadFileInfo } from 'naive-ui';
 import { NButton, NUpload } from 'naive-ui';
 import { useLoading } from '@sa/hooks';

@@ -2,7 +2,7 @@ import type { RouteLocationNormalizedLoaded, RouteRecordRaw, _RouteRecordBase } 
 import type { ElegantConstRoute, LastLevelRouteKey, RouteKey, RouteMap } from '@elegant-router/types';
 import { isDev } from '@/constants/env';
 import { useSvgIcon } from '@/hooks/common/icon';
-import { $t } from '@/locales';
+import { $t, $te } from '@/locales';
 
 /**
  * Filter auth routes by roles
@@ -134,6 +134,18 @@ export function getGlobalMenusByAuthRoutes(routes: ElegantConstRoute[]) {
 }
 
 /**
+ * Resolve the display label of a menu
+ *
+ * 优先用 i18n 词条渲染；词条不存在（如后端下发了未登记的 key，或直接下发纯文本名称）时回退原名称。
+ *
+ * @param i18nKey I18n key
+ * @param rawLabel Raw label（route.meta.title 或已有 label）
+ */
+function resolveMenuLabel(i18nKey: App.I18n.I18nKey | null | undefined, rawLabel: string) {
+  return i18nKey && $te(i18nKey) ? $t(i18nKey) : rawLabel;
+}
+
+/**
  * Update locale of global menus
  *
  * @param menus
@@ -144,7 +156,7 @@ export function updateLocaleOfGlobalMenus(menus: App.Global.Menu[]) {
   menus.forEach(menu => {
     const { i18nKey, label, children } = menu;
 
-    const newLabel = i18nKey ? $t(i18nKey) : label;
+    const newLabel = resolveMenuLabel(i18nKey, label);
 
     const newMenu: App.Global.Menu = {
       ...menu,
@@ -172,7 +184,7 @@ function getGlobalMenuByBaseRoute(route: RouteLocationNormalizedLoaded | Elegant
   const { name, path } = route;
   const { title, i18nKey, icon = import.meta.env.VITE_MENU_ICON, localIcon, iconFontSize } = route.meta ?? {};
 
-  const label = i18nKey ? $t(i18nKey) : title!;
+  const label = resolveMenuLabel(i18nKey, title!);
 
   const menu: App.Global.Menu = {
     key: name as string,

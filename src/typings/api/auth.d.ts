@@ -79,6 +79,7 @@ declare namespace Api {
       userId: string;
       /** 兼容 soybean-admin：角色名列表（由 `authorities` 映射） */
       roles: string[];
+      role: string;
       /** 兼容 soybean-admin：按钮权限列表（GVA 由其他接口提供，暂置空） */
       buttons: string[];
     }

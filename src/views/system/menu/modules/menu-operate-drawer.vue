@@ -199,6 +199,15 @@ const transitionTypeOptions = computed(() => [
   { label: 'slide', value: 'slide' }
 ]);
 
+/**
+ * 外链打开方式：借用 `component` 字段存储，与路由转换器 `transform-gva-menu.ts` 的约定保持一致。
+ *
+ * - `layout.base$view.iframe-page`：项目内打开，由内置 iframe-page 视图承载
+ * - `new_tab`：浏览器新标签打开，路由 meta.href 交给守卫 window.open
+ */
+const EXTERNAL_OPEN_IFRAME = 'layout.base$view.iframe-page';
+const EXTERNAL_OPEN_NEW_TAB = 'new_tab';
+
 /** 切换菜单类型：选择目录时锁定布局为 layout.base，并清空已选组件；外链时清空路径相关自动填充 */
 function handleMenuTypeChange(val: 'directory' | 'menu' | 'link') {
   model.value.menuType = val;
@@ -212,7 +221,8 @@ function handleMenuTypeChange(val: 'directory' | 'menu' | 'link') {
     model.value.path = '';
     model.value.name = '';
     model.value.meta.title = '';
-    model.value.component = 'layout.base$view.iframe-page';
+    // 外链默认在项目内打开
+    model.value.component = EXTERNAL_OPEN_IFRAME;
   }
 }
 
@@ -222,14 +232,18 @@ function handleHrefChange(val: string) {
   model.value.name = model.value.path;
 }
 
-const openInProjectOptions = computed(() => [
-  { label: $t('common.yesOrNo.yes'), value: 'layout.base$view.iframe-page' },
-  { label: $t('common.yesOrNo.no'), value: 'new_tab' }
-]);
+/** 是否项目内打开：非 new_tab 一律视为项目内打开（兼容历史数据 component 为空的情况） */
+const openInProject = computed({
+  get: () => model.value.component !== EXTERNAL_OPEN_NEW_TAB,
+  set: (val: boolean) => {
+    model.value.component = val ? EXTERNAL_OPEN_IFRAME : EXTERNAL_OPEN_NEW_TAB;
+  }
+});
 
-function handleOpenInProjectChange(val: string) {
-  model.value.component = val ?? '';
-}
+const openInProjectOptions = computed(() => [
+  { label: $t('common.yesOrNo.yes'), value: true },
+  { label: $t('common.yesOrNo.no'), value: false }
+]);
 
 /** 表单校验规则：核心字段必填 */
 const formRules = computed(() => {
@@ -765,12 +779,28 @@ async function handleSubmit() {
             />
           </NFormItemGi>
           <template v-if="model.menuType === 'link'">
-            <NFormItemGi :span="24" label="是否项目内打开" path="component">
-              <NSelect
-                :value="model.component"
-                :options="openInProjectOptions"
-                @update:value="handleOpenInProjectChange"
-              />
+            <NFormItemGi :span="24" path="component">
+              <template #label>
+                <div class="flex items-center gap-4px">
+                  <span>{{ $t('page.system.menu.openInProject') }}</span>
+                  <IconTooltip placement="top">
+                    <template #trigger>
+                      <span class="text-14px cursor-pointer text-[var(--n-text-color-3)] inline-flex">
+                        <SvgIcon icon="ri:information-line" />
+                      </span>
+                    </template>
+                    {{ $t('page.system.menu.openInProjectTip') }}
+                  </IconTooltip>
+                </div>
+              </template>
+              <NRadioGroup v-model:value="openInProject">
+                <NRadio
+                  v-for="opt in openInProjectOptions"
+                  :key="String(opt.value)"
+                  :value="opt.value"
+                  :label="opt.label"
+                />
+              </NRadioGroup>
             </NFormItemGi>
             <NFormItemGi :span="24" :label="$t('page.system.menu.titleField')" path="meta.title">
               <NInput v-model:value="model.meta.title" :placeholder="$t('page.system.menu.titlePlaceholder')" />

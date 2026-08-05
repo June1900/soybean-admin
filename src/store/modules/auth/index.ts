@@ -76,6 +76,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
       passwordUpdatedAt: null,
       userId: '',
       roles: [],
+      role: '',
       buttons: []
     };
   }
@@ -277,8 +278,10 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
 
       // 后端返回 data.userInfo（GVA 结构），拍平到 userInfo，并补齐权限系统所需字段
       Object.assign(userInfo, raw);
+      console.log(raw);
       userInfo.userId = String(raw.ID);
       userInfo.roles = raw.authorities?.map(item => item.authorityName) ?? [];
+      userInfo.role = raw.authority?.authorityName ?? '';
       userInfo.buttons = [];
 
       return true;

@@ -1,14 +1,16 @@
 import { computed, nextTick, ref, shallowRef } from 'vue';
-import type { RouteRecordRaw } from 'vue-router';
+import type { RouteComponent, RouteRecordRaw } from 'vue-router';
 import { defineStore } from 'pinia';
 import { useBoolean } from '@sa/hooks';
 import type { CustomRoute, ElegantConstRoute, LastLevelRouteKey, RouteKey, RouteMap } from '@elegant-router/types';
 import { router } from '@/router';
-import { fetchGetConstantRoutes, fetchGetUserRoutes, fetchIsRouteExist } from '@/service/api';
+import { fetchGetMenu } from '@/service/api';
 import { SetupStoreId } from '@/enum';
 import { createStaticRoutes, getAuthVueRoutes } from '@/router/routes';
 import { ROOT_ROUTE } from '@/router/routes/builtin';
-import { getRouteName, getRoutePath } from '@/router/elegant/transform';
+import { getRouteName, transformElegantRoutesToVueRoutes } from '@/router/elegant/transform';
+import { layouts, views } from '@/router/elegant/imports';
+import { transformGvaMenus } from '@/router/routes/transform-gva-menu';
 import { useAuthStore } from '../auth';
 import { useTabStore } from '../tab';
 import {
@@ -155,18 +157,8 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
 
     const staticRoute = createStaticRoutes();
 
-    if (authRouteMode.value === 'static') {
-      addConstantRoutes(staticRoute.constantRoutes);
-    } else {
-      const { data, error } = await fetchGetConstantRoutes();
-
-      if (!error) {
-        addConstantRoutes(data);
-      } else {
-        // if fetch constant routes failed, use static constant routes
-        addConstantRoutes(staticRoute.constantRoutes);
-      }
-    }
+    // 常量路由（login/403/404 等）始终来自本地静态定义，后端菜单只负责权限路由
+    addConstantRoutes(staticRoute.constantRoutes);
 
     handleConstantAndAuthRoutes();
 
@@ -208,35 +200,45 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
     setIsInitAuthRoute(true);
   }
 
-  /** Init dynamic auth route */
+  /** Init dynamic auth route (后端菜单驱动) */
   async function initDynamicAuthRoute() {
-    const { data, error } = await fetchGetUserRoutes();
+    const { data, error } = await fetchGetMenu();
 
-    if (!error) {
-      const { routes, home } = data;
+    if (!error && data?.menus?.length) {
+      const result = transformGvaMenus(data.menus);
 
-      addAuthRoutes(routes);
+      addAuthRoutes(result.routes);
 
-      handleConstantAndAuthRoutes();
+      handleConstantAndAuthRoutes(result.dynamicViews);
 
-      setRouteHome(home);
+      setRouteHome(result.home.key as LastLevelRouteKey);
 
-      handleUpdateRootRouteRedirect(home);
+      handleUpdateRootRouteRedirectByPath(result.home.path);
 
       setIsInitAuthRoute(true);
     } else {
-      // if fetch user routes failed, reset store
-      authStore.resetStore();
+      // 后端菜单不可用（服务未启动 / 尚未提供真实菜单数据）：回退到静态路由，保证开发可继续
+      console.warn('[route] 后端菜单获取失败，回退到静态路由');
+      initStaticAuthRoute();
     }
   }
 
-  /** handle constant and auth routes */
-  function handleConstantAndAuthRoutes() {
+  /**
+   * Handle constant and auth routes
+   *
+   * @param dynamicViews 后端菜单解析出的视图组件表，合并进静态 views 映射（静态模式不传）
+   */
+  function handleConstantAndAuthRoutes(dynamicViews?: Record<string, () => Promise<{ default: RouteComponent }>>) {
     const allRoutes = filterRoutesByDev([...constantRoutes.value, ...authRoutes.value]);
 
     const sortRoutes = sortRoutesByOrder(allRoutes);
 
-    const vueRoutes = getAuthVueRoutes(sortRoutes);
+    const usedViews = { ...views, ...dynamicViews } as unknown as Record<
+      string,
+      RouteComponent | (() => Promise<RouteComponent>)
+    >;
+
+    const vueRoutes = transformElegantRoutesToVueRoutes(sortRoutes, layouts, usedViews);
 
     resetVueRoutes();
 
@@ -269,22 +271,22 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
   }
 
   /**
-   * Update root route redirect when auth route mode is dynamic
+   * Update root route redirect by path (用于后端菜单驱动的动态路由，home 为运行时 key)
    *
-   * @param redirectKey Redirect route key
+   * @param redirectPath Redirect route path
    */
-  function handleUpdateRootRouteRedirect(redirectKey: LastLevelRouteKey) {
-    const redirect = getRoutePath(redirectKey);
-
-    if (redirect) {
-      const rootRoute: CustomRoute = { ...ROOT_ROUTE, redirect };
-
-      router.removeRoute(rootRoute.name);
-
-      const [rootVueRoute] = getAuthVueRoutes([rootRoute]);
-
-      router.addRoute(rootVueRoute);
+  function handleUpdateRootRouteRedirectByPath(redirectPath: string) {
+    if (!redirectPath) {
+      return;
     }
+
+    const rootRoute: CustomRoute = { ...ROOT_ROUTE, redirect: redirectPath };
+
+    router.removeRoute(rootRoute.name);
+
+    const [rootVueRoute] = getAuthVueRoutes([rootRoute]);
+
+    router.addRoute(rootVueRoute);
   }
 
   /**
@@ -293,20 +295,39 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
    * @param routePath Route path
    */
   async function getIsAuthRouteExist(routePath: RouteMap[RouteKey]) {
-    const routeName = getRouteName(routePath);
-
-    if (!routeName) {
-      return false;
-    }
-
     if (authRouteMode.value === 'static') {
+      const routeName = getRouteName(routePath);
+
+      if (!routeName) {
+        return false;
+      }
+
       const { authRoutes: staticAuthRoutes } = createStaticRoutes();
       return isRouteExistByRouteName(routeName, staticAuthRoutes);
     }
 
-    const { data } = await fetchIsRouteExist(routeName);
+    // 动态模式：后端菜单即权限来源，按路径在本地已注册路由中查找
+    return isRoutePathExist(routePath as string);
+  }
 
-    return data;
+  /**
+   * 按路径判断路由是否存在于已注册的后端菜单路由中
+   *
+   * @param path 路由路径
+   * @param routes 待匹配的路由集合
+   */
+  function isRoutePathExist(path: string, routes: ElegantConstRoute[] = authRoutes.value): boolean {
+    return routes.some(route => {
+      if (route.path === path) {
+        return true;
+      }
+
+      if (route.children?.length) {
+        return isRoutePathExist(path, route.children);
+      }
+
+      return false;
+    });
   }
 
   /**

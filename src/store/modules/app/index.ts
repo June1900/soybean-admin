@@ -5,7 +5,7 @@ import { useBoolean } from '@sa/hooks';
 import { router } from '@/router';
 import { localStg } from '@/utils/storage';
 import { SetupStoreId } from '@/enum';
-import { $t, setLocale } from '@/locales';
+import { $t, $te, setLocale } from '@/locales';
 import { setDayjsLocale } from '@/locales/dayjs';
 import { useRouteStore } from '../route';
 import { useTabStore } from '../tab';
@@ -72,7 +72,7 @@ export const useAppStore = defineStore(SetupStoreId.App, () => {
   function updateDocumentTitleByLocale() {
     const { i18nKey, title } = router.currentRoute.value.meta;
 
-    const documentTitle = i18nKey ? $t(i18nKey) : title;
+    const documentTitle = i18nKey && $te(i18nKey) ? $t(i18nKey) : title;
 
     useTitle(documentTitle);
   }
@@ -111,6 +111,16 @@ export const useAppStore = defineStore(SetupStoreId.App, () => {
         }
       },
       { immediate: true }
+    );
+
+    // 移动端下路由切换后自动收起侧边栏，避免移动端遮罩持续遮挡内容（如内嵌 iframe 页面）
+    watch(
+      () => router.currentRoute.value.path,
+      () => {
+        if (isMobile.value && !siderCollapse.value) {
+          setSiderCollapse(true);
+        }
+      }
     );
 
     // watch locale

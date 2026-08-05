@@ -19,7 +19,8 @@ const avatarUrl = computed(() => getUploadFileUrl(authStore.userInfo.headerImg))
 const showDropdown = ref(false);
 
 // 角色文字（无则显示「无」）
-const rolesText = computed(() => (authStore.userInfo.roles ?? []).filter(Boolean).join(' / ') || '无');
+const rolesText = computed(() => authStore.userInfo.role || '无');
+console.log(authStore.userInfo);
 
 function loginOrRegister() {
   toLogin();
@@ -69,10 +70,10 @@ function handleLogout() {
         <div class="text-14px text-gray-800 dark:text-gray-100">
           {{ authStore.userInfo.nickName || authStore.userInfo.userName }}
         </div>
-        <div class="mt-2px text-12px text-gray-400">{{ rolesText }}</div>
+        <div class="mt-4px text-12px text-gray-400">当前角色:{{ rolesText }}</div>
       </div>
 
-      <NDivider class="!my-8px" />
+      <NDivider class="!my-6px" />
 
       <div
         class="flex cursor-pointer items-center rounded-4px px-4px py-8px hover:bg-gray-100 dark:hover:bg-gray-700"

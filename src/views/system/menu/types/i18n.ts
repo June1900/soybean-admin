@@ -112,6 +112,8 @@ export interface SystemMenuLang {
   linkAddress: string;
   linkAddressPlaceholder: string;
   linkPathPlaceholder: string;
+  openInProject: string;
+  openInProjectTip: string;
   linkRequired: string;
   linkFormatInvalid: string;
   statusNormal: string;
