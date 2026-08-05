@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
-import { NButton } from 'naive-ui';
+import { computed, reactive } from 'vue';
+import { NButton, NCard, NDivider, NTag, NTooltip } from 'naive-ui';
 import { useLoading } from '@sa/hooks';
 import { useAuthStore } from '@/store/modules/auth';
+import { useThemeStore } from '@/store/modules/theme';
 import { useFormRules, useNaiveForm } from '@/hooks/common/form';
-import OnlineTable from './modules/online-table.vue';
-import SocialCard from './modules/social-card.vue';
+import { formatDateTime } from '@/utils/date';
+import SvgIcon from '@/components/custom/svg-icon.vue';
 import UserAvatar from './modules/user-avatar.vue';
 
 defineOptions({
@@ -13,33 +14,27 @@ defineOptions({
 });
 
 const authStore = useAuthStore();
+const { userInfo } = authStore;
 
-// 模拟个人资料数据（替代后端 profile 接口，避免未接入的后端依赖）
-interface ProfileDetail {
-  nickName: string;
-  userName: string;
-  phonenumber: string;
-  email: string;
-  sex: string;
-  deptName: string;
-  roles: { roleId: number; roleName: string }[];
-  createTime: string;
-  avatar: string;
-  tenantId: string;
+const themeStore = useThemeStore();
+const primaryColor = computed(() => themeStore.themeColors.primary);
+
+/** 账号状态 */
+const accountStatus = computed(() => (userInfo.enable === 1 ? '启用' : '禁用'));
+
+/** 所属部门（空时显示占位） */
+const deptName = computed(() => userInfo.dept?.name || '-');
+
+/** 复制到剪贴板 */
+async function copyText(text: string, label: string) {
+  if (!text) return;
+  try {
+    await navigator.clipboard.writeText(text);
+    window.$message?.success(`${label}已复制`);
+  } catch {
+    window.$message?.error('复制失败');
+  }
 }
-
-const profileDetail = reactive<ProfileDetail>({
-  nickName: 'Soybean Admin',
-  userName: authStore.userInfo.userName || 'Soybean',
-  phonenumber: '13800138000',
-  email: 'admin@soybean.dev',
-  sex: '0',
-  deptName: '研发部',
-  roles: [{ roleId: 1, roleName: '超级管理员' }],
-  createTime: '2024-01-01 10:00:00',
-  avatar: '',
-  tenantId: '000000'
-});
 
 const { loading: btnLoading, startLoading: startBtnLoading, endLoading: endBtnLoading } = useLoading();
 
@@ -58,8 +53,7 @@ const { createRequiredRule, patternRules } = useFormRules();
 interface ProfileModel {
   nickName: string;
   email: string;
-  phonenumber: string;
-  sex: string;
+  phone: string;
 }
 
 interface PasswordModel {
@@ -73,10 +67,9 @@ const passwordModel: PasswordModel = reactive(createDefaultPasswordModel());
 
 function createDefaultProfileModel(): ProfileModel {
   return {
-    nickName: profileDetail.nickName,
-    email: profileDetail.email,
-    phonenumber: profileDetail.phonenumber,
-    sex: profileDetail.sex
+    nickName: userInfo.nickName,
+    email: userInfo.email,
+    phone: userInfo.phone
   };
 }
 
@@ -88,14 +81,13 @@ function createDefaultPasswordModel(): PasswordModel {
   };
 }
 
-type ProfileRuleKey = Extract<keyof ProfileModel, 'nickName' | 'email' | 'phonenumber' | 'sex'>;
+type ProfileRuleKey = Extract<keyof ProfileModel, 'nickName' | 'email' | 'phone'>;
 type PasswordRuleKey = Extract<keyof PasswordModel, 'oldPassword' | 'newPassword' | 'confirmPassword'>;
 
 const profileRules: Record<ProfileRuleKey, App.Global.FormRule> = {
   nickName: createRequiredRule('昵称不能为空'),
   email: { ...patternRules.email, required: true },
-  phonenumber: { ...patternRules.phone, required: true },
-  sex: createRequiredRule('性别不能为空')
+  phone: { ...patternRules.phone, required: true }
 };
 
 const passwordRules: Record<PasswordRuleKey, App.Global.FormRule> = {
@@ -115,7 +107,7 @@ async function updateProfile() {
   // 模拟保存个人资料接口
   await mockRequest();
   window.$message?.success('更新成功');
-  Object.assign(profileDetail, profileModel);
+  Object.assign(userInfo, profileModel);
   profileRestoreValidation();
   endBtnLoading();
 }
@@ -139,42 +131,103 @@ async function updatePassword() {
 <template>
   <div class="flex gap-16px">
     <!-- 个人信息卡片 -->
-    <NCard title="个人信息" class="w-360px shadow-sm">
-      <div class="flex-x-center flex-wrap gap-24px">
-        <div class="flex-center flex-col gap-16px">
-          <div class="relative">
+    <NCard :bordered="false" class="profile-card w-440px shadow-sm" :content-style="{ padding: '0' }">
+      <!-- 渐变封面 -->
+      <div class="cover-banner">
+        <div class="cover-pattern" />
+      </div>
+
+      <div class="card-body">
+        <div class="avatar-wrap">
+          <div class="avatar-ring">
             <UserAvatar />
           </div>
-          <div class="text-18px font-medium">{{ profileDetail.nickName }}</div>
-          <div class="text-14px text-gray-500">{{ profileDetail.userName }}</div>
         </div>
-        <NDescriptions :column="1" label-placement="left" label-width="120px">
-          <NDescriptionsItem label="手机号码">
-            <div class="text-14px">{{ profileDetail.phonenumber }}</div>
-          </NDescriptionsItem>
-          <NDescriptionsItem label="用户邮箱">
-            <div class="text-14px">{{ profileDetail.email }}</div>
-          </NDescriptionsItem>
-          <NDescriptionsItem label="所属部门">
-            <div class="text-14px">{{ profileDetail.deptName }}</div>
-          </NDescriptionsItem>
-          <NDescriptionsItem label="所属角色">
-            <NSpace>
-              <NTag v-for="role in profileDetail.roles" :key="role.roleId" type="primary" size="small">
-                {{ role.roleName }}
-              </NTag>
-            </NSpace>
-          </NDescriptionsItem>
-          <NDescriptionsItem label="创建日期">
-            <div class="text-14px">{{ profileDetail.createTime }}</div>
-          </NDescriptionsItem>
-        </NDescriptions>
+
+        <div class="text-center">
+          <div class="flex-center justify-center gap-8px">
+            <span class="nickname">{{ userInfo.nickName }}</span>
+          </div>
+          <div class="username">{{ userInfo.userName }}</div>
+          <div class="mt-10px flex-center flex-wrap justify-center gap-6px">
+            <NTag
+              v-for="role in userInfo.authorities"
+              :key="role.authorityId"
+              :bordered="false"
+              type="primary"
+              size="small"
+              round
+            >
+              {{ role.authorityName }}
+            </NTag>
+            <NTag v-if="!userInfo.authorities.length" :bordered="false" size="small" round>暂无角色</NTag>
+          </div>
+        </div>
+
+        <div class="stat-row">
+          <div class="stat-item">
+            <div class="stat-value">{{ userInfo.authorities.length }}</div>
+            <div class="stat-label">角色数</div>
+          </div>
+          <div class="stat-divider" />
+          <div class="stat-item">
+            <div class="stat-value" :class="userInfo.enable === 1 ? 'text-success' : 'text-error'">
+              {{ accountStatus }}
+            </div>
+            <div class="stat-label">账号状态</div>
+          </div>
+        </div>
+
+        <NDivider class="my-16px" />
+
+        <!-- 信息列表（带图标 + 复制） -->
+        <div class="info-list">
+          <div class="info-item">
+            <span class="info-icon"><SvgIcon icon="material-symbols:call" /></span>
+            <span class="info-label">手机号</span>
+            <span class="info-value">{{ userInfo.phone || '-' }}</span>
+            <NTooltip trigger="hover">
+              <template #trigger>
+                <button class="copy-btn" @click="copyText(userInfo.phone, '手机号')">
+                  <SvgIcon icon="material-symbols:content-copy" />
+                </button>
+              </template>
+              复制手机号
+            </NTooltip>
+          </div>
+
+          <div class="info-item">
+            <span class="info-icon"><SvgIcon icon="material-symbols:mail" /></span>
+            <span class="info-label">邮箱</span>
+            <span class="info-value">{{ userInfo.email || '-' }}</span>
+            <NTooltip trigger="hover">
+              <template #trigger>
+                <button class="copy-btn" @click="copyText(userInfo.email, '邮箱')">
+                  <SvgIcon icon="material-symbols:content-copy" />
+                </button>
+              </template>
+              复制邮箱
+            </NTooltip>
+          </div>
+
+          <div class="info-item">
+            <span class="info-icon"><SvgIcon icon="material-symbols:apartment" /></span>
+            <span class="info-label">部门</span>
+            <span class="info-value">{{ deptName }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-icon"><SvgIcon icon="material-symbols:calendar-month" /></span>
+            <span class="info-label">注册于</span>
+            <span class="info-value">{{ formatDateTime(userInfo.CreatedAt) }}</span>
+          </div>
+        </div>
       </div>
     </NCard>
 
     <!-- 基本资料卡片 -->
-    <NCard title="基本资料" class="w-full overflow-x-auto shadow-sm">
-      <NTabs type="line" animated class="h-full" s>
+    <NCard title="基本资料" :bordered="false" class="w-full overflow-x-auto shadow-sm">
+      <NTabs type="line" animated class="h-full">
         <NTabPane name="userInfo" tab="基本资料">
           <NForm
             ref="profileFormRef"
@@ -190,14 +243,8 @@ async function updatePassword() {
             <NFormItem label="邮箱" path="email">
               <NInput v-model:value="profileModel.email" placeholder="请输入邮箱" />
             </NFormItem>
-            <NFormItem label="手机号" path="phonenumber">
-              <NInput v-model:value="profileModel.phonenumber" placeholder="请输入手机号" />
-            </NFormItem>
-            <NFormItem label="性别" path="sex">
-              <NRadioGroup v-model:value="profileModel.sex">
-                <NRadio value="0">男</NRadio>
-                <NRadio value="1">女</NRadio>
-              </NRadioGroup>
+            <NFormItem label="手机号" path="phone">
+              <NInput v-model:value="profileModel.phone" placeholder="请输入手机号" />
             </NFormItem>
             <NFormItem class="flex items-center justify-end">
               <NButton class="ml-20px w-80px" type="primary" :loading="btnLoading" @click="updateProfile">
@@ -252,14 +299,6 @@ async function updatePassword() {
             </NFormItem>
           </NForm>
         </NTabPane>
-        <NTabPane name="social" tab="第三方应用">
-          <SocialCard />
-        </NTabPane>
-        <NTabPane name="online" tab="在线设备">
-          <div class="h-full">
-            <OnlineTable />
-          </div>
-        </NTabPane>
       </NTabs>
     </NCard>
   </div>
@@ -270,8 +309,200 @@ async function updatePassword() {
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
-:deep(.n-tabs-pane-wrapper),
-:deep(.n-tab-pane) {
-  height: 100% !important;
+/* 卡片：静态展示 */
+.profile-card {
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+/* 渐变封面 */
+.cover-banner {
+  position: relative;
+  height: 116px;
+  overflow: hidden;
+}
+
+.card-body {
+  padding: 0 18px 18px;
+}
+
+.cover-pattern {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 18% 22%, rgb(255 255 255 / 0.28), transparent 42%),
+    radial-gradient(circle at 82% 8%, rgb(255 255 255 / 0.2), transparent 38%),
+    radial-gradient(circle at 60% 90%, rgb(255 255 255 / 0.16), transparent 40%);
+}
+
+/* 头像浮起 */
+.avatar-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: -56px;
+}
+
+.avatar-ring {
+  position: relative;
+  width: 128px;
+  height: 128px;
+  padding: 4px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.12);
+}
+
+.avatar-ring :deep(img) {
+  border-radius: 50%;
+}
+
+.nickname {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2329;
+}
+
+.username {
+  margin-top: 2px;
+  font-size: 13px;
+  color: #86909c;
+}
+
+.text-primary {
+  color: v-bind(primaryColor);
+}
+
+.text-success {
+  color: #18c964;
+}
+
+.text-error {
+  color: #f53f3f;
+}
+
+/* 关键指标 */
+.stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  margin-top: 18px;
+  padding: 12px 0;
+  background: rgb(0 0 0 / 0.02);
+  border-radius: 10px;
+}
+
+.stat-item {
+  flex: 1;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: v-bind(primaryColor);
+}
+
+.stat-label {
+  margin-top: 2px;
+  font-size: 12px;
+  color: #86909c;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 28px;
+  background: rgb(0 0 0 / 0.08);
+}
+
+/* 信息列表 */
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 8px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.info-item:hover {
+  background: rgb(0 0 0 / 0.03);
+}
+
+.info-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  font-size: 17px;
+  color: v-bind(primaryColor);
+  background: color-mix(in srgb, v-bind(primaryColor) 12%, #fff);
+}
+
+.info-label {
+  flex-shrink: 0;
+  width: 56px;
+  font-size: 13px;
+  color: #86909c;
+}
+
+.info-value {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  color: #1f2329;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.info-value.uuid {
+  font-size: 12px;
+  color: #4e5969;
+}
+
+.copy-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #a9b0bd;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
+}
+
+.copy-btn:hover {
+  color: v-bind(primaryColor);
+  background: color-mix(in srgb, v-bind(primaryColor) 12%, #fff);
+}
+
+/* 更多信息折叠 */
+.more-collapse {
+  border: none;
+}
+
+:deep(.more-collapse .n-collapse-item) {
+  border: none;
+}
+
+:deep(.more-collapse .n-collapse-item__header) {
+  font-size: 13px;
+  color: #86909c;
 }
 </style>

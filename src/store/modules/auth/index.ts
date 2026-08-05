@@ -2,7 +2,7 @@ import { computed, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { defineStore } from 'pinia';
 import { useLoading } from '@sa/hooks';
-import { fetchGetUserInfo, fetchLogin, fetchLoginByCaptcha } from '@/service/api';
+import { fetchGetUserInfo, fetchLogin, fetchLoginByCaptcha, fetchLogout } from '@/service/api';
 import { useRouterPush } from '@/hooks/common/router';
 import { localStg } from '@/utils/storage';
 import { SetupStoreId } from '@/enum';
@@ -21,12 +21,66 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
 
   const token = ref('');
 
-  const userInfo: Api.Auth.UserInfo = reactive({
-    userId: '',
-    userName: '',
-    roles: [],
-    buttons: []
-  });
+  function createDefaultAuthority(): Api.Auth.Authority {
+    return {
+      CreatedAt: '',
+      UpdatedAt: '',
+      DeletedAt: null,
+      authorityId: 0,
+      authorityName: '',
+      parentId: 0,
+      children: null,
+      menus: null,
+      dataScope: 1,
+      defaultRouter: ''
+    };
+  }
+
+  function createDefaultDept(): Api.Auth.Dept {
+    return {
+      ID: 0,
+      CreatedAt: '',
+      UpdatedAt: '',
+      name: '',
+      parentId: 0,
+      ancestors: '',
+      sort: 0,
+      leaderId: 0,
+      leader: null,
+      status: null,
+      children: null,
+      namePath: ''
+    };
+  }
+
+  function createDefaultUserInfo(): Api.Auth.UserInfo {
+    return {
+      ID: 0,
+      CreatedAt: '',
+      UpdatedAt: '',
+      uuid: '',
+      userName: '',
+      nickName: '',
+      headerImg: '',
+      authorityId: 0,
+      authority: createDefaultAuthority(),
+      authorities: [],
+      deptId: 0,
+      dept: createDefaultDept(),
+      departments: [],
+      positions: [],
+      phone: '',
+      email: '',
+      enable: 1,
+      originSetting: { settings: {}, version: 0 },
+      passwordUpdatedAt: null,
+      userId: '',
+      roles: [],
+      buttons: []
+    };
+  }
+
+  const userInfo: Api.Auth.UserInfo = reactive(createDefaultUserInfo());
 
   /** is super role in static route */
   const isStaticSuper = computed(() => {
@@ -38,20 +92,33 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
   /** Is login */
   const isLogin = computed(() => Boolean(token.value));
 
-  /** Reset auth store */
-  async function resetStore() {
+  /** Reset auth store
+   * @param force Force navigation to login even if current route is constant
+   */
+  async function resetStore(force = false) {
     recordUserId();
 
     clearAuthStorage();
 
     authStore.$reset();
 
-    if (!route.meta.constant) {
+    if (force || !route.meta.constant) {
       await toLogin();
     }
 
     tabStore.cacheTabs();
     routeStore.resetStore();
+  }
+
+  async function logout() {
+    try {
+      await fetchLogout();
+    } catch (e) {
+      console.warn('[auth] 注销接口调用失败，仍执行本地登出', e);
+    }
+
+    // 接口返回后，清空本地存储数据并强制跳转登录页
+    await resetStore(true);
   }
 
   /** Record the user ID of the previous login session Used to compare with the current user ID on next login */
@@ -203,13 +270,16 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
   }
 
   async function getUserInfo() {
-    const { data: info, error } = await fetchGetUserInfo();
+    const { data, error } = await fetchGetUserInfo();
 
-    console.log('======>',info);
+    if (!error && data?.userInfo) {
+      const raw = data.userInfo;
 
-    if (!error) {
-      // update store
-      Object.assign(userInfo, info);
+      // 后端返回 data.userInfo（GVA 结构），拍平到 userInfo，并补齐权限系统所需字段
+      Object.assign(userInfo, raw);
+      userInfo.userId = String(raw.ID);
+      userInfo.roles = raw.authorities?.map(item => item.authorityName) ?? [];
+      userInfo.buttons = [];
 
       return true;
     }
@@ -237,6 +307,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
     isLogin,
     loginLoading,
     resetStore,
+    logout,
     login,
     loginByCaptcha,
     initUserInfo

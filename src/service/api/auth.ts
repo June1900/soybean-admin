@@ -18,9 +18,14 @@ export function fetchLogin(userName: string, password: string) {
   });
 }
 
-/** Get user info */
+/**
+ * Get user info
+ *
+ * 后端返回结构为 `{ code, data: { userInfo: {...} }, msg }`，
+ * request 的 transform 会取出 `data`，因此这里的数据类型为 `{ userInfo: GvaUserInfo }`。
+ */
 export function fetchGetUserInfo() {
-  return request<Api.Auth.UserInfo>({
+  return request<{ userInfo: Omit<Api.Auth.UserInfo, 'userId' | 'roles' | 'buttons'> }>({
     url: '/user/getUserInfo',
     method: 'get'
   });
@@ -42,11 +47,7 @@ export function fetchGetCaptcha() {
 /**
  * Login with image captcha
  *
- * @param username User name
- * @param password Password
- * @param captcha Captcha code typed by user
- * @param captchaId Captcha id returned by `/base/captcha`
- * @param openCaptcha Whether captcha verification is enabled
+ * @param params
  */
 export function fetchLoginByCaptcha(params: {
   username: string;
@@ -86,4 +87,14 @@ export function fetchRefreshToken(refreshToken: string) {
  */
 export function fetchCustomBackendError(code: string, msg: string) {
   return request({ url: '/auth/error', params: { code, msg } });
+}
+
+/**
+ * 退出登录
+ */
+export function fetchLogout() {
+  return request({
+    url: '/jwt/jsonInBlacklist',
+    method: 'post'
+  });
 }

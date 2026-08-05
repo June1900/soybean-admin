@@ -3,20 +3,23 @@ import { ref } from 'vue';
 import type { UploadFileInfo } from 'naive-ui';
 import { NButton, NModal, NUpload } from 'naive-ui';
 import { useBoolean, useLoading } from '@sa/hooks';
+import { useAuthStore } from '@/store/modules/auth';
 import defaultAvatar from '@/assets/imgs/soybean.jpg';
 
 defineOptions({
   name: 'UserAvatar'
 });
 
+const authStore = useAuthStore();
+
 // 使用 useBoolean 管理模态框显示状态
 const { bool: showModal, setTrue: showDrawer, setFalse: hideDrawer } = useBoolean();
 // 使用 useLoading 管理加载状态
 const { loading, startLoading, endLoading } = useLoading();
 
-const imageUrl = ref(defaultAvatar);
+const imageUrl = ref(authStore.userInfo.headerImg || defaultAvatar);
 // 待保存的新头像（本地预览）
-const pendingUrl = ref(defaultAvatar);
+const pendingUrl = ref(authStore.userInfo.headerImg || defaultAvatar);
 
 /** 编辑头像 */
 function handleEdit() {
@@ -49,6 +52,7 @@ async function handleSave() {
   // 模拟头像更新接口
   await new Promise(resolve => setTimeout(resolve, 500));
   imageUrl.value = pendingUrl.value;
+  authStore.userInfo.headerImg = imageUrl.value;
   window.$message?.success('头像更新成功！');
   endLoading();
   hideDrawer();
