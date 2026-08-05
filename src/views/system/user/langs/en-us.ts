@@ -4,6 +4,7 @@ export default {
   nickName: 'Nickname',
   phone: 'Phone',
   email: 'Email',
+  avatar: 'Avatar',
   role: 'Role',
   department: 'Department',
   position: 'Position',

@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue';
 import { useLoading } from '@sa/hooks';
 import type { FormInst, FormRules, TreeOption } from 'naive-ui';
 import { $t } from '@/locales';
 import { fetchCreateUser, fetchUpdateUser, fetchSetUserAuthorities, type User } from '../api';
 import { fetchGetAuthorityList, type Authority } from '../../authority/api';
+import UserAvatarUpload from './user-avatar-upload.vue';
 
 defineOptions({
   name: 'UserOperateDrawer'
@@ -83,7 +84,11 @@ const title = computed(() =>
 watch(
   () => props.visible,
   visible => {
-    if (!visible) return;
+    if (!visible) {
+      // 关闭时清除上一次留下的校验信息
+      formRef.value?.restoreValidation();
+      return;
+    }
 
     if (props.operateType === 'edit' && props.editingData) {
       const d = props.editingData;
@@ -112,6 +117,11 @@ watch(
       model.enable = 1;
       model.headerImg = '';
     }
+
+    // 打开时重置数据后，下一帧清除校验红字
+    nextTick(() => {
+      formRef.value?.restoreValidation();
+    });
   },
   { immediate: true }
 );
@@ -194,6 +204,9 @@ async function handleSubmit() {
         </NFormItem>
         <NFormItem :label="$t('page.system.user.email')" path="email">
           <NInput v-model:value="model.email" :placeholder="$t('page.system.user.emailPlaceholder')" />
+        </NFormItem>
+        <NFormItem :label="$t('page.system.user.avatar')">
+          <UserAvatarUpload v-model:header-img="model.headerImg" />
         </NFormItem>
         <NFormItem :label="$t('page.system.user.role')" path="authorityIds">
           <NTreeSelect

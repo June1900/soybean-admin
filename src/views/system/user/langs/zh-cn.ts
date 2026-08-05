@@ -4,6 +4,7 @@ export default {
   nickName: '昵称',
   phone: '手机号',
   email: '邮箱',
+  avatar: '头像',
   role: '角色',
   department: '所属部门',
   position: '岗位',

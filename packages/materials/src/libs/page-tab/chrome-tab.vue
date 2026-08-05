@@ -51,7 +51,6 @@ defineSlots<Slots>();
     <slot name="prefix"></slot>
     <slot></slot>
     <slot name="suffix"></slot>
-    <div class=":soy: absolute right-7px h-16px w-1px bg-#1f2225" :class="[style['chrome-tab-divider']]"></div>
   </div>
 </template>
 

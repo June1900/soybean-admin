@@ -25,6 +25,13 @@ export const request = createFlatRequest(
     async onRequest(config) {
       Object.assign(config.headers, getAuthorizationHeaders());
 
+      // 文件上传场景：data 为 FormData 时，必须移除默认的 application/json，
+      // 否则 axios 会把 FormData 序列化为 JSON 发出（后端 c.FormFile 收不到文件）。
+      // 移除后交由浏览器自动带上 multipart/form-data; boundary=...
+      if (config.data instanceof FormData) {
+        config.headers.delete('Content-Type');
+      }
+
       // 非侵入式加解密:仅对标记 isEncrypt 的请求(验证码/登录)加密请求体
       await encryptRequest(config);
 

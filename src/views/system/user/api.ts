@@ -55,6 +55,16 @@ export function fetchResetPassword(data: { ID: number; password: string }) {
   });
 }
 
+/** 修改密码（当前登录用户，ID 由后端从 JWT 提取，传输加密） */
+export function fetchChangePassword(data: { password: string; newPassword: string }) {
+  return request<void>({
+    url: '/user/changePassword',
+    method: 'post',
+    data,
+    isEncrypt: true
+  });
+}
+
 /** 设置用户角色权限 */
 export function fetchSetUserAuthorities(data: { ID: number; authorityIds: number[] }) {
   return request<void>({

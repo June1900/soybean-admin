@@ -4,6 +4,9 @@ import type { UploadFileInfo } from 'naive-ui';
 import { NButton, NModal, NUpload } from 'naive-ui';
 import { useBoolean, useLoading } from '@sa/hooks';
 import { useAuthStore } from '@/store/modules/auth';
+import { fetchUpdateUser } from '@/views/system/user/api';
+import { fetchUploadFile } from '@/service/api/file';
+import { getUploadFileUrl } from '@/utils/service';
 import defaultAvatar from '@/assets/imgs/soybean.jpg';
 
 defineOptions({
@@ -17,13 +20,16 @@ const { bool: showModal, setTrue: showDrawer, setFalse: hideDrawer } = useBoolea
 // 使用 useLoading 管理加载状态
 const { loading, startLoading, endLoading } = useLoading();
 
-const imageUrl = ref(authStore.userInfo.headerImg || defaultAvatar);
+const imageUrl = ref(getUploadFileUrl(authStore.userInfo.headerImg) || defaultAvatar);
 // 待保存的新头像（本地预览）
-const pendingUrl = ref(authStore.userInfo.headerImg || defaultAvatar);
+const pendingUrl = ref(getUploadFileUrl(authStore.userInfo.headerImg) || defaultAvatar);
+// 已选择但未上传的文件
+const selectedFile = ref<File | null>(null);
 
 /** 编辑头像 */
 function handleEdit() {
   pendingUrl.value = imageUrl.value;
+  selectedFile.value = null;
   showDrawer();
 }
 
@@ -37,6 +43,8 @@ async function handleFileSelect(data: { file: UploadFileInfo }) {
     return false;
   }
 
+  selectedFile.value = file;
+
   const reader = new FileReader();
   reader.addEventListener('load', () => {
     pendingUrl.value = reader.result as string;
@@ -46,22 +54,50 @@ async function handleFileSelect(data: { file: UploadFileInfo }) {
   return false;
 }
 
-/** 保存头像（模拟接口） */
+/** 保存头像：先上传文件，再调用修改信息接口更新 headerImg */
 async function handleSave() {
+  if (!selectedFile.value) {
+    hideDrawer();
+    return;
+  }
+
   startLoading();
-  // 模拟头像更新接口
-  await new Promise(resolve => setTimeout(resolve, 500));
-  imageUrl.value = pendingUrl.value;
-  authStore.userInfo.headerImg = imageUrl.value;
-  window.$message?.success('头像更新成功！');
-  endLoading();
-  hideDrawer();
+  try {
+    // 1) 上传文件，拿回文件 url
+    const { data: uploadData, error: uploadError } = await fetchUploadFile(selectedFile.value);
+    if (uploadError || !uploadData?.file?.url) {
+      window.$message?.error('头像上传失败');
+      return;
+    }
+
+    const url = uploadData.file.url;
+
+    // 2) 调用修改信息接口（/user/setUserInfo），更新 headerImg（其余字段带原始值，避免被覆盖）
+    const { error } = await fetchUpdateUser({
+      ID: authStore.userInfo.ID,
+      nickName: authStore.userInfo.nickName,
+      phone: authStore.userInfo.phone || undefined,
+      email: authStore.userInfo.email || undefined,
+      headerImg: url,
+      enable: authStore.userInfo.enable
+    });
+
+    if (!error) {
+      imageUrl.value = getUploadFileUrl(url);
+      authStore.userInfo.headerImg = url;
+      window.$message?.success('头像更新成功！');
+      hideDrawer();
+    }
+  } finally {
+    endLoading();
+  }
 }
 
 /** 关闭对话框 */
 function handleClose() {
   hideDrawer();
   pendingUrl.value = imageUrl.value;
+  selectedFile.value = null;
 }
 </script>
 

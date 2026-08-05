@@ -99,3 +99,34 @@ function createProxyPattern(key?: App.Service.OtherBaseURLKey) {
 
   return `/proxy-${key}`;
 }
+
+/**
+ * 将后端返回的相对文件地址（如 `uploads/file/xxx.png`）转换为可访问的完整 URL。
+ *
+ *  文件上传接口 `/fileUploadAndDownload/upload` 返回的 `url` 是相对路径，
+ * 直接作为 `<img src>` 无法显示，需要拼接后端基地址：
+ * - 已为 http(s)/data/blob 绝对地址则原样返回；
+ * - 开发代理模式下前缀为代理路径（如 `/proxy-dev`）；
+ * - 生产/直连模式下前缀为 `VITE_SERVICE_BASE_URL`。
+ */
+export function getUploadFileUrl(url?: string | null): string {
+  if (!url) {
+    return '';
+  }
+
+  if (/^(https?:|data:|blob:)/.test(url)) {
+    return url;
+  }
+
+  const isProxy = import.meta.env.DEV && import.meta.env.VITE_HTTP_PROXY === 'Y';
+  const { baseURL } = getServiceBaseURL(import.meta.env, isProxy);
+
+  if (!baseURL) {
+    return url;
+  }
+
+  const base = baseURL.replace(/\/+$/, '');
+  const path = url.replace(/^\/+/, '');
+
+  return `${base}/${path}`;
+}

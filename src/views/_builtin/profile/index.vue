@@ -5,6 +5,7 @@ import { useLoading } from '@sa/hooks';
 import { useAuthStore } from '@/store/modules/auth';
 import { useThemeStore } from '@/store/modules/theme';
 import { useFormRules, useNaiveForm } from '@/hooks/common/form';
+import { fetchUpdateUser, fetchChangePassword } from '@/views/system/user/api';
 import { formatDateTime } from '@/utils/date';
 import SvgIcon from '@/components/custom/svg-icon.vue';
 import UserAvatar from './modules/user-avatar.vue';
@@ -86,8 +87,8 @@ type PasswordRuleKey = Extract<keyof PasswordModel, 'oldPassword' | 'newPassword
 
 const profileRules: Record<ProfileRuleKey, App.Global.FormRule> = {
   nickName: createRequiredRule('昵称不能为空'),
-  email: { ...patternRules.email, required: true },
-  phone: { ...patternRules.phone, required: true }
+  email: { ...patternRules.email },
+  phone: { ...patternRules.phone }
 };
 
 const passwordRules: Record<PasswordRuleKey, App.Global.FormRule> = {
@@ -96,18 +97,24 @@ const passwordRules: Record<PasswordRuleKey, App.Global.FormRule> = {
   newPassword: createRequiredRule('新密码不能为空')
 };
 
-/** 模拟接口请求（替代真实后端调用） */
-function mockRequest(delay = 600): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, delay));
-}
-
 async function updateProfile() {
   await profileValidate();
   startBtnLoading();
-  // 模拟保存个人资料接口
-  await mockRequest();
-  window.$message?.success('更新成功');
-  Object.assign(userInfo, profileModel);
+  // 复用用户管理「编辑用户」接口（/user/setUserInfo）
+  // 后端更新时 NickName/HeaderImg/Phone/Email/Enable 均取传入值，
+  // 表单未编辑的 HeaderImg、Enable 需带上原始值，避免被零值/空值覆盖。
+  const { error } = await fetchUpdateUser({
+    ID: userInfo.ID,
+    nickName: profileModel.nickName,
+    phone: profileModel.phone || undefined,
+    email: profileModel.email || undefined,
+    headerImg: userInfo.headerImg || undefined,
+    enable: userInfo.enable
+  });
+  if (!error) {
+    window.$message?.success('更新成功');
+    Object.assign(userInfo, profileModel);
+  }
   profileRestoreValidation();
   endBtnLoading();
 }
@@ -119,10 +126,15 @@ async function updatePassword() {
     return;
   }
   startBtnLoading();
-  // 模拟修改密码接口
-  await mockRequest();
-  window.$message?.success('密码修改成功');
-  Object.assign(passwordModel, createDefaultPasswordModel());
+  // 复用用户管理「修改密码」接口（/user/changePassword，传输加密）
+  const { error } = await fetchChangePassword({
+    password: passwordModel.oldPassword,
+    newPassword: passwordModel.newPassword
+  });
+  if (!error) {
+    window.$message?.success('密码修改成功');
+    Object.assign(passwordModel, createDefaultPasswordModel());
+  }
   passwordRestoreValidation();
   endBtnLoading();
 }
