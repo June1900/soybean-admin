@@ -4,7 +4,14 @@ import { NDataTable, NDescriptions, NDescriptionsItem, NEmpty, NSpin, NTag, useT
 import { $t } from '@/locales';
 import SvgIcon from '@/components/custom/svg-icon.vue';
 import type { Menu } from '../api';
-import { translateTitle, resolveMenuType, isExternalLink, layoutOptions, yesOrNoOptions, menuTypeTagType } from '../shared';
+import {
+  translateTitle,
+  resolveMenuType,
+  isExternalLink,
+  layoutOptions,
+  yesOrNoOptions,
+  menuTypeTagType
+} from '../shared';
 
 defineOptions({
   name: 'MenuDetailPanel'
@@ -17,7 +24,7 @@ const props = defineProps<{
 
 const themeVars = useThemeVars();
 
-/** 菜单类型文案 */
+// 菜单类型文案
 const menuTypeLabel = computed(() => {
   if (!props.menu) return '';
   const type = resolveMenuType(props.menu);
@@ -26,35 +33,34 @@ const menuTypeLabel = computed(() => {
   return $t('page.system.menu.typeMenu');
 });
 
-/** 是否外链 */
+//是否外链
 const isExternal = computed(() => !!props.menu && isExternalLink(props.menu));
 
-/** 展示名称（翻译 meta.title i18n key） */
+//展示名称（翻译 meta.title i18n key）
 const titleText = computed(() => {
   if (!props.menu) return '';
   return translateTitle(props.menu.meta?.title) || props.menu.name;
 });
 
-/** 布局方式简短文案 */
+//布局方式简短文案
 const layoutLabel = computed(() => {
   if (!props.menu) return '';
   const fallback = props.menu.layout || 'layout.base';
   return layoutOptions().find(o => o.value === fallback)?.label ?? fallback;
 });
 
-/** 路由切换动画文案（空值跟随全局） */
+//路由切换动画文案（空值跟随全局）
 const transitionLabel = computed(() => {
   const val = props.menu?.meta?.transitionType;
   if (!val) return $t('page.system.menu.followGlobal');
   return val;
 });
 
-/** 是否是/否文案 */
+//是否是/否文案
 function yesNoText(val: boolean | undefined): string {
   return yesOrNoOptions().find(o => o.value === (val ? 1 : 0))?.label ?? '';
 }
 
-/* ---------- 参数表 ---------- */
 function paramRowKey(row: { ID?: number; key: string }) {
   return String(row.ID ?? row.key);
 }
@@ -106,7 +112,6 @@ const paramScrollX = computed(() =>
   )
 );
 
-/* ---------- 按钮表 ---------- */
 function btnRowKey(row: { ID: number }) {
   return String(row.ID);
 }
@@ -186,7 +191,7 @@ const btnScrollX = computed(() =>
           <NDescriptionsItem :label="$t('page.system.menu.titleField')">
             {{ titleText || '-' }}
           </NDescriptionsItem>
-          <NDescriptionsItem :label="$t('page.system.menu.path')">
+          <NDescriptionsItem :label="isExternal ? $t('page.system.menu.linkAddress') : $t('page.system.menu.path')">
             {{ menu.path || '-' }}
           </NDescriptionsItem>
           <NDescriptionsItem :label="$t('page.system.menu.icon')">
@@ -198,42 +203,27 @@ const btnScrollX = computed(() =>
           <NDescriptionsItem :label="$t('page.system.menu.sortLabel')">
             {{ menu.sort }}
           </NDescriptionsItem>
-          <NDescriptionsItem :label="$t('page.system.menu.visibility')">
+          <NDescriptionsItem v-if="!isExternal" :label="$t('page.system.menu.visibility')">
             <NTag size="small" :type="menu.hidden ? 'warning' : 'success'" :bordered="false" round>
               {{ menu.hidden ? $t('page.system.menu.hidden') : $t('page.system.menu.show') }}
             </NTag>
           </NDescriptionsItem>
-          <NDescriptionsItem :label="$t('page.system.menu.keepAlive')">
+          <NDescriptionsItem v-if="!isExternal" :label="$t('page.system.menu.keepAlive')">
             <NTag size="small" :type="menu.meta?.keepAlive ? 'success' : 'default'" :bordered="false" round>
               {{ yesNoText(menu.meta?.keepAlive) }}
             </NTag>
           </NDescriptionsItem>
-          <NDescriptionsItem :label="$t('page.system.menu.fieldIsExternal')">
-            <NTag size="small" :type="isExternal ? 'warning' : 'success'" :bordered="false" round>
-              {{ isExternal ? $t('page.system.menu.externalYes') : $t('page.system.menu.externalNo') }}
-            </NTag>
-          </NDescriptionsItem>
-          <NDescriptionsItem v-if="isExternal" :label="$t('page.system.menu.linkAddress')">
-            <a
-              :href="menu.meta?.href"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-[var(--theme-primary)] break-all"
-            >
-              {{ menu.meta?.href }}
-            </a>
-          </NDescriptionsItem>
-          <NDescriptionsItem :label="$t('page.system.menu.fieldLayout')">
+          <NDescriptionsItem v-if="!isExternal" :label="$t('page.system.menu.fieldLayout')">
             {{ layoutLabel }}
           </NDescriptionsItem>
-          <NDescriptionsItem :label="$t('page.system.menu.transitionType')">
+          <NDescriptionsItem v-if="!isExternal" :label="$t('page.system.menu.transitionType')">
             {{ transitionLabel }}
           </NDescriptionsItem>
         </NDescriptions>
       </div>
 
       <!-- 菜单参数 -->
-      <div class="detail-card rounded-8px p-16px">
+      <div v-if="!isExternal" class="detail-card rounded-8px p-16px">
         <h4 class="m-0 mb-12px flex items-center gap-6px text-14px font-500">
           <SvgIcon icon="ri:settings-3-line" class="text-16px text-[var(--theme-primary)]" />
           {{ $t('page.system.menu.sectionParams') }}
@@ -254,7 +244,7 @@ const btnScrollX = computed(() =>
       </div>
 
       <!-- 按钮权限 -->
-      <div class="detail-card rounded-8px p-16px">
+      <div v-if="!isExternal" class="detail-card rounded-8px p-16px">
         <h4 class="m-0 mb-12px flex items-center gap-6px text-14px font-500">
           <SvgIcon icon="ri:key-line" class="text-16px text-[var(--theme-primary)]" />
           {{ $t('page.system.menu.sectionButtons') }}
@@ -278,19 +268,16 @@ const btnScrollX = computed(() =>
 </template>
 
 <style scoped lang="scss">
-/* NSpin 根容器撑满 */
 :deep(.n-spin-container) {
   width: 100%;
 }
 
-/* NSpin 内容容器撑满，作为滚动容器 */
 :deep(.n-spin-content) {
   width: 100%;
   height: 100%;
   min-height: 0;
 }
 
-/* 详情卡片统一样式 */
 .detail-card {
   width: 100%;
   border: 1px solid var(--theme-border-color);
@@ -300,7 +287,6 @@ const btnScrollX = computed(() =>
     box-shadow 0.2s ease;
 }
 
-/* 未选中时的空状态 */
 .detail-empty {
   border: 1px dashed var(--theme-border-color);
   color: var(--theme-text-3);

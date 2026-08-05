@@ -1,5 +1,5 @@
 import { request } from '@/service/request';
-import type { Menu, MenuBtn, MenuForm } from './types';
+import type { Menu, MenuForm } from './types';
 
 export type { Menu, MenuBtn, MenuForm } from './types';
 

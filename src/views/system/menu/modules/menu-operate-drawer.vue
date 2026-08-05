@@ -25,8 +25,16 @@ import { views } from '@/router/elegant/imports';
 import { generatedRoutes } from '@/router/elegant/routes';
 import { getRoutePath } from '@/router/elegant/transform';
 import { fetchCreateMenu, fetchGetMenuList, fetchUpdateMenu, type Menu, type MenuForm } from '../api';
-import { layoutOptions, menuTypeOptions, resolveMenuType, showHiddenOptions, translateTitle, yesOrNoOptions } from '../shared';
+import {
+  layoutOptions,
+  menuTypeOptions,
+  resolveMenuType,
+  showHiddenOptions,
+  translateTitle,
+  yesOrNoOptions
+} from '../shared';
 import IconPickerModal from './icon-picker-modal.vue';
+import { validateExternalLink } from '@/views/system/menu/validate';
 
 defineOptions({
   name: 'MenuOperateDrawer'
@@ -178,14 +186,6 @@ const componentMode = computed<'select' | 'manual'>({
   }
 });
 
-/** 需要手动编辑 name/path/title 的场景：外链，或目录/菜单型切换为手动输入组件 */
-const manualFields = computed(
-  () =>
-    model.value.menuType === 'link' ||
-    (model.value.menuType === 'directory' && directoryManualMode.value) ||
-    (model.value.menuType === 'menu' && menuManualMode.value)
-);
-
 /** 菜单类型可选项：directory 目录 | menu 菜单 */
 const menuTypeOpts = computed(() => menuTypeOptions());
 
@@ -212,28 +212,36 @@ function handleMenuTypeChange(val: 'directory' | 'menu' | 'link') {
     model.value.path = '';
     model.value.name = '';
     model.value.meta.title = '';
+    model.value.component = 'layout.base$view.iframe-page';
   }
 }
 
 /** 外链地址变更 */
 function handleHrefChange(val: string) {
   model.value.path = val;
-  const url = (val || '').trim();
-  let host = '';
-  try {
-    host = new URL(url).host;
-  } catch {
-    host = url.replace(/^https?:\/\//i, '').split('/')[0];
-  }
-  model.value.name = host || 'external';
-  model.value.component = 'layout.base$view.iframe-page'
+  model.value.name = model.value.path;
+}
+
+const openInProjectOptions = computed(() => [
+  { label: $t('common.yesOrNo.yes'), value: 'layout.base$view.iframe-page' },
+  { label: $t('common.yesOrNo.no'), value: 'new_tab' }
+]);
+
+function handleOpenInProjectChange(val: string) {
+  model.value.component = val ?? '';
 }
 
 /** 表单校验规则：核心字段必填 */
 const formRules = computed(() => {
   const rules: Record<
     string,
-    { required: boolean; message: string; trigger: ('blur' | 'input' | 'change')[]; type?: 'number' }
+    {
+      required?: boolean;
+      message?: string;
+      trigger: ('blur' | 'input' | 'change')[];
+      type?: 'number';
+      validator?: (rule: unknown, value: unknown) => boolean | Error;
+    }
   > = {
     'meta.title': {
       required: true,
@@ -258,21 +266,10 @@ const formRules = computed(() => {
     }
   };
   if (model.value.menuType === 'link') {
-    // rules['meta.href'] = {
-    //   required: true,
-    //   message: $t('page.system.menu.linkRequired'),
-    //   trigger: ['blur', 'input']
-    // };
     rules.path = {
-      required: true,
-      message: $t('page.system.menu.linkRequired'),
-      trigger: ['blur', 'change']
+      trigger: ['blur', 'change'],
+      validator: validateExternalLink
     };
-    // rules.component = {
-    //   required: true,
-    //   message: $t('page.system.menu.linkRequired'),
-    //   trigger: ['blur', 'change']
-    // };
   } else if (!(model.value.menuType === 'menu' && menuManualMode.value)) {
     // 菜单型手动输入模式：component 由 name 派生，无需校验
     rules.component = {
@@ -388,8 +385,7 @@ function createDefaultModel(): MenuForm {
       closeTab: true,
       defaultMenu: false,
       activeName: '',
-      transitionType: '',
-      href: ''
+      transitionType: ''
     }
   };
 }
@@ -473,10 +469,10 @@ function initParamAndBtnList() {
 }
 
 /** 抽屉打开时初始化表单：构造模型、加载父级选项、回填参数与按钮 */
-function initFormOnOpen() {
+async function initFormOnOpen() {
   model.value = buildModelFromProps();
   const editingId = props.operateType === 'edit' ? props.editingData?.ID : undefined;
-  loadParentTreeOptions(editingId);
+  await loadParentTreeOptions(editingId);
   initParamAndBtnList();
   // 编辑目录且已存组件不在可选目录路由中，判定为手动输入模式
   if (props.operateType === 'edit' && model.value.menuType === 'directory' && model.value.component) {
@@ -658,7 +654,7 @@ async function handleSubmit() {
   <NDrawer :show="props.visible" display-directive="show" :width="640" @update:show="handleDrawerUpdateShow">
     <NDrawerContent :title="title" :native-scrollbar="false">
       <!-- 顶部警告 -->
-      <NAlert type="warning" :bordered="false" class="mb-16px">
+      <NAlert type="warning" :bordered="false" class="mb-12px">
         {{ $t('page.system.menu.addMenuWarning') }}
       </NAlert>
 
@@ -769,40 +765,52 @@ async function handleSubmit() {
             />
           </NFormItemGi>
           <template v-if="model.menuType === 'link'">
+            <NFormItemGi :span="24" label="是否项目内打开" path="component">
+              <NSelect
+                :value="model.component"
+                :options="openInProjectOptions"
+                @update:value="handleOpenInProjectChange"
+              />
+            </NFormItemGi>
             <NFormItemGi :span="24" :label="$t('page.system.menu.titleField')" path="meta.title">
               <NInput v-model:value="model.meta.title" :placeholder="$t('page.system.menu.titlePlaceholder')" />
             </NFormItemGi>
           </template>
-<!--          <template v-if="manualFields">-->
-<!--            <NFormItemGi :span="24" :label="$t('page.system.menu.name')" path="name">-->
-<!--              <NInput v-model:value="model.name" :placeholder="$t('page.system.menu.namePlaceholder')" />-->
-<!--            </NFormItemGi>-->
-<!--            <NFormItemGi :span="24" :label="$t('page.system.menu.path')" path="path">-->
-<!--              <NInput-->
-<!--                v-model:value="model.path"-->
-<!--                :placeholder="-->
-<!--                  model.menuType === 'link'-->
-<!--                    ? $t('page.system.menu.linkPathPlaceholder')-->
-<!--                    : $t('page.system.menu.pathPlaceholder')-->
-<!--                "-->
-<!--              />-->
-<!--            </NFormItemGi>-->
-<!--            <NFormItemGi :span="24" :label="$t('page.system.menu.titleField')" path="meta.title">-->
-<!--              <NInput v-model:value="model.meta.title" :placeholder="$t('page.system.menu.titlePlaceholder')" />-->
-<!--            </NFormItemGi>-->
-<!--          </template>-->
-<!--          <template v-else>-->
-<!--            <NFormItemGi :span="24" :label="$t('page.system.menu.titleField')" path="meta.title">-->
-<!--              <NInput-->
-<!--                :value="translateTitle(model.meta.title)"-->
-<!--                :placeholder="$t('page.system.menu.titlePlaceholder')"-->
-<!--                readonly-->
-<!--              />-->
-<!--            </NFormItemGi>-->
-<!--            <NFormItemGi :span="24" :label="$t('page.system.menu.path')" path="path">-->
-<!--              <NInput v-model:value="model.path" :placeholder="$t('page.system.menu.pathPlaceholder')" readonly />-->
-<!--            </NFormItemGi>-->
-<!--          </template>-->
+          <template v-if="model.menuType === 'menu'">
+            <NFormItemGi :span="24" :label="$t('page.system.menu.titleField')" path="meta.title">
+              <NInput
+                :value="translateTitle(model.meta.title)"
+                :placeholder="$t('page.system.menu.titlePlaceholder')"
+                readonly
+              />
+            </NFormItemGi>
+            <NFormItemGi :span="24" :label="$t('page.system.menu.path')" path="path">
+              <NInput v-model:value="model.path" :placeholder="$t('page.system.menu.pathPlaceholder')" readonly />
+            </NFormItemGi>
+          </template>
+          <template v-if="model.menuType === 'directory'">
+            <NFormItemGi :span="24" :label="$t('page.system.menu.name')" path="name">
+              <NInput v-model:value="model.name" :placeholder="$t('page.system.menu.namePlaceholder')" />
+            </NFormItemGi>
+            <NFormItemGi :span="24" :label="$t('page.system.menu.path')" path="path">
+              <NInput
+                v-model:value="model.path"
+                :placeholder="$t('page.system.menu.pathPlaceholder')"
+                :readonly="!directoryManualMode"
+              />
+            </NFormItemGi>
+            <NFormItemGi :span="24" :label="$t('page.system.menu.titleField')" path="meta.title">
+              <!-- 选择路径模式：meta.title 存储 i18n key，回显翻译文案，只读 -->
+              <NInput
+                v-if="!directoryManualMode"
+                :value="translateTitle(model.meta.title)"
+                :placeholder="$t('page.system.menu.titlePlaceholder')"
+                readonly
+              />
+              <!-- 手动输入模式：直接编辑明文 -->
+              <NInput v-else v-model:value="model.meta.title" :placeholder="$t('page.system.menu.titlePlaceholder')" />
+            </NFormItemGi>
+          </template>
         </NGrid>
 
         <!-- 显示设置 -->
@@ -839,23 +847,33 @@ async function handleSubmit() {
               style="width: 100%"
             />
           </NFormItemGi>
-          <NFormItemGi :span="12" :label="$t('page.system.menu.visibility')" path="hidden">
+          <NFormItemGi
+            v-if="model.menuType !== 'link'"
+            :span="12"
+            :label="$t('page.system.menu.visibility')"
+            path="hidden"
+          >
             <NSelect :value="model.hidden ? 1 : 0" :options="showHiddenOptions()" @update:value="handleHiddenChange" />
           </NFormItemGi>
-          <NFormItemGi :span="12" label="KeepAlive" path="meta.keepAlive">
+          <NFormItemGi v-if="model.menuType !== 'link'" :span="12" label="KeepAlive" path="meta.keepAlive">
             <NSelect
               :value="model.meta.keepAlive ? 1 : 0"
               :options="yesOrNoOptions()"
               @update:value="handleKeepAliveChange"
             />
           </NFormItemGi>
-          <NFormItemGi :span="12" :label="$t('page.system.menu.transitionType')" path="meta.transitionType">
+          <NFormItemGi
+            v-if="model.menuType !== 'link'"
+            :span="12"
+            :label="$t('page.system.menu.transitionType')"
+            path="meta.transitionType"
+          >
             <NSelect v-model:value="model.meta.transitionType" :options="transitionTypeOptions" clearable />
           </NFormItemGi>
         </NGrid>
 
         <!-- 菜单参数配置 -->
-        <NDivider title-placement="left">
+        <NDivider v-if="model.menuType !== 'link'" title-placement="left">
           <NSpace align="center" :wrap="false">
             <span>{{ $t('page.system.menu.sectionParams') }}</span>
             <NButton type="primary" size="tiny" @click="handleAddParam">
@@ -865,6 +883,7 @@ async function handleSubmit() {
         </NDivider>
 
         <NDataTable
+          v-if="model.menuType !== 'link'"
           :columns="paramColumns"
           :data="paramList"
           size="small"
@@ -878,7 +897,7 @@ async function handleSubmit() {
         </NDataTable>
 
         <!-- 可控按钮配置 -->
-        <NDivider title-placement="left">
+        <NDivider v-if="model.menuType !== 'link'" title-placement="left">
           <NSpace align="center" :wrap="false">
             <span>{{ $t('page.system.menu.sectionButtons') }}</span>
             <NButton type="primary" size="tiny" @click="handleAddBtn">
@@ -888,6 +907,7 @@ async function handleSubmit() {
         </NDivider>
 
         <NDataTable
+          v-if="model.menuType !== 'link'"
           :columns="btnColumns"
           :data="btnList"
           size="small"

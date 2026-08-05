@@ -112,6 +112,7 @@ const zhCN: import('../types/i18n').SystemMenuLang = {
   linkAddressPlaceholder: '请输入外部链接地址，如 https://example.com',
   linkPathPlaceholder: '由外链地址自动生成（可手动修改）',
   linkRequired: '请输入外链地址',
+  linkFormatInvalid: '外链地址格式不正确，需以 http:// 或 https:// 开头',
   statusNormal: '正常',
   statusDisabled: '停用',
   externalYes: '是',

@@ -113,6 +113,7 @@ export interface SystemMenuLang {
   linkAddressPlaceholder: string;
   linkPathPlaceholder: string;
   linkRequired: string;
+  linkFormatInvalid: string;
   statusNormal: string;
   statusDisabled: string;
   externalYes: string;
