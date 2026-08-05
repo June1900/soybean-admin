@@ -18,17 +18,17 @@ const emit = defineEmits<{
   select: [icon: string];
 }>();
 
-/** 全部 ri 图标名称列表（带 ri: 前缀） */
+// 全部 ri 图标名称列表（带 ri: 前缀）
 const allIcons: string[] = Object.keys(riIcons.icons).map(name => `ri:${name}`);
 
 const keyword = ref('');
-/** 已应用的搜索关键字（点击搜索按钮后才更新） */
+// 已应用的搜索关键字（点击搜索按钮后才更新）
 const appliedKw = ref('');
 const page = ref(1);
-const pageSize = ref(72);
-const pageSizes = [72, 120, 180, 240];
+const pageSize = ref(54);
+const pageSizes = [54, 96, 144, 192];
 
-/** 过滤后的全部图标（不分页） */
+// 过滤后的全部图标（不分页）
 const filteredIcons = computed(() => {
   const kw = appliedKw.value.trim().toLowerCase();
   if (!kw) return allIcons;
@@ -37,7 +37,7 @@ const filteredIcons = computed(() => {
 
 const filteredTotal = computed(() => filteredIcons.value.length);
 
-/** 当前页的图标列表 */
+// 当前页的图标列表
 const pagedIcons = computed(() => {
   const start = (page.value - 1) * pageSize.value;
   return filteredIcons.value.slice(start, start + pageSize.value);
@@ -50,7 +50,7 @@ function handleSearch() {
 
 function handleSelect(icon: string) {
   emit('select', icon);
-  emit('close');
+  handleClose();
 }
 
 function handleReset() {
@@ -73,13 +73,14 @@ function handleClose() {
     preset="card"
     :title="$t('page.system.menu.iconPlaceholder')"
     :bordered="false"
-    style="width: 720px; max-width: 95vw"
+    style="width: 740px; max-width: 95vw"
     @update:show="val => !val && handleClose()"
   >
     <div class="flex flex-col gap-12px">
-      <div class="flex gap-8px">
+      <div class="flex items-center gap-8px">
         <NInput
           v-model:value="keyword"
+          class="flex-1"
           clearable
           size="small"
           :placeholder="$t('page.system.menu.searchTitle')"
@@ -96,21 +97,16 @@ function handleClose() {
           {{ $t('page.system.menu.reset') }}
         </NButton>
       </div>
-
-      <div class="text-12px op-60">
-        {{ $t('page.system.menu.iconCountTip', { shown: pagedIcons.length, total: filteredTotal }) }}
-      </div>
-
-      <NScrollbar class="h-420px rounded-6px border border-[var(--n-border-color)] p-12px">
-        <div v-if="pagedIcons.length" class="grid grid-cols-[repeat(auto-fill,minmax(40px,1fr))] gap-8px">
+      <NScrollbar class="h-480px rounded-6px border border-[var(--n-border-color)] p-12px">
+        <div v-if="pagedIcons.length" class="grid grid-cols-[repeat(auto-fill,minmax(56px,1fr))] gap-10px">
           <NTooltip v-for="icon in pagedIcons" :key="icon" trigger="hover" placement="top">
             <template #trigger>
               <button
                 type="button"
-                class="flex h-40px w-full items-center justify-center rounded-4px border border-transparent transition-colors hover:border-[var(--n-primary-color)] hover:bg-[var(--n-color-hover)]"
+                class="flex h-56px w-full items-center justify-center rounded-6px border border-transparent transition-colors hover:border-[var(--n-primary-color)] hover:bg-[var(--n-color-hover)]"
                 @click="handleSelect(icon)"
               >
-                <SvgIcon :icon="icon" class="text-20px" />
+                <SvgIcon :icon="icon" class="text-28px" />
               </button>
             </template>
             {{ icon }}
@@ -119,14 +115,19 @@ function handleClose() {
         <NEmpty v-else size="small" class="py-40px" />
       </NScrollbar>
 
-      <div v-if="filteredTotal" class="flex justify-end">
+      <div v-if="filteredTotal" class="flex flex-nowrap items-center justify-end gap-12px whitespace-nowrap">
         <NPagination
           v-model:page="page"
           v-model:page-size="pageSize"
           :item-count="filteredTotal"
           :page-sizes="pageSizes"
+          :display-order="['pages', 'size-picker']"
           show-size-picker
-        />
+        >
+          <template #prefix>
+            <span class="text-12px">共 {{ filteredTotal }} 条</span>
+          </template>
+        </NPagination>
       </div>
     </div>
   </NModal>
