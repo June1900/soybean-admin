@@ -5,6 +5,7 @@ import type { FormInst, FormRules } from 'naive-ui';
 import { NAlert, NDrawer, NDrawerContent, NForm, NFormItem, NInput, NSelect, NSpace } from 'naive-ui';
 import { $t } from '@/locales';
 import { fetchCreateApi, fetchGetApiGroups, fetchUpdateApi, type Api, type ApiForm } from '../api';
+import { methodOptions } from '../shared';
 
 defineOptions({
   name: 'ApiOperateDrawer'
@@ -35,14 +36,6 @@ function createDefaultModel(): ApiForm {
     method: ''
   };
 }
-
-const methodOptions = [
-  { label: 'GET', value: 'GET' },
-  { label: 'POST', value: 'POST' },
-  { label: 'PUT', value: 'PUT' },
-  { label: 'DELETE', value: 'DELETE' },
-  { label: 'PATCH', value: 'PATCH' }
-];
 
 const groupOptions = ref<{ label: string; value: string }[]>([]);
 const { loading: groupLoading, startLoading: startGroupLoading, endLoading: endGroupLoading } = useLoading();

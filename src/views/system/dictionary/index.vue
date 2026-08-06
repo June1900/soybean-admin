@@ -223,5 +223,3 @@ function createAllColumns(): NaiveUI.TableColumn<Dictionary>[] {
     />
   </div>
 </template>
-
-<style scoped></style>

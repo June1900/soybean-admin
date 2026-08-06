@@ -20,8 +20,6 @@ const props = defineProps<{
 
 const emit = defineEmits<{ close: [] }>();
 
-const appStore = useAppStore();
-
 /* 字典项数据 */
 const detailData = ref<DictionaryDetail[]>([]);
 const detailLoading = ref(false);
@@ -89,10 +87,15 @@ const drawerTitle = computed(() =>
     : $t('page.system.dictionary.detailTitle')
 );
 
-const drawerWidth = computed(() => (appStore.isMobile ? '100%' : 900));
-
 function createDetailColumns(): NaiveUI.TableColumn<DictionaryDetail>[] {
   return [
+    {
+      key: 'index',
+      title: $t('page.system.dictionary.index'),
+      width: 70,
+      align: 'center',
+      render: (_row, index) => index + 1
+    },
     { key: 'label', title: $t('page.system.dictionary.label'), minWidth: 200, tree: true },
     { key: 'value', title: $t('page.system.dictionary.value'), minWidth: 140 },
     { key: 'extend', title: $t('page.system.dictionary.extend'), minWidth: 120, render: row => row.extend || '-' },
@@ -161,12 +164,7 @@ const detailScrollX = computed(() =>
 </script>
 
 <template>
-  <NDrawer
-    :show="props.visible"
-    display-directive="show"
-    :width="drawerWidth"
-    @update:show="val => !val && emit('close')"
-  >
+  <NDrawer :show="props.visible" display-directive="show" width="50%" @update:show="val => !val && emit('close')">
     <NDrawerContent :native-scrollbar="false">
       <template #header>
         <div class="flex w-full items-center justify-between">
@@ -215,5 +213,3 @@ const detailScrollX = computed(() =>
     </NDrawerContent>
   </NDrawer>
 </template>
-
-<style scoped></style>

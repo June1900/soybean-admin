@@ -6,6 +6,7 @@ import { useNaiveForm } from '@/hooks/common/form';
 import { $t } from '@/locales';
 import { fetchGetApiGroups } from '../api';
 import type { ApiSearchParams } from '../api';
+import { methodOptions } from '../shared';
 
 defineOptions({
   name: 'ApiSearch'
@@ -21,14 +22,6 @@ const emit = defineEmits<Emits>();
 const { formRef, validate, restoreValidation } = useNaiveForm();
 
 const model = defineModel<ApiSearchParams>('model', { required: true });
-
-const methodOptions = [
-  { label: 'GET', value: 'GET' },
-  { label: 'POST', value: 'POST' },
-  { label: 'PUT', value: 'PUT' },
-  { label: 'DELETE', value: 'DELETE' },
-  { label: 'PATCH', value: 'PATCH' }
-];
 
 const apiGroupMap = ref<Record<string, string>>({});
 const groupOptions = ref<{ label: string; value: string }[]>([]);

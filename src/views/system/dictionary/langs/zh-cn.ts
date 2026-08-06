@@ -25,7 +25,7 @@ const zhCN: import('../types/i18n').SystemDictionaryLang = {
   editDictSuccess: '编辑字典成功',
   deleteDictSuccess: '删除字典成功',
   detailTitle: '字典详情',
-  detail: '详情',
+  detail: '字典项',
   selectDictHint: '请选择左侧字典查看详情',
   addDetail: '新增字典项',
   addChildDetail: '添加子项',

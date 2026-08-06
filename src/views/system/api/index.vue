@@ -17,6 +17,7 @@ import ApiRoleAssignDrawer from './modules/api-role-assign-drawer.vue';
 import ApiSearch from './modules/api-search.vue';
 
 import TableActionButtons from '@/components/common/table-action-buttons';
+import { methodTagType } from './shared';
 
 defineOptions({
   name: 'SystemApi'
@@ -25,23 +26,6 @@ defineOptions({
 const appStore = useAppStore();
 
 type ApiListResponse = Awaited<ReturnType<typeof fetchGetApiList>>;
-
-const methodTagType = (method: string): 'success' | 'primary' | 'warning' | 'error' | 'info' | 'default' => {
-  switch (method) {
-    case 'GET':
-      return 'success';
-    case 'POST':
-      return 'primary';
-    case 'PUT':
-      return 'warning';
-    case 'DELETE':
-      return 'error';
-    case 'PATCH':
-      return 'info';
-    default:
-      return 'default';
-  }
-};
 
 const searchParams = reactive<ApiSearchParams>({
   path: '',

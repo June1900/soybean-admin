@@ -3,7 +3,7 @@ import type { ApiForm, ApiGroupResponse, ApiListQuery, ApiListResponse } from '.
 
 export type { Api, ApiForm, ApiGroupResponse, ApiListQuery, ApiListResponse, ApiSearchParams } from './types';
 
-/** 分页获取接口列表 */
+// 分页获取接口列表
 export function fetchGetApiList(params?: ApiListQuery) {
   return request<ApiListResponse>({
     url: '/api/getApiList',
@@ -12,7 +12,7 @@ export function fetchGetApiList(params?: ApiListQuery) {
   });
 }
 
-/** 新增接口 */
+// 新增接口
 export function fetchCreateApi(data: ApiForm) {
   return request<void>({
     url: '/api/createApi',
@@ -21,7 +21,7 @@ export function fetchCreateApi(data: ApiForm) {
   });
 }
 
-/** 更新接口 */
+// 更新接口
 export function fetchUpdateApi(data: ApiForm & { ID: number }) {
   return request<void>({
     url: '/api/updateApi',
@@ -30,7 +30,7 @@ export function fetchUpdateApi(data: ApiForm & { ID: number }) {
   });
 }
 
-/** 删除接口 */
+// 删除接口
 export function fetchDeleteApi(id: number) {
   return request<void>({
     url: '/api/deleteApi',
@@ -39,7 +39,7 @@ export function fetchDeleteApi(id: number) {
   });
 }
 
-/** 获取接口分组（用于下拉） */
+// 获取接口分组
 export function fetchGetApiGroups() {
   return request<ApiGroupResponse>({
     url: '/api/getApiGroups',
@@ -47,7 +47,7 @@ export function fetchGetApiGroups() {
   });
 }
 
-/** 获取接口已分配的角色 ID */
+// 获取接口已分配的角色 ID
 export function fetchGetApiRoles(path: string, method: string) {
   return request<number[]>({
     url: '/api/getApiRoles',
@@ -56,7 +56,7 @@ export function fetchGetApiRoles(path: string, method: string) {
   });
 }
 
-/** 保存接口角色（全量覆盖） */
+// 保存接口角色（全量覆盖）
 export function fetchSetApiRoles(path: string, method: string, authorityIds: number[]) {
   return request<void>({
     url: '/api/setApiRoles',
@@ -65,7 +65,7 @@ export function fetchSetApiRoles(path: string, method: string, authorityIds: num
   });
 }
 
-/** 刷新 Casbin 缓存 */
+// 刷新 Casbin 缓存
 export function fetchFreshCasbin() {
   return request<void>({
     url: '/api/freshCasbin',

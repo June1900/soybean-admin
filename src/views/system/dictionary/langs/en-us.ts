@@ -26,7 +26,7 @@ const enUS: import('../types/i18n').SystemDictionaryLang = {
   editDictSuccess: 'Dictionary updated successfully',
   deleteDictSuccess: 'Dictionary deleted successfully',
   detailTitle: 'Dictionary Details',
-  detail: 'Details',
+  detail: 'Dictionary Items',
   selectDictHint: 'Select a dictionary on the left to view its details',
   addDetail: 'Add Detail',
   addChildDetail: 'Add Child',
