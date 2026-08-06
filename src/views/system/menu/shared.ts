@@ -1,6 +1,15 @@
 import { $t } from '@/locales';
 import type { Menu } from './api';
 
+/**
+ * 外链打开方式：借用 `component` 字段存储，与路由转换器 `transform-menu.ts` 的约定保持一致。
+ *
+ * - `layout.base$view.iframe-page`：项目内打开，由内置 iframe-page 视图承载
+ * - `new_tab`：浏览器新标签打开，路由 meta.href 交给守卫 window.open
+ */
+export const EXTERNAL_OPEN_IFRAME = 'layout.base$view.iframe-page';
+export const EXTERNAL_OPEN_NEW_TAB = 'new_tab';
+
 /** 将 meta.title 中存储的 i18n key（如 route.home）转换为实际文案 */
 export function translateTitle(title: string | undefined): string {
   if (!title) return '';

@@ -23,7 +23,7 @@ const componentPath = String((route.meta as Record<string, unknown>).realCompone
           </p>
           <p class="mt-2">
             请提供与项目实际视图路径一致的后端菜单数据，或在
-            <code>src/router/routes/transform-gva-menu.ts</code>
+            <code>src/router/routes/transform-menu.ts</code>
             中补全映射。
           </p>
         </div>

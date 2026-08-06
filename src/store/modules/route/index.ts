@@ -10,7 +10,7 @@ import { createStaticRoutes, getAuthVueRoutes } from '@/router/routes';
 import { ROOT_ROUTE } from '@/router/routes/builtin';
 import { getRouteName, transformElegantRoutesToVueRoutes } from '@/router/elegant/transform';
 import { layouts, views } from '@/router/elegant/imports';
-import { transformGvaMenus } from '@/router/routes/transform-gva-menu';
+import { transformGvaMenus } from '@/router/routes/transform-menu';
 import { useAuthStore } from '../auth';
 import { useTabStore } from '../tab';
 import {

@@ -79,13 +79,13 @@ const zhCN: import('../types/i18n').SystemMenuLang = {
   paramKey: '参数key',
   paramValue: '参数值',
   addParamBtn: '新增菜单参数',
-  paramEmptyTip: '暂无菜单参数，点击上方按钮新增',
+  paramEmptyTip: '暂无菜单参数',
   paramRequiredTip: '菜单参数存在未填写的必填项，请补全后再提交',
   /* button table */
   btnName: '按钮名称',
   btnDesc: '备注',
   addBtnBtn: '新增可控按钮',
-  btnEmptyTip: '暂无可控按钮，点击上方按钮新增',
+  btnEmptyTip: '暂无可控按钮',
   btnRequiredTip: '可控按钮存在未填写的必填项，请补全后再提交',
   /* detail panel */
   panelMenuList: '菜单列表',

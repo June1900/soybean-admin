@@ -79,13 +79,13 @@ const enUS: import('../types/i18n').SystemMenuLang = {
   paramKey: 'Key',
   paramValue: 'Value',
   addParamBtn: 'Add Parameter',
-  paramEmptyTip: 'No parameters yet, click the button above to add',
+  paramEmptyTip: 'No parameters yet',
   paramRequiredTip: 'Some required parameters are missing, please complete them before submitting',
   /* button table */
   btnName: 'Button Name',
   btnDesc: 'Description',
   addBtnBtn: 'Add Button',
-  btnEmptyTip: 'No buttons yet, click the button above to add',
+  btnEmptyTip: 'No buttons yet',
   btnRequiredTip: 'Some required button fields are missing, please complete them before submitting',
   /* detail panel */
   panelMenuList: 'Menu List',

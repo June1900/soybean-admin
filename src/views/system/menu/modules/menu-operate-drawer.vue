@@ -26,6 +26,8 @@ import { generatedRoutes } from '@/router/elegant/routes';
 import { getRoutePath } from '@/router/elegant/transform';
 import { fetchCreateMenu, fetchGetMenuList, fetchUpdateMenu, type Menu, type MenuForm } from '../api';
 import {
+  EXTERNAL_OPEN_IFRAME,
+  EXTERNAL_OPEN_NEW_TAB,
   layoutOptions,
   menuTypeOptions,
   resolveMenuType,
@@ -35,6 +37,7 @@ import {
 } from '../shared';
 import IconPickerModal from './icon-picker-modal.vue';
 import { validateExternalLink } from '@/views/system/menu/validate';
+import { createSafeNanoid, nanoid } from '@sa/utils';
 
 defineOptions({
   name: 'MenuOperateDrawer'
@@ -198,15 +201,6 @@ const transitionTypeOptions = computed(() => [
   { label: 'fade', value: 'fade' },
   { label: 'slide', value: 'slide' }
 ]);
-
-/**
- * 外链打开方式：借用 `component` 字段存储，与路由转换器 `transform-gva-menu.ts` 的约定保持一致。
- *
- * - `layout.base$view.iframe-page`：项目内打开，由内置 iframe-page 视图承载
- * - `new_tab`：浏览器新标签打开，路由 meta.href 交给守卫 window.open
- */
-const EXTERNAL_OPEN_IFRAME = 'layout.base$view.iframe-page';
-const EXTERNAL_OPEN_NEW_TAB = 'new_tab';
 
 /** 切换菜单类型：选择目录时锁定布局为 layout.base，并清空已选组件；外链时清空路径相关自动填充 */
 function handleMenuTypeChange(val: 'directory' | 'menu' | 'link') {
@@ -625,6 +619,10 @@ const btnColumns: NaiveUI.TableColumn<{ _id: number; name: string; desc: string 
 
 async function handleSubmit() {
   await formRef.value?.validate();
+  // 外链类型时，name 重新赋值
+  if (model.value.menuType === 'link') {
+    model.value.name = `${createSafeNanoid(10)}_${model.value.path}`;
+  }
   // 菜单型手动输入模式：component 由 name 派生（view.{name}），避免后端缺字段
   if (model.value.menuType === 'menu' && menuManualMode.value && !model.value.component && model.value.name) {
     model.value.component = `view.${model.value.name}`;

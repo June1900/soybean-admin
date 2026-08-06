@@ -1,7 +1,8 @@
 import type { RouteComponent } from 'vue-router';
 import type { ElegantConstRoute } from '@elegant-router/types';
 import Placeholder from '@/components/common/route-placeholder.vue';
-import { $tOrRaw, $teAnyLocale } from '@/locales';
+import { $teAnyLocale, $tOrRaw } from '@/locales';
+import { EXTERNAL_OPEN_NEW_TAB } from '@/views/system/menu/shared';
 
 /**
  * GVA（gin-vue-admin）`getMenu` 返回的菜单结构转换器。
@@ -114,25 +115,17 @@ function buildPath(parentPath: string | null, segment: string): string {
   return parentPath ? `${parentPath.replace(/\/$/, '')}/${clean}` : `/${clean}`;
 }
 
-/**
- * 外链「浏览器新标签打开」的 component 标识。
- *
- * 与菜单管理页 `menu-operate-drawer.vue` 的 `openInProjectOptions` 保持一致：
- * 「是」-> `layout.base$view.iframe-page`（项目内嵌打开），「否」-> `new_tab`（新标签打开）。
- */
-const EXTERNAL_NEW_TAB = 'new_tab';
-
-/** 是否为外链节点：`menuType=link` 时 path 存的就是外链地址（见菜单管理页 `validateExternalLink`） */
+// 是否为外链节点：`menuType=link` 时 path 为外链地址
 function isExternal(node: GvaMenu): boolean {
   return node.menuType === 'link' || /^https?:/i.test(node.path || '') || /^https?:/i.test(node.component || '');
 }
 
-/** 外链是否在浏览器新标签打开（否则在项目内用 iframe-page 承载） */
+// 外链是否在浏览器新标签打开（否则在项目内用 iframe-page 承载）
 function isOpenInNewTab(node: GvaMenu): boolean {
-  return node.component === EXTERNAL_NEW_TAB;
+  return node.component === EXTERNAL_OPEN_NEW_TAB;
 }
 
-/** 是否为纯目录节点（仅分组、无自身页面） */
+// 是否为纯目录节点（仅分组、无自身页面）
 function isDirectory(node: GvaMenu): boolean {
   return node.menuType === 'directory';
 }
@@ -141,13 +134,13 @@ export function transformGvaMenus(menus: GvaMenu[]): GvaTransformResult {
   const dynamicViews: Record<string, () => Promise<{ default: RouteComponent }>> = {};
   const leafInfos: LeafInfo[] = [];
 
+  console.log('menus===>', menus);
+
   function transformNode(node: GvaMenu, parentPath: string | null, parentKey: string | null): ElegantConstRoute[] {
     const external = isExternal(node);
-    const externalUrl = external ? node.path || node.component : '';
+    const externalUrl = external ? node.path : '';
     const newTab = external && isOpenInNewTab(node);
 
-    // 外链路径仅用于生成唯一路由记录：新标签打开的路由会被守卫拦截（不渲染），
-    // 项目内打开的则由 iframe-page 承载，url 通过静态 props 传入。
     let path: string;
     if (external) {
       path = newTab ? `/external-link/${sanitizeKey(externalUrl)}` : `/iframe-page/${encodeURIComponent(externalUrl)}`;
@@ -169,7 +162,7 @@ export function transformGvaMenus(menus: GvaMenu[]): GvaTransformResult {
 
     // 菜单名称：后端 `meta.title` 可能是 i18n key（`route.system_user`），也可能是纯文本（「用户管理」）。
     // 能在词条表中命中就交给 i18n（并写入 i18nKey，切换语言时可自动重算）；命中不到则原样使用后端下发的名称。
-    const rawTitle = node.meta?.title || node.name || node.path || '';
+    const rawTitle = node.meta?.title || '';
     // 任一语言存在词条即记录 i18nKey，保证切换语言时能重新翻译；当前语言翻不出来时 title 已是原名称
     const translatable = $teAnyLocale(rawTitle);
 
@@ -198,7 +191,7 @@ export function transformGvaMenus(menus: GvaMenu[]): GvaTransformResult {
       });
     }
 
-    // 外链：统一复用内置 iframe-page 视图承载
+    // 外链：复用内置 iframe-page 视图承载
     // - 新标签打开：写入 meta.href，路由守卫会拦截导航并 window.open（此路由不会真正渲染）
     // - 项目内打开：不写 meta.href（否则会被守卫拦截），url 通过静态 props 传给 iframe-page
     if (external) {
@@ -241,14 +234,12 @@ export function transformGvaMenus(menus: GvaMenu[]): GvaTransformResult {
     const loader = resolveViewByPath(node.path || '');
     const layout = normalizeLayout(node.layout);
 
-    const resolvedLoader =
+    dynamicViews[viewKey] =
       loader ??
       (() => {
         console.warn(`[gva-menu] 未匹配到视图文件，使用占位页：`, node.path, node.component);
         return Promise.resolve({ default: Placeholder });
       });
-
-    dynamicViews[viewKey] = resolvedLoader;
 
     // 有父目录时继承父布局（view.xxx）；顶级叶子自带布局（layout.base$view.xxx）
     const component = parentKey ? `view.${viewKey}` : `${layout}$view.${viewKey}`;
