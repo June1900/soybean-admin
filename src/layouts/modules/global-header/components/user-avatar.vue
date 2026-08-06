@@ -12,15 +12,13 @@ defineOptions({
 const authStore = useAuthStore();
 const { routerPushByKey, toLogin } = useRouterPush();
 
-// 头像：有 headerImg 时显示头像图，否则回退到默认 icon
 const avatarUrl = computed(() => getUploadFileUrl(authStore.userInfo.headerImg));
 
-// 控制下拉面板显隐
 const showDropdown = ref(false);
 
-// 角色文字（无则显示「无」）
 const rolesText = computed(() => authStore.userInfo.role || '无');
-console.log(authStore.userInfo);
+const userName = computed(() => authStore.userInfo.userName);
+const nickName = computed(() => authStore.userInfo.nickName);
 
 function loginOrRegister() {
   toLogin();
@@ -59,7 +57,7 @@ function handleLogout() {
         <ButtonIcon>
           <img v-if="avatarUrl" :src="avatarUrl" alt="avatar" class="h-28px w-28px rounded-full object-cover" />
           <SvgIcon v-else icon="ri:user-6-line" class="text-icon-large" />
-          <span class="text-16px font-medium">{{ authStore.userInfo.userName }}</span>
+          <span class="text-16px font-medium">{{ userName }}</span>
         </ButtonIcon>
       </div>
     </template>
@@ -68,7 +66,7 @@ function handleLogout() {
       <!-- 昵称 + 角色信息块 -->
       <div class="px-4px py-2px leading-tight">
         <div class="text-14px text-gray-800 dark:text-gray-100">
-          {{ authStore.userInfo.nickName || authStore.userInfo.userName }}
+          {{ nickName }}
         </div>
         <div class="mt-4px text-12px text-gray-400">当前角色:{{ rolesText }}</div>
       </div>
@@ -93,5 +91,3 @@ function handleLogout() {
     </div>
   </NPopover>
 </template>
-
-<style scoped></style>

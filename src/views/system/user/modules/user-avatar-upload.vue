@@ -5,14 +5,13 @@ import { NButton, NUpload } from 'naive-ui';
 import { useLoading } from '@sa/hooks';
 import { fetchUploadFile } from '@/service/api/file';
 import { getUploadFileUrl } from '@/utils/service';
-import defaultAvatar from '@/assets/imgs/soybean.jpg';
+import SvgIcon from '@/components/custom/svg-icon.vue';
 
 defineOptions({
   name: 'UserAvatarUpload'
 });
 
 const props = defineProps<{
-  /** 当前头像（后端返回的相对路径，如 uploads/file/xxx.png） */
   headerImg?: string;
 }>();
 
@@ -22,7 +21,7 @@ const emit = defineEmits<{
 
 const { loading, startLoading, endLoading } = useLoading();
 
-const previewUrl = computed(() => getUploadFileUrl(props.headerImg) || defaultAvatar);
+const previewUrl = computed(() => (props.headerImg ? getUploadFileUrl(props.headerImg) : ''));
 
 async function handleUpload(data: { file: UploadFileInfo }) {
   const file = data.file.file;
@@ -40,22 +39,39 @@ async function handleUpload(data: { file: UploadFileInfo }) {
       window.$message?.error('头像上传失败');
       return false;
     }
-    // 仅发出后端返回的相对路径，由后端存储
     emit('update:headerImg', uploadData.file.url);
     window.$message?.success('头像上传成功');
   } finally {
     endLoading();
   }
 
-  // 阻止 NUpload 默认上传，改用我们自己的接口
+  // 阻止 NUpload 默认上传
   return false;
+}
+
+function handleRemove() {
+  emit('update:headerImg', '');
 }
 </script>
 
 <template>
   <div class="flex items-center gap-16px">
-    <div class="h-80px w-80px overflow-hidden rounded-full border border-gray-200">
-      <img :src="previewUrl" alt="avatar" class="h-full w-full object-cover" />
+    <div
+      class="h-80px w-80px overflow-hidden rounded-full border border-gray-200 box-border flex-shrink-0 relative group"
+    >
+      <template v-if="previewUrl">
+        <img :src="previewUrl" alt="avatar" class="h-full w-full object-cover block" />
+        <div
+          class="absolute inset-0 flex-center bg-black/50 text-white opacity-0 transition-opacity duration-300 cursor-pointer group-hover:opacity-100"
+          title="删除头像"
+          @click="handleRemove"
+        >
+          <SvgIcon icon="ri:delete-bin-line" class="text-24px" />
+        </div>
+      </template>
+      <div v-else class="h-full w-full flex-center bg-gray-50 text-gray-300">
+        <SvgIcon icon="ri:user-add-line" class="text-40px" />
+      </div>
     </div>
     <NUpload
       accept=".jpg,.jpeg,.png,.gif"
@@ -64,7 +80,7 @@ async function handleUpload(data: { file: UploadFileInfo }) {
       :disabled="loading"
       @before-upload="handleUpload"
     >
-      <NButton :loading="loading">选择图片</NButton>
+      <NButton :loading="loading">{{ previewUrl ? '重新选择' : '选择图片' }}</NButton>
     </NUpload>
   </div>
 </template>

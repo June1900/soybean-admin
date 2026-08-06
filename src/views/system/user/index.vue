@@ -308,7 +308,6 @@ function openResetPwd(row: User) {
         @submitted="getDataByPage"
       />
 
-      <!-- 重置密码弹窗 -->
       <UserResetPwdModal
         :visible="resetPwdVisible"
         :user="resetPwdUser"

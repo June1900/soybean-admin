@@ -199,15 +199,6 @@ async function handleSubmit() {
         <NFormItem :label="$t('page.system.user.nickName')" path="nickName">
           <NInput v-model:value="model.nickName" :placeholder="$t('page.system.user.nickNamePlaceholder')" />
         </NFormItem>
-        <NFormItem :label="$t('page.system.user.phone')" path="phone">
-          <NInput v-model:value="model.phone" :placeholder="$t('page.system.user.phonePlaceholder')" />
-        </NFormItem>
-        <NFormItem :label="$t('page.system.user.email')" path="email">
-          <NInput v-model:value="model.email" :placeholder="$t('page.system.user.emailPlaceholder')" />
-        </NFormItem>
-        <NFormItem :label="$t('page.system.user.avatar')">
-          <UserAvatarUpload v-model:header-img="model.headerImg" />
-        </NFormItem>
         <NFormItem :label="$t('page.system.user.role')" path="authorityIds">
           <NTreeSelect
             v-model:value="model.authorityIds"
@@ -218,11 +209,20 @@ async function handleSubmit() {
             :default-expand-all="true"
           />
         </NFormItem>
+        <NFormItem :label="$t('page.system.user.phone')" path="phone">
+          <NInput v-model:value="model.phone" :placeholder="$t('page.system.user.phonePlaceholder')" />
+        </NFormItem>
+        <NFormItem :label="$t('page.system.user.email')" path="email">
+          <NInput v-model:value="model.email" :placeholder="$t('page.system.user.emailPlaceholder')" />
+        </NFormItem>
         <NFormItem :label="$t('page.system.user.status')" path="enable">
           <NRadioGroup v-model:value="model.enable">
             <NRadio :value="1">{{ $t('page.system.user.enable') }}</NRadio>
             <NRadio :value="2">{{ $t('page.system.user.disable') }}</NRadio>
           </NRadioGroup>
+        </NFormItem>
+        <NFormItem :label="$t('page.system.user.avatar')">
+          <UserAvatarUpload v-model:header-img="model.headerImg" />
         </NFormItem>
       </NForm>
       <template #footer>

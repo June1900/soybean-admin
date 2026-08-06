@@ -3,7 +3,10 @@ import type { UserListQuery, UserListResponse, UserForm } from './types';
 
 export type { User, UserListQuery, UserListResponse, UserForm, UserSearchParams } from './types';
 
-/** 获取分页用户列表 */
+/**
+ * 获取分页用户列表
+ * @param params
+ */
 export function fetchGetUserList(params?: UserListQuery) {
   return request<UserListResponse>({
     url: '/user/getUserList',
@@ -12,7 +15,10 @@ export function fetchGetUserList(params?: UserListQuery) {
   });
 }
 
-/** 创建用户（注册） */
+/**
+ * 创建用户（注册）
+ * @param data
+ */
 export function fetchCreateUser(data: UserForm) {
   return request<void>({
     url: '/user/admin_register',
@@ -21,7 +27,10 @@ export function fetchCreateUser(data: UserForm) {
   });
 }
 
-/** 更新用户信息 */
+/**
+ * 更新用户信息
+ * @param data
+ */
 export function fetchUpdateUser(data: Partial<UserForm> & { ID: number }) {
   return request<void>({
     url: '/user/setUserInfo',
@@ -30,7 +39,10 @@ export function fetchUpdateUser(data: Partial<UserForm> & { ID: number }) {
   });
 }
 
-/** 删除单个用户 */
+/**
+ * 删除单个用户
+ * @param id
+ */
 export function fetchDeleteUser(id: number) {
   return request<void>({
     url: '/user/deleteUser',
@@ -39,13 +51,19 @@ export function fetchDeleteUser(id: number) {
   });
 }
 
-/** 批量删除用户（gin-vue-admin 采用循环单删，若后端支持批量则批量） */
+/**
+ * 批量删除用户（gin-vue-admin 采用循环单删，若后端支持批量则批量）
+ * @param ids
+ */
 export async function fetchBatchDeleteUser(ids: number[]) {
   await Promise.all(ids.map(id => fetchDeleteUser(id)));
   return { data: null, error: false } as const;
 }
 
-/** 重置用户密码 */
+/**
+ * 重置用户密码
+ * @param data
+ */
 export function fetchResetPassword(data: { ID: number; password: string }) {
   return request<void>({
     url: '/user/resetPassword',
@@ -55,7 +73,10 @@ export function fetchResetPassword(data: { ID: number; password: string }) {
   });
 }
 
-/** 修改密码（当前登录用户，ID 由后端从 JWT 提取，传输加密） */
+/**
+ * 修改密码（当前登录用户，ID 由后端从 JWT 提取，传输加密）
+ * @param data
+ */
 export function fetchChangePassword(data: { password: string; newPassword: string }) {
   return request<void>({
     url: '/user/changePassword',
@@ -65,7 +86,10 @@ export function fetchChangePassword(data: { password: string; newPassword: strin
   });
 }
 
-/** 设置用户角色权限 */
+/**
+ * 设置用户角色权限
+ * @param data
+ */
 export function fetchSetUserAuthorities(data: { ID: number; authorityIds: number[] }) {
   return request<void>({
     url: '/user/setUserAuthorities',
@@ -74,7 +98,10 @@ export function fetchSetUserAuthorities(data: { ID: number; authorityIds: number
   });
 }
 
-/** 设置用户部门 */
+/**
+ * 设置用户部门
+ * @param data
+ */
 export function fetchSetUserDepartments(data: { ID: number; deptIds: number[]; primaryDeptId: number }) {
   return request<void>({
     url: '/user/setUserDepartments',
@@ -83,7 +110,10 @@ export function fetchSetUserDepartments(data: { ID: number; deptIds: number[]; p
   });
 }
 
-/** 设置用户岗位 */
+/**
+ * 设置用户岗位
+ * @param data
+ */
 export function fetchSetUserPositions(data: { ID: number; positionIds: number[] }) {
   return request<void>({
     url: '/user/setUserPositions',

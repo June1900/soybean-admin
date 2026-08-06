@@ -100,9 +100,6 @@ const passwordRules: Record<PasswordRuleKey, App.Global.FormRule> = {
 async function updateProfile() {
   await profileValidate();
   startBtnLoading();
-  // 复用用户管理「编辑用户」接口（/user/setUserInfo）
-  // 后端更新时 NickName/HeaderImg/Phone/Email/Enable 均取传入值，
-  // 表单未编辑的 HeaderImg、Enable 需带上原始值，避免被零值/空值覆盖。
   const { error } = await fetchUpdateUser({
     ID: userInfo.ID,
     nickName: profileModel.nickName,
@@ -115,7 +112,7 @@ async function updateProfile() {
     window.$message?.success('更新成功');
     Object.assign(userInfo, profileModel);
   }
-  profileRestoreValidation();
+  await profileRestoreValidation();
   endBtnLoading();
 }
 
@@ -126,7 +123,6 @@ async function updatePassword() {
     return;
   }
   startBtnLoading();
-  // 复用用户管理「修改密码」接口（/user/changePassword，传输加密）
   const { error } = await fetchChangePassword({
     password: passwordModel.oldPassword,
     newPassword: passwordModel.newPassword
@@ -135,7 +131,7 @@ async function updatePassword() {
     window.$message?.success('密码修改成功');
     Object.assign(passwordModel, createDefaultPasswordModel());
   }
-  passwordRestoreValidation();
+  await passwordRestoreValidation();
   endBtnLoading();
 }
 </script>
@@ -143,8 +139,7 @@ async function updatePassword() {
 <template>
   <div class="flex gap-16px">
     <!-- 个人信息卡片 -->
-    <NCard :bordered="false" class="profile-card w-440px shadow-sm" :content-style="{ padding: '0' }">
-      <!-- 渐变封面 -->
+    <NCard :bordered="false" class="profile-card w-540px shadow-sm" :content-style="{ padding: '0' }">
       <div class="cover-banner">
         <div class="cover-pattern" />
       </div>
@@ -192,7 +187,6 @@ async function updatePassword() {
 
         <NDivider class="my-16px" />
 
-        <!-- 信息列表（带图标 + 复制） -->
         <div class="info-list">
           <div class="info-item">
             <span class="info-icon"><SvgIcon icon="material-symbols:call" /></span>
@@ -321,13 +315,11 @@ async function updatePassword() {
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
-/* 卡片：静态展示 */
 .profile-card {
   overflow: hidden;
   border-radius: 12px;
 }
 
-/* 渐变封面 */
 .cover-banner {
   position: relative;
   height: 116px;
@@ -347,7 +339,6 @@ async function updatePassword() {
     radial-gradient(circle at 60% 90%, rgb(255 255 255 / 0.16), transparent 40%);
 }
 
-/* 头像浮起 */
 .avatar-wrap {
   display: flex;
   justify-content: center;
@@ -380,10 +371,6 @@ async function updatePassword() {
   color: #86909c;
 }
 
-.text-primary {
-  color: v-bind(primaryColor);
-}
-
 .text-success {
   color: #18c964;
 }
@@ -392,7 +379,6 @@ async function updatePassword() {
   color: #f53f3f;
 }
 
-/* 关键指标 */
 .stat-row {
   display: flex;
   align-items: center;
@@ -502,19 +488,5 @@ async function updatePassword() {
 .copy-btn:hover {
   color: v-bind(primaryColor);
   background: color-mix(in srgb, v-bind(primaryColor) 12%, #fff);
-}
-
-/* 更多信息折叠 */
-.more-collapse {
-  border: none;
-}
-
-:deep(.more-collapse .n-collapse-item) {
-  border: none;
-}
-
-:deep(.more-collapse .n-collapse-item__header) {
-  font-size: 13px;
-  color: #86909c;
 }
 </style>
