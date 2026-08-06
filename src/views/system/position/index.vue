@@ -584,6 +584,7 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   line-height: 1;
+  height: 44px;
   padding: 10px 12px;
   border: 1px solid transparent;
   border-radius: 6px;
