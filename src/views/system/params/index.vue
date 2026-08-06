@@ -26,6 +26,10 @@ const searchModel = reactive<ParamsSearchParams>({
   key: ''
 });
 
+const ellipsisTooltip: NaiveUI.DataTableBaseColumn<Params>['ellipsis'] = {
+  tooltip: { contentStyle: { maxWidth: '360px', whiteSpace: 'pre-wrap', wordBreak: 'break-all' } }
+};
+
 type ParamsListResponse = Awaited<ReturnType<typeof fetchGetParamsList>>;
 
 function getQueryParams(): ParamsListQuery {
@@ -61,7 +65,6 @@ const scrollX = computed(() =>
   }, 0)
 );
 
-/* 增删改 */
 const {
   drawerVisible,
   closeDrawer,
@@ -103,10 +106,23 @@ function createAllColumns(): NaiveUI.TableColumn<Params>[] {
       align: 'center',
       render: (_row, index) => index + 1
     },
-    { key: 'name', title: $t('page.system.params.name'), minWidth: 160 },
-    { key: 'key', title: $t('page.system.params.key'), minWidth: 140 },
-    { key: 'value', title: $t('page.system.params.value'), minWidth: 140, render: row => row.value || '-' },
-    { key: 'desc', title: $t('page.system.params.desc'), minWidth: 180, render: row => row.desc || '-' },
+    { key: 'name', title: $t('page.system.params.name'), minWidth: 160, ellipsis: ellipsisTooltip },
+    { key: 'key', title: $t('page.system.params.key'), minWidth: 140, ellipsis: ellipsisTooltip },
+    {
+      key: 'value',
+      title: $t('page.system.params.value'),
+      minWidth: 140,
+      ellipsis: ellipsisTooltip,
+      render: row => row.value || '-'
+    },
+    {
+      key: 'desc',
+      title: $t('page.system.params.desc'),
+      multiple: false,
+      minWidth: 180,
+      ellipsis: ellipsisTooltip,
+      render: row => row.desc || '-'
+    },
     {
       key: 'operation',
       title: $t('page.system.params.operation'),

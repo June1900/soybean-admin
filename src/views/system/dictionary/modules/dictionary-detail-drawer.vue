@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, h, ref, watch } from 'vue';
 import { NButton, NDataTable, NDrawer, NDrawerContent, NSpace, NTag } from 'naive-ui';
-import { useAppStore } from '@/store/modules/app';
 import { $t } from '@/locales';
 import { useTableOperate } from '@/hooks/common/table';
 import { fetchDeleteDictionaryDetail, fetchGetDictionaryDetailList, type DictionaryDetail } from '../api';
 import TableActionButtons from '@/components/common/table-action-buttons';
 import DictionaryDetailOperateDrawer from './dictionary-detail-operate-drawer.vue';
+import SvgIcon from '@/components/custom/svg-icon.vue';
 
 defineOptions({
   name: 'DictionaryDetailDrawer'
@@ -20,7 +20,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{ close: [] }>();
 
-/* 字典项数据 */
+// 字典项数据
 const detailData = ref<DictionaryDetail[]>([]);
 const detailLoading = ref(false);
 
@@ -39,11 +39,15 @@ async function getDetailData() {
 watch(
   () => props.visible,
   val => {
+    if (!val) {
+      // 关闭时，清除数据
+      detailData.value = [];
+    }
     if (val && props.dictId) getDetailData();
   }
 );
 
-/* 字典项新增/编辑 */
+// 字典项新增/编辑
 const {
   drawerVisible: formDrawerVisible,
   closeDrawer: closeFormDrawer,
@@ -80,7 +84,6 @@ async function handleDeleteDetail(id: number) {
   if (!error) await onDetailDeleted();
 }
 
-/* 表格列 */
 const drawerTitle = computed(() =>
   props.dictName
     ? `${$t('page.system.dictionary.detailTitle')}（${props.dictName}）`
@@ -171,9 +174,15 @@ const detailScrollX = computed(() =>
           <span class="text-16px font-500">{{ drawerTitle }}</span>
           <NSpace>
             <NButton size="small" :loading="detailLoading" @click="getDetailData">
+              <template #icon>
+                <SvgIcon icon="ri:refresh-line" />
+              </template>
               {{ $t('page.system.dictionary.refresh') }}
             </NButton>
             <NButton size="small" type="primary" @click="handleAddDetailClick">
+              <template #icon>
+                <SvgIcon icon="ri:add-line" />
+              </template>
               {{ $t('page.system.dictionary.addDetail') }}
             </NButton>
           </NSpace>
@@ -182,7 +191,7 @@ const detailScrollX = computed(() =>
 
       <template #footer>
         <div class="flex w-full justify-end">
-          <NButton size="small" @click="handleClose">
+          <NButton size="small" type="primary" @click="handleClose">
             {{ $t('common.close') }}
           </NButton>
         </div>

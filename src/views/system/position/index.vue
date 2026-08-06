@@ -333,7 +333,7 @@ onMounted(async () => {
           clearable
           size="small"
         />
-        <NButton type="primary" size="small" @click="openAddDrawer">
+        <NButton type="primary" size="small" ghost @click="openAddDrawer">
           <template #icon>
             <span class="text-14px font-bold leading-none">+</span>
           </template>
@@ -391,7 +391,10 @@ onMounted(async () => {
       <template #header-extra>
         <NTooltip placement="bottom">
           <template #trigger>
-            <NButton type="primary" size="small" :loading="savingMembers" @click="handleSaveMembers">
+            <NButton type="primary" size="small" ghost :loading="savingMembers" @click="handleSaveMembers">
+              <template #icon>
+                <SvgIcon icon="ri:save-line" class="text-14px" />
+              </template>
               {{ $t('page.system.position.saveMembers') }}
             </NButton>
           </template>
@@ -422,13 +425,13 @@ onMounted(async () => {
             />
           </div>
           <div class="member-actions flex gap-8px">
-            <NButton type="primary" size="small" @click="handleMemberQuery">
+            <NButton type="primary" ghost size="small" @click="handleMemberQuery">
               <template #icon>
                 <icon-ri-search-line class="text-14px" />
               </template>
               {{ $t('page.system.position.query') }}
             </NButton>
-            <NButton size="small" @click="handleMemberReset">
+            <NButton size="small" ghost @click="handleMemberReset">
               <template #icon>
                 <icon-ri-refresh-line class="text-14px" />
               </template>

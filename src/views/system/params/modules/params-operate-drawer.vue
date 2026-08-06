@@ -55,7 +55,11 @@ function handleKeyInput(val: string) {
 watch(
   () => props.visible,
   val => {
-    if (!val) return;
+    if (!val) {
+      // 关闭时重置校验状态，避免下次打开残留错误提示
+      formRef.value?.restoreValidation();
+      return;
+    }
     const editing = props.operateType === 'edit' && props.editingData;
     model.value = editing
       ? {
@@ -106,7 +110,7 @@ async function handleSubmit() {
               {{ $t('page.system.params.key') }}
               <NTooltip trigger="hover">
                 <template #trigger>
-                  <icon-ri-question-line class="text-14px text-gray-400 cursor-help" />
+                  <icon-ri-question-line class="text-14px text-gray-400 cursor-pointer" />
                 </template>
                 {{ $t('page.system.params.keyPatternError') }}
               </NTooltip>

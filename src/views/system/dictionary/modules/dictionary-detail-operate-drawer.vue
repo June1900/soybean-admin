@@ -111,7 +111,11 @@ const sortModel = computed<number | null>({
 watch(
   () => props.visible,
   val => {
-    if (!val) return;
+    if (!val) {
+      // 关闭时重置校验状态，避免下次打开残留错误提示
+      formRef.value?.restoreValidation();
+      return;
+    }
     const editing = props.operateType === 'edit' && props.editingData;
     model.value = editing
       ? {
