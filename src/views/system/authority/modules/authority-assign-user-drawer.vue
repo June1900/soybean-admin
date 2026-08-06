@@ -51,7 +51,7 @@ function getQueryParams(): UserListQuery {
   };
 }
 
-/** 加载用户列表与已关联用户 ID */
+// 加载用户列表与已关联用户 ID
 async function loadAssignUserData(authorityId: number) {
   checkedRowKeys.value = [];
   searchModel.username = '';

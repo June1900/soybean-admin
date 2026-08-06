@@ -189,5 +189,3 @@ onMounted(() => {
     </NCard>
   </div>
 </template>
-
-<style scoped></style>

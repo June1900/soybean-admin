@@ -4,9 +4,12 @@ import type { Menu } from '@/views/system/menu/api';
 import { translateTitle } from '@/views/system/menu/shared';
 import type { Authority } from './api';
 
-/* ---------------- 通用树工具（泛型） ---------------- */
-
-/** 收集所有叶子节点 id */
+/**
+ * 收集所有叶子节点 id
+ * @param tree
+ * @param getId
+ * @param getChildren
+ */
 export function collectLeafIds<T>(
   tree: T[],
   getId: (n: T) => number,
@@ -24,7 +27,10 @@ export function collectLeafIds<T>(
   return ids;
 }
 
-/** 收集 TreeOption 节点的所有叶子后代 key */
+/**
+ * 收集 TreeOption 节点的所有叶子后代 key
+ * @param node
+ */
 export function collectTreeLeafKeys(node: TreeOption): number[] {
   const keys: number[] = [];
   const walk = (n: TreeOption) => {
@@ -39,7 +45,11 @@ export function collectTreeLeafKeys(node: TreeOption): number[] {
   return keys;
 }
 
-/** 拍平树为一维数组，去除 children 嵌套 */
+/**
+ * 拍平树为一维数组，去除 children 嵌套
+ * @param tree
+ * @param getChildren
+ */
 export function flattenTree<T>(tree: T[], getChildren: (n: T) => T[] | undefined): T[] {
   const out: T[] = [];
   const walk = (list: T[]) => {
@@ -54,7 +64,13 @@ export function flattenTree<T>(tree: T[], getChildren: (n: T) => T[] | undefined
   return out;
 }
 
-/** 按 id 查找节点 */
+/**
+ *  按 id 查找节点
+ * @param tree
+ * @param id
+ * @param getId
+ * @param getChildren
+ */
 export function findNodeById<T>(
   tree: T[],
   id: number,
@@ -69,7 +85,13 @@ export function findNodeById<T>(
   return null;
 }
 
-/** 收集 targetId 及其所有子孙 id（防循环引用） */
+/**
+ * 收集 targetId 及其所有子孙 id（防循环引用）
+ * @param tree
+ * @param targetId
+ * @param getId
+ * @param getChildren
+ */
 export function collectDisabledIds<T>(
   tree: T[],
   targetId: number,
@@ -99,9 +121,10 @@ export function collectDisabledIds<T>(
   return result;
 }
 
-/* ---------------- 角色树工具 ---------------- */
-
-/** 角色树拍平为 { authorityId: authorityName } */
+/**
+ * 角色树拍平为 { authorityId: authorityName }
+ * @param list
+ */
 export function buildRoleNameMap(list: Authority[]): Record<number, string> {
   const map: Record<number, string> = {};
   const walk = (items: Authority[]) => {
@@ -114,7 +137,11 @@ export function buildRoleNameMap(list: Authority[]): Record<number, string> {
   return map;
 }
 
-/** 构建父级角色树选项，disableIds 中的节点禁用 */
+/**
+ * 构建父级角色树选项，disableIds 中的节点禁用
+ * @param list
+ * @param disableIds
+ */
 export function buildParentOptions(list: Authority[], disableIds: Set<number>): TreeSelectOption[] {
   return (list ?? []).map(item => {
     const id = Number(item.authorityId) || 0;
@@ -128,7 +155,11 @@ export function buildParentOptions(list: Authority[], disableIds: Set<number>): 
   });
 }
 
-/** 收集角色树中目标节点及子孙 id */
+/**
+ * 收集角色树中目标节点及子孙 id
+ * @param list
+ * @param targetId
+ */
 export function collectRoleDisabledIds(list: Authority[], targetId: number): Set<number> {
   return collectDisabledIds(
     list,
@@ -138,9 +169,7 @@ export function collectRoleDisabledIds(list: Authority[], targetId: number): Set
   );
 }
 
-/* ---------------- 数据范围 ---------------- */
-
-/** 数据范围下拉选项 */
+// 数据范围下拉选项
 export const dataScopeOptions = () => [
   { label: $t('page.system.authority.allData'), value: 1 },
   { label: $t('page.system.authority.deptAndBelow'), value: 2 },
@@ -149,13 +178,14 @@ export const dataScopeOptions = () => [
   { label: $t('page.system.authority.customDept'), value: 5 }
 ];
 
-/** 数据范围标签颜色 */
+// 数据范围标签颜色
 export const dataScopeTagType = (value: number): 'success' | 'warning' | 'default' =>
   value === 1 ? 'success' : value === 5 ? 'warning' : 'default';
 
-/* ---------------- 菜单树工具 ---------------- */
-
-/** 菜单树转 TreeOption，label 经 i18n 转义 */
+/**
+ * 菜单树转 TreeOption，label 经 i18n 转义
+ * @param menus
+ */
 export function toMenuTreeOptions(menus: Menu[]): TreeOption[] {
   return (menus ?? []).map(m => ({
     key: m.ID,
@@ -164,7 +194,11 @@ export function toMenuTreeOptions(menus: Menu[]): TreeOption[] {
   }));
 }
 
-/** 菜单树搜索过滤 */
+/**
+ * 菜单树搜索过滤
+ * @param menus
+ * @param k
+ */
 export function filterMenuTree(menus: Menu[], k: string): TreeOption[] {
   return (menus ?? []).reduce<TreeOption[]>((acc, m) => {
     const label = (translateTitle(m.meta?.title) || m.name).toLowerCase();
@@ -180,7 +214,10 @@ export function filterMenuTree(menus: Menu[], k: string): TreeOption[] {
   }, []);
 }
 
-/** 收集菜单树所有叶子节点 ID */
+/**
+ * 收集菜单树所有叶子节点 ID
+ * @param menus
+ */
 export function collectMenuLeafIds(menus: Menu[]): number[] {
   return collectLeafIds(
     menus,
@@ -189,7 +226,11 @@ export function collectMenuLeafIds(menus: Menu[]): number[] {
   );
 }
 
-/** 按 ID 查找菜单 name */
+/**
+ *  按 ID 查找菜单 name
+ * @param menus
+ * @param id
+ */
 export function findMenuNameById(menus: Menu[], id: number): string | null {
   const node = findNodeById(
     menus,
@@ -200,12 +241,19 @@ export function findMenuNameById(menus: Menu[], id: number): string | null {
   return node?.name ?? null;
 }
 
-/** 菜单树拍平为一维数组 */
+/**
+ *  菜单树拍平为一维数组
+ * @param menus
+ */
 export function flattenMenuTree(menus: Menu[]): Menu[] {
   return flattenTree(menus, n => n.children ?? undefined);
 }
 
-/** 裁剪已勾选菜单树：保留勾选节点及其祖先路径 */
+/**
+ * 裁剪已勾选菜单树：保留勾选节点及其祖先路径
+ * @param menus
+ * @param checked
+ */
 export function pruneMenuTree(menus: Menu[], checked: Set<number>): Menu[] {
   const out: Menu[] = [];
   for (const m of menus ?? []) {

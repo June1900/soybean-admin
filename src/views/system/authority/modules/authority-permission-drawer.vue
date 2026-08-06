@@ -16,7 +16,7 @@ import {
 } from 'naive-ui';
 import { $t } from '@/locales';
 import type { Menu } from '@/views/system/menu/api';
-import { translateTitle } from '@/views/system/menu/shared';
+import { resolveMenuType, translateTitle } from '@/views/system/menu/shared';
 import {
   collectMenuLeafIds,
   collectTreeLeafKeys,
@@ -32,10 +32,12 @@ import {
   fetchGetBaseMenuTree,
   fetchGetMenuAuthority,
   fetchGetPolicyPathByAuthorityId,
+  fetchUpdateAuthority,
   fetchUpdateCasbin,
   type Authority,
   type AuthorityApi,
-  type AuthorityApiPolicy
+  type AuthorityApiPolicy,
+  type AuthorityForm
 } from '../api';
 import AuthorityBtnAssignModal from './authority-btn-assign-modal.vue';
 
@@ -54,6 +56,9 @@ const { loading: apiSaving, startLoading: startApiSaving, endLoading: endApiSavi
 
 const activeTab = ref<'menu' | 'api'>('menu');
 
+/* 加载初始数据期间为 true，用于屏蔽 defaultRouter watcher 触发误调用 */
+const isLoadingData = ref(false);
+
 /* ---------- menu tab ---------- */
 const menuKeyword = ref('');
 const menuKeywordApplied = ref('');
@@ -68,10 +73,12 @@ const filteredMenuTreeOptions = computed(() => {
 });
 
 const defaultRouterOptions = computed(() => {
+  // 仅展示已勾选且为菜单类型（menu）的节点，目录/外链不在首页选择范围内
+  const checkedSet = new Set(checkedMenuKeys.value.map(Number));
   const opts: { label: string; value: string }[] = [];
   const walk = (menus: Menu[]) => {
     for (const m of menus ?? []) {
-      if (!m.children?.length) {
+      if (resolveMenuType(m) === 'menu' && checkedSet.has(Number(m.ID))) {
         // defaultRouter 存菜单 name（路由名）
         opts.push({ label: translateTitle(m.meta?.title) || m.name, value: m.name });
       }
@@ -185,6 +192,13 @@ function handleMenuCheckedKeysUpdate(
     leafKeys.forEach(k => set.add(k));
   } else {
     leafKeys.forEach(k => set.delete(k));
+    // 取消勾选后，若被取消的菜单正是当前默认首页，则清空默认首页选择
+    if (defaultRouter.value) {
+      const isDefaultCleared = leafKeys.some(id => findMenuNameById(menuTree.value, id) === defaultRouter.value);
+      if (isDefaultCleared) {
+        defaultRouter.value = null;
+      }
+    }
   }
   checkedMenuKeys.value = Array.from(set);
 }
@@ -265,6 +279,7 @@ function openBtnAssign(menu: Menu) {
 /** 加载角色权限数据（四个接口并行） */
 async function loadPermissionData(authorityId: number) {
   startLoading();
+  isLoadingData.value = true;
   try {
     const [{ data: baseMenuData }, { data: menuAuthData }, { data: apiData }, { data: policyData }] = await Promise.all(
       [
@@ -288,10 +303,10 @@ async function loadPermissionData(authorityId: number) {
       .filter((a): a is AuthorityApi => !!a)
       .map(a => String(a.ID));
 
-    const router = props.role?.defaultRouter;
-    defaultRouter.value =
-      router || (checkedMenuKeys.value.length > 0 ? findMenuNameById(menuTree.value, checkedMenuKeys.value[0]) : null);
+    // 打开抽屉时仅回显角色已配置的默认首页，不做任何自动更新/回退
+    defaultRouter.value = props.role?.defaultRouter ?? null;
   } finally {
+    isLoadingData.value = false;
     endLoading();
   }
 }
@@ -309,6 +324,35 @@ watch(
     await loadPermissionData(props.role.authorityId);
   },
   { immediate: true }
+);
+
+/**
+ * 默认首页变更（含清空）后即时调用 fetchUpdateAuthority 持久化，defaultRouter 可为空字符串。
+ * 跳过初始加载触发的赋值。
+ */
+watch(
+  defaultRouter,
+  async (newVal, oldVal) => {
+    if (isLoadingData.value) return;
+    if (!props.role) return;
+    if (newVal === oldVal) return;
+
+    const form: AuthorityForm = {
+      authorityId: props.role.authorityId,
+      authorityName: props.role.authorityName,
+      parentId: props.role.parentId,
+      dataScope: props.role.dataScope,
+      defaultRouter: newVal ?? ''
+    };
+
+    const { error } = await fetchUpdateAuthority(form);
+    if (!error) {
+      // 同步本地 role 状态，避免下次打开回显到旧值
+      props.role.defaultRouter = newVal ?? undefined;
+      window.$message?.success($t('page.system.authority.permissionSuccess'));
+    }
+  },
+  { flush: 'sync' }
 );
 
 // 角色菜单

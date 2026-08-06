@@ -11,7 +11,7 @@ const props = defineProps<{
   visible: boolean;
   operateType: NaiveUI.TableOperateType;
   editingData: Authority | null;
-  /** 新增子角色时，预置的父级角色 ID（顶级用 0） */
+  // 新增子角色时，预置的父级角色 ID（顶级用 0）
   defaultParentId?: number | null;
 }>();
 
@@ -55,7 +55,7 @@ const title = computed(() =>
   props.operateType === 'add' ? $t('page.system.authority.addRole') : $t('page.system.authority.editRole')
 );
 
-/** 父级角色展示文案：顶级=根角色，其余按 parentId 查名称 */
+// 级角色展示文案：顶级=根角色，其余按 parentId 查名称
 const parentRoleLabel = computed(() => {
   if (model.parentId === 0) return $t('page.system.authority.rootRole');
   return roleNameMap.value[model.parentId] ?? '';
@@ -104,14 +104,12 @@ async function handleSubmit() {
     parentId: model.parentId ?? 0,
     dataScope: model.dataScope
   };
-
   try {
-    const { error } =
-      props.operateType === 'add' ? await fetchCreateAuthority(payload) : await fetchUpdateAuthority(payload);
-
+    const isAdd = props.operateType === 'add';
+    const { error } = isAdd ? await fetchCreateAuthority(payload) : await fetchUpdateAuthority(payload);
     if (!error) {
       window.$message?.success(
-        props.operateType === 'add' ? $t('page.system.authority.addSuccess') : $t('page.system.authority.editSuccess')
+        isAdd ? $t('page.system.authority.addSuccess') : $t('page.system.authority.editSuccess')
       );
       emit('submitted');
       emit('close');

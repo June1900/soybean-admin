@@ -7,17 +7,15 @@ import type { Menu, MenuBtn } from '@/views/system/menu/api';
 import { fetchGetAuthorityBtn, fetchSetAuthorityBtn } from '../api';
 
 const props = defineProps<{
-  /** 控制弹窗显隐（v-model:show） */
   show: boolean;
-  /** 当前菜单（携带 menuBtn） */
+  // 当前菜单（携带 menuBtn）
   menu: Menu | null;
-  /** 角色 ID */
+  // 角色 ID
   authorityId: number;
 }>();
 
 const emit = defineEmits<{
   'update:show': [boolean];
-  /** 保存成功 */
   saved: [];
 }>();
 
@@ -27,7 +25,6 @@ const { loading: saving, startLoading: startSaving, endLoading: endSaving } = us
 const btnOptions = ref<MenuBtn[]>([]);
 const checkedBtnKeys = ref<number[]>([]);
 
-/** 加载按钮全集与已选 ID */
 async function loadBtnData() {
   if (!props.menu) return;
   btnOptions.value = props.menu.menuBtn ?? [];
