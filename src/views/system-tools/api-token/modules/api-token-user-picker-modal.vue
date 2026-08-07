@@ -131,8 +131,18 @@ function createAllColumns(): NaiveUI.TableColumn<User>[] {
         class="w-180px"
         @keydown.enter="handleSearch"
       />
-      <NButton type="primary" @click="handleSearch">{{ $t('common.search') }}</NButton>
-      <NButton @click="handleReset">{{ $t('common.reset') }}</NButton>
+      <NButton ghost @click="handleReset">
+        <template #icon>
+          <icon-ri-refresh-line class="text-16px" />
+        </template>
+        {{ $t('common.reset') }}
+      </NButton>
+      <NButton type="primary" ghost @click="handleSearch">
+        <template #icon>
+          <icon-ri-search-line class="text-16px" />
+        </template>
+        {{ $t('common.search') }}
+      </NButton>
     </div>
 
     <NDataTable

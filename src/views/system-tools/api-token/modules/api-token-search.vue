@@ -97,5 +97,3 @@ async function search() {
     </NCollapse>
   </NCard>
 </template>
-
-<style scoped></style>

@@ -86,7 +86,6 @@ async function handleDelete(id: number) {
   }
 }
 
-/* ---------- Token 弹窗 + Curl 抽屉 ---------- */
 const resultModalVisible = ref(false);
 const tokenResult = ref('');
 
@@ -104,7 +103,7 @@ function openCurl(row: ApiToken) {
   curlDrawerVisible.value = true;
 }
 
-/* 格式化过期时间：永久令牌显示「永久」，空值显示「-」 */
+// 格式化过期时间：永久令牌显示「永久」，空值显示「-」
 function formatExpiresAt(val?: string): string {
   if (!val) return '-';
   const d = dayjs(val);
@@ -113,19 +112,17 @@ function formatExpiresAt(val?: string): string {
   return d.format('YYYY-MM-DD HH:mm:ss');
 }
 
-/* 作废确认弹窗 */
 function handleInvalidate(row: ApiToken) {
   window.$dialog?.warning({
     title: $t('page.systemTools.apiToken.columns.invalidate'),
     content: $t('page.systemTools.apiToken.invalidateConfirm'),
     positiveText: $t('common.confirm'),
     negativeText: $t('common.cancel'),
-    positiveButtonProps: { type: 'default' },
+    positiveButtonProps: { type: 'primary' },
     onPositiveClick: () => handleDelete(row.ID)
   });
 }
 
-/* ---------- 列定义 ---------- */
 function createAllColumns(): NaiveUI.TableColumn<ApiToken>[] {
   return [
     {

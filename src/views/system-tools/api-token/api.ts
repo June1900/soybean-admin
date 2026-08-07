@@ -10,7 +10,10 @@ export type {
   ApiTokenSearchParams
 } from './types';
 
-/** 获取凭证分页列表（POST /sysApiToken/getApiTokenList） */
+/**
+ * 获取凭证分页列表
+ * @param params
+ */
 export function fetchGetApiTokenList(params?: ApiTokenListQuery) {
   return request<ApiTokenListResponse>({
     url: '/sysApiToken/getApiTokenList',
@@ -19,7 +22,10 @@ export function fetchGetApiTokenList(params?: ApiTokenListQuery) {
   });
 }
 
-/** 签发凭证（POST /sysApiToken/createApiToken） */
+/**
+ * 签发凭证
+ * @param data
+ */
 export function fetchCreateApiToken(data: ApiTokenForm) {
   return request<ApiTokenCreateResponse>({
     url: '/sysApiToken/createApiToken',
@@ -28,7 +34,10 @@ export function fetchCreateApiToken(data: ApiTokenForm) {
   });
 }
 
-/** 作废凭证（POST /sysApiToken/deleteApiToken） */
+/**
+ * 作废凭证
+ * @param id
+ */
 export function fetchDeleteApiToken(id: number) {
   return request<void>({
     url: '/sysApiToken/deleteApiToken',

@@ -19,14 +19,12 @@ const { userInfo } = authStore;
 
 const themeStore = useThemeStore();
 const primaryColor = computed(() => themeStore.themeColors.primary);
-
-/** 账号状态 */
+// 账号状态
 const accountStatus = computed(() => (userInfo.enable === 1 ? '启用' : '禁用'));
-
-/** 所属部门（空时显示占位） */
+// 所属部门
 const deptName = computed(() => userInfo.dept?.name || '-');
 
-/** 复制到剪贴板 */
+// 复制到剪贴板
 async function copyText(text: string, label: string) {
   if (!text) return;
   try {
@@ -271,12 +269,34 @@ async function updatePassword() {
             label-width="100px"
             class="mt-16px max-w-520px"
           >
+            <!-- 隐藏的用户名输入框：满足密码表单无障碍/autocomplete 关联要求 -->
+            <div
+              style="
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                padding: 0;
+                margin: -1px;
+                overflow: hidden;
+                clip: rect(0 0 0 0);
+                white-space: nowrap;
+                border: 0;
+              "
+            >
+              <NInput
+                :value="userInfo.userName"
+                type="text"
+                readonly
+                :input-props="{ autocomplete: 'username', name: 'username' }"
+              />
+            </div>
             <NFormItem label="旧密码" path="oldPassword">
               <NInput
                 v-model:value="passwordModel.oldPassword"
                 type="password"
                 placeholder="请输入旧密码"
                 show-password-on="click"
+                :input-props="{ autocomplete: 'current-password' }"
               />
             </NFormItem>
             <NFormItem label="新密码" path="newPassword">
@@ -285,6 +305,7 @@ async function updatePassword() {
                 type="password"
                 placeholder="请输入新密码"
                 show-password-on="click"
+                :input-props="{ autocomplete: 'new-password' }"
               />
             </NFormItem>
             <NFormItem label="确认密码" path="confirmPassword">
@@ -293,6 +314,7 @@ async function updatePassword() {
                 type="password"
                 placeholder="请再次输入新密码"
                 show-password-on="click"
+                :input-props="{ autocomplete: 'new-password' }"
               />
             </NFormItem>
             <NFormItem class="flex items-center justify-end">

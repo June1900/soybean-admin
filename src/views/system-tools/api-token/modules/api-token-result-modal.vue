@@ -21,7 +21,9 @@ async function copyText(text: string) {
     v-model:show="show"
     :title="$t('page.systemTools.apiToken.tokenDialog.title')"
     preset="card"
-    style="width: 520px"
+    :close-on-esc="false"
+    :mask-closable="false"
+    style="width: 620px"
   >
     <NAlert type="warning" :show-icon="true" :title="$t('page.systemTools.apiToken.tokenDialog.warning')" />
     <NInput type="textarea" :rows="6" :value="token" readonly class="mt-12px" />
