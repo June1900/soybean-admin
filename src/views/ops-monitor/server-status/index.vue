@@ -19,7 +19,7 @@ const serverInfo = ref<ServerInfo | null>(null);
 const lastUpdateTime = ref('');
 const refreshIntervalSeconds = 30;
 
-/** 计算平均 CPU 使用率 */
+// 计算平均 CPU 使用率
 function calcCpuAvg(info: ServerInfo): number {
   if (!info.cpu.cpus.length) return 0;
   const sum = info.cpu.cpus.reduce((a, b) => a + b, 0);
@@ -39,7 +39,6 @@ async function loadData() {
   }
 }
 
-/* ---------- 自动刷新 ---------- */
 let timer: ReturnType<typeof setInterval> | null = null;
 
 function startAutoRefresh() {
@@ -57,7 +56,7 @@ onUnmounted(() => {
   if (timer) clearInterval(timer);
 });
 
-/* ---------- CPU 进度条颜色 ---------- */
+// CPU 进度条颜色
 function cpuBarColor(percentage: number): string {
   if (percentage >= 80) return themeVars.value.errorColor;
   if (percentage >= 50) return themeVars.value.warningColor;

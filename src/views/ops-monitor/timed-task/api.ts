@@ -23,7 +23,10 @@ export type {
   TimedTaskSearchParams
 } from './types';
 
-/** 获取定时任务分页列表 */
+/**
+ * 获取定时任务分页列表
+ * @param params
+ */
 export function fetchGetTimedTaskList(params?: TimedTaskListQuery) {
   return request<TimedTaskListResponse>({
     url: '/timedTask/getTimedTaskList',
@@ -32,7 +35,10 @@ export function fetchGetTimedTaskList(params?: TimedTaskListQuery) {
   });
 }
 
-/** 新建定时任务 */
+/**
+ * 新建定时任务
+ * @param data
+ */
 export function fetchCreateTimedTask(data: TimedTaskForm) {
   return request<void>({
     url: '/timedTask/createTimedTask',
@@ -41,7 +47,10 @@ export function fetchCreateTimedTask(data: TimedTaskForm) {
   });
 }
 
-/** 更新定时任务 */
+/**
+ * 更新定时任务
+ * @param data
+ */
 export function fetchUpdateTimedTask(data: TimedTaskForm) {
   return request<void>({
     url: '/timedTask/updateTimedTask',
@@ -50,7 +59,10 @@ export function fetchUpdateTimedTask(data: TimedTaskForm) {
   });
 }
 
-/** 删除定时任务 */
+/**
+ * 删除定时任务
+ * @param id
+ */
 export function fetchDeleteTimedTask(id: number) {
   return request<void>({
     url: '/timedTask/deleteTimedTask',
@@ -59,7 +71,11 @@ export function fetchDeleteTimedTask(id: number) {
   });
 }
 
-/** 启用 / 停用 */
+/**
+ * 启用 / 停用
+ * @param id
+ * @param enabled
+ */
 export function fetchToggleTimedTask(id: number, enabled: boolean) {
   return request<void>({
     url: '/timedTask/toggleTimedTask',
@@ -68,7 +84,10 @@ export function fetchToggleTimedTask(id: number, enabled: boolean) {
   });
 }
 
-/** 立即触发（执行一次） */
+/**
+ * 立即触发（执行一次）
+ * @param id
+ */
 export function fetchTriggerTimedTask(id: number) {
   return request<void>({
     url: '/timedTask/triggerTimedTask',
@@ -77,7 +96,10 @@ export function fetchTriggerTimedTask(id: number) {
   });
 }
 
-/** 获取任务执行日志 */
+/**
+ * 获取任务执行日志
+ * @param params
+ */
 export function fetchGetTimedTaskLogList(params?: TimedTaskLogListQuery) {
   return request<TimedTaskLogListResponse>({
     url: '/timedTask/getTimedTaskLogList',
@@ -86,7 +108,9 @@ export function fetchGetTimedTaskLogList(params?: TimedTaskLogListQuery) {
   });
 }
 
-/** 获取后端已注册的任务方法 */
+/**
+ * 获取后端已注册的任务方法
+ */
 export async function fetchRegisteredMethods() {
   const { data, error } = await request<RegisteredMethodsResponse>({
     url: '/timedTask/getRegisteredMethods',

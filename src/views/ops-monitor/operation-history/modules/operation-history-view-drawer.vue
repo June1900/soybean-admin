@@ -5,7 +5,7 @@ import { $t } from '@/locales';
 import { formatDateTime } from '@/utils/date';
 import { useClipboard } from '@vueuse/core';
 import type { OperationRecord } from '../api';
-import { statusTagType } from '../share';
+import { statusTagType } from '../shared';
 
 defineOptions({ name: 'OperationHistoryViewDrawer' });
 

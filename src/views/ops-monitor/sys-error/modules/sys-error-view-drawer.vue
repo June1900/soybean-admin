@@ -2,9 +2,10 @@
 import { computed } from 'vue';
 import { NButton, NDescriptions, NDescriptionsItem, NDrawer, NDrawerContent, NScrollbar, NSpace, NTag } from 'naive-ui';
 import { $t } from '@/locales';
-import type { SysError, SysErrorLevel, SysErrorStatus } from '../api';
+import type { SysError } from '../api';
 import { formatDateTime } from '@/utils/date';
 import { useClipboard } from '@vueuse/core';
+import { levelTagType, statusTagType } from '../shared';
 
 defineOptions({ name: 'SysErrorViewDrawer' });
 
@@ -14,18 +15,6 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{ close: [] }>();
-
-const levelTagType: Record<SysErrorLevel, 'error' | 'warning'> = {
-  fatal: 'error',
-  error: 'warning'
-};
-
-const statusTagType: Record<SysErrorStatus, 'warning' | 'info' | 'success' | 'error'> = {
-  未处理: 'info',
-  处理中: 'warning',
-  处理完成: 'success',
-  处理失败: 'error'
-};
 
 const levelLabel = computed(() => (props.data ? $t(`page.opsMonitor.sysError.level.${props.data.level}`) : ''));
 const statusLabel = computed(() => (props.data ? $t(`page.opsMonitor.sysError.status.${props.data.status}`) : ''));

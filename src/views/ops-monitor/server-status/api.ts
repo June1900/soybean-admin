@@ -10,7 +10,9 @@ export type {
   ServerDiskItem
 } from './types';
 
-/** 获取服务器状态信息 */
+/**
+ * 获取服务器状态信息
+ */
 export function fetchServerInfo() {
   return request<ServerInfoResponse>({
     url: '/system/getServerInfo',

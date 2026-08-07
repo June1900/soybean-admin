@@ -10,7 +10,10 @@ export type {
   SysErrorSearchParams
 } from './types';
 
-/** 分页获取错误日志列表 */
+/**
+ * 分页获取错误日志列表
+ * @param params
+ */
 export function fetchSysErrorList(params: SysErrorListQuery) {
   return request<SysErrorListResponse>({
     url: '/sysError/getSysErrorList',
@@ -19,7 +22,10 @@ export function fetchSysErrorList(params: SysErrorListQuery) {
   });
 }
 
-/** 用 id 查询错误日志详情 */
+/**
+ * 用 id 查询错误日志详情
+ * @param id
+ */
 export function findSysError(id: number) {
   return request<SysError>({
     url: '/sysError/findSysError',
@@ -28,7 +34,10 @@ export function findSysError(id: number) {
   });
 }
 
-/** 删除单条错误日志 */
+/**
+ * 删除单条错误日志
+ * @param id
+ */
 export function deleteSysError(id: number) {
   return request<void>({
     url: '/sysError/deleteSysError',
@@ -37,7 +46,10 @@ export function deleteSysError(id: number) {
   });
 }
 
-/** 批量删除错误日志 */
+/**
+ * 批量删除错误日志
+ * @param ids
+ */
 export function deleteSysErrorByIds(ids: number[]) {
   return request<void>({
     url: '/sysError/deleteSysErrorByIds',

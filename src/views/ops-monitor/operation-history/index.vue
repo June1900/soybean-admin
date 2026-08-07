@@ -19,7 +19,7 @@ import OperationHistorySearch from './modules/operation-history-search.vue';
 type OperationHistoryListApiResponse = Awaited<ReturnType<typeof fetchOperationRecordList>>;
 
 import TableActionButtons from '@/components/common/table-action-buttons';
-import { statusTagType } from '@/views/ops-monitor/operation-history/share';
+import { statusTagType } from './shared';
 
 defineOptions({
   name: 'OpsMonitorOperationHistory'

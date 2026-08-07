@@ -28,9 +28,9 @@ defineOptions({
 const show = defineModel<boolean>('show', { required: true });
 
 const props = defineProps<{
-  /** 当前定时任务 ID */
+  // 当前定时任务 ID
   taskId: number;
-  /** 当前定时任务名称（仅用于标题展示） */
+  // 当前定时任务名称
   taskName: string;
 }>();
 

@@ -10,9 +10,7 @@ import {
   deleteSysError,
   deleteSysErrorByIds,
   type SysError,
-  type SysErrorLevel,
   type SysErrorListQuery,
-  type SysErrorStatus,
   type SysErrorSearchParams
 } from './api';
 import SysErrorViewDrawer from './modules/sys-error-view-drawer.vue';
@@ -22,6 +20,7 @@ type SysErrorListApiResponse = Awaited<ReturnType<typeof fetchSysErrorList>>;
 
 import TableActionButtons from '@/components/common/table-action-buttons';
 import { formatDateTime } from '@/utils/date';
+import { levelTagType, statusTagType } from './shared';
 
 defineOptions({
   name: 'OpsMonitorSysError'
@@ -73,7 +72,6 @@ const scrollX = computed(() =>
   }, 0)
 );
 
-/* ---------- operate ---------- */
 const { checkedRowKeys, onDeleted, onBatchDeleted } = useTableOperate<SysError>(data, 'ID', getData);
 
 const viewVisible = ref(false);
@@ -98,18 +96,6 @@ async function handleBatchDelete() {
   const { error } = await deleteSysErrorByIds(ids);
   if (!error) await onBatchDeleted();
 }
-
-const levelTagType: Record<SysErrorLevel, 'error' | 'warning'> = {
-  fatal: 'error',
-  error: 'warning'
-};
-
-const statusTagType: Record<SysErrorStatus, 'warning' | 'info' | 'success' | 'error'> = {
-  未处理: 'info',
-  处理中: 'warning',
-  处理完成: 'success',
-  处理失败: 'error'
-};
 
 function createAllColumns(): NaiveUI.TableColumn<SysError>[] {
   return [

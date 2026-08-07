@@ -9,7 +9,10 @@ export type {
   OperationRecordSearchParams
 } from './types';
 
-/** 分页获取操作历史列表 */
+/**
+ * 分页获取操作历史列表
+ * @param params
+ */
 export function fetchOperationRecordList(params: OperationRecordListQuery) {
   return request<OperationRecordListResponse>({
     url: '/sysOperationRecord/getSysOperationRecordList',
@@ -18,7 +21,10 @@ export function fetchOperationRecordList(params: OperationRecordListQuery) {
   });
 }
 
-/** 删除单条操作记录 */
+/**
+ * 删除单条操作记录
+ * @param id
+ */
 export function deleteOperationRecord(id: number) {
   return request<void>({
     url: '/sysOperationRecord/deleteSysOperationRecord',
@@ -27,7 +33,10 @@ export function deleteOperationRecord(id: number) {
   });
 }
 
-/** 批量删除操作记录 */
+/**
+ * 批量删除操作记录
+ * @param ids
+ */
 export function deleteOperationRecordByIds(ids: number[]) {
   return request<void>({
     url: '/sysOperationRecord/deleteSysOperationRecordByIds',
