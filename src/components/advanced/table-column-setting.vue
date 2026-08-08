@@ -117,5 +117,3 @@ function toggleSelectAll(checked: boolean) {
     </div>
   </NPopover>
 </template>
-
-<style scoped></style>

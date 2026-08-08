@@ -39,5 +39,3 @@ const icon = computed(() => iconMap[props.type]);
     <NButton type="primary" @click="routerPushByKey('root')">{{ $t('common.backToHome') }}</NButton>
   </div>
 </template>
-
-<style scoped></style>

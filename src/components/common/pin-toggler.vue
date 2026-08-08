@@ -22,5 +22,3 @@ const icon = computed(() => (props.pin ? 'mdi-pin-off' : 'mdi-pin'));
     <SvgIcon :icon="icon" />
   </ButtonIcon>
 </template>
-
-<style scoped></style>

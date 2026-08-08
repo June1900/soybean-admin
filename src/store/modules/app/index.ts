@@ -46,7 +46,7 @@ export const useAppStore = defineStore(SetupStoreId.App, () => {
     });
 
     setReloadFlag(true);
-    routeStore.resetRouteCache();
+    await routeStore.resetRouteCache();
   }
 
   const locale = ref<App.I18n.LangType>(localStg.get('lang') || 'zh-CN');
@@ -106,7 +106,7 @@ export const useAppStore = defineStore(SetupStoreId.App, () => {
               setSiderCollapse(backup.siderCollapse);
 
               localStg.remove('backupThemeSettingBeforeIsMobile');
-            });
+            }).then(() => {});
           }
         }
       },

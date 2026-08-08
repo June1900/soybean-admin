@@ -52,5 +52,3 @@ const tooltipContent = computed(() => {
     @click="handleSwitch"
   />
 </template>
-
-<style scoped></style>

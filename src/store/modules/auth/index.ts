@@ -108,7 +108,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
     }
 
     tabStore.cacheTabs();
-    routeStore.resetStore();
+    await routeStore.resetStore();
   }
 
   async function logout() {
@@ -190,7 +190,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
         });
       }
     } else {
-      resetStore();
+      await resetStore();
     }
 
     endLoading();
@@ -298,7 +298,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
       const pass = await getUserInfo();
 
       if (!pass) {
-        resetStore();
+        await resetStore();
       }
     }
   }

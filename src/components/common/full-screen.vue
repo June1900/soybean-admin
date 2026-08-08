@@ -18,5 +18,3 @@ defineProps<Props>();
     <icon-ri-fullscreen-line v-else />
   </ButtonIcon>
 </template>
-
-<style scoped></style>

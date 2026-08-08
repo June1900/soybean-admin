@@ -11,5 +11,3 @@ defineOptions({
     <ThemePreset />
   </div>
 </template>
-
-<style scoped></style>

@@ -57,5 +57,3 @@ function changeLang(lang: App.I18n.LangType) {
     </div>
   </NDropdown>
 </template>
-
-<style scoped></style>

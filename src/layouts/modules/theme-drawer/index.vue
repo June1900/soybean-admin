@@ -34,7 +34,7 @@ const drawerWidth = computed(() => {
         <NTab name="appearance" :tab="$t('theme.tabs.appearance')"></NTab>
         <NTab name="layout" :tab="$t('theme.tabs.layout')"></NTab>
         <NTab name="general" :tab="$t('theme.tabs.general')"></NTab>
-        <NTab name="preset" :tab="$t('theme.tabs.preset')"></NTab>
+        <!-- <NTab name="preset" :tab="$t('theme.tabs.preset')"></NTab>-->
       </NTabs>
 
       <div class="min-h-400px">

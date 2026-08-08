@@ -49,5 +49,3 @@ const icon = computed(() => {
     <SvgIcon :icon="icon" />
   </ButtonIcon>
 </template>
-
-<style scoped></style>

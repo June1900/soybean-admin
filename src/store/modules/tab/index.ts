@@ -114,7 +114,7 @@ export const useTabStore = defineStore(SetupStoreId.Tab, () => {
     }
 
     // reset route cache
-    routeStore.resetRouteCache(removedTabRouteKey);
+    await routeStore.resetRouteCache(removedTabRouteKey);
   }
 
   /** remove active tab */
@@ -180,7 +180,7 @@ export const useTabStore = defineStore(SetupStoreId.Tab, () => {
 
     // After tabs are updated and route potentially switched, reset cache for removed tabs
     for (const routeKey of routeKeysToReset) {
-      routeStore.resetRouteCache(routeKey);
+      await routeStore.resetRouteCache(routeKey);
     }
   }
 
@@ -237,7 +237,7 @@ export const useTabStore = defineStore(SetupStoreId.Tab, () => {
   async function clearRightTabs(tabId: string) {
     const isHomeTab = tabId === homeTab.value?.id;
     if (isHomeTab) {
-      clearTabs();
+      await clearTabs();
       return;
     }
 

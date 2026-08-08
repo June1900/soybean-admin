@@ -35,5 +35,3 @@ const ContextHolder = defineComponent({
     </NDialogProvider>
   </NLoadingBarProvider>
 </template>
-
-<style scoped></style>

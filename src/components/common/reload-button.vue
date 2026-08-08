@@ -17,5 +17,3 @@ defineProps<Props>();
     <icon-ri-restart-line :class="{ 'animate-spin animate-duration-750': loading }" />
   </ButtonIcon>
 </template>
-
-<style scoped></style>

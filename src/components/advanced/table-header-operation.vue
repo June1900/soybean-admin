@@ -71,5 +71,3 @@ function refresh() {
     <slot name="suffix"></slot>
   </NSpace>
 </template>
-
-<style scoped></style>

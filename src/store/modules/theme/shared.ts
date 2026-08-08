@@ -15,7 +15,7 @@ export function initThemeSettings() {
   if (!isProd) return themeSettings;
 
   // if it is production mode, the theme settings will be cached in localStorage
-  // if want to update theme settings when publish new version, please update `overrideThemeSettings` in `src/theme/settings.ts`
+  // if you want to update theme settings when publish new version, please update `overrideThemeSettings` in `src/theme/settings.ts`
 
   const localSettings = localStg.get('themeSettings');
 

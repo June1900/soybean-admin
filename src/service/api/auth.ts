@@ -20,9 +20,6 @@ export function fetchLogin(userName: string, password: string) {
 
 /**
  * Get user info
- *
- * 后端返回结构为 `{ code, data: { userInfo: {...} }, msg }`，
- * request 的 transform 会取出 `data`，因此这里的数据类型为 `{ userInfo: GvaUserInfo }`。
  */
 export function fetchGetUserInfo() {
   return request<{ userInfo: Omit<Api.Auth.UserInfo, 'userId' | 'roles' | 'buttons'> }>({
